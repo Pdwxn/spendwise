@@ -224,6 +224,16 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
         accounts: mergeUpdate(state.accounts, action.payload.id, action.payload.input),
       };
     case "remove-account":
+      if (
+        state.transactions.some(
+          (transaction) =>
+            transaction.accountId === action.payload.id &&
+            transaction.date.startsWith(state.selectedMonth),
+        )
+      ) {
+        return state;
+      }
+
       return {
         ...state,
         accounts: state.accounts.filter((account) => account.id !== action.payload.id),
@@ -246,6 +256,19 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
         categories: mergeUpdate(state.categories, action.payload.id, action.payload.input),
       };
     case "remove-category":
+      if (
+        state.transactions.some(
+          (transaction) =>
+            transaction.categoryId === action.payload.id &&
+            transaction.date.startsWith(state.selectedMonth),
+        ) ||
+        state.budgets.some(
+          (budget) => budget.categoryId === action.payload.id && budget.month === state.selectedMonth,
+        )
+      ) {
+        return state;
+      }
+
       return {
         ...state,
         categories: state.categories.filter((category) => category.id !== action.payload.id),

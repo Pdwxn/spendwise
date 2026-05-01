@@ -31,13 +31,37 @@ function pad(value: number) {
 }
 
 export function getMonthKeyFromDate(value: string | Date): MonthKey {
+  if (typeof value === "string") {
+    if (/^\d{4}-\d{2}$/.test(value)) {
+      return value as MonthKey;
+    }
+
+    const monthMatch = value.match(/^(\d{4}-\d{2})-/);
+    if (monthMatch) {
+      return monthMatch[1] as MonthKey;
+    }
+  }
+
   const date = value instanceof Date ? value : new Date(value);
 
   if (Number.isNaN(date.getTime())) {
     return "1970-01";
   }
 
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}` as MonthKey;
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}` as MonthKey;
+}
+
+export function getElapsedMonthsBetweenDates(start: string | Date, end: string | Date = new Date()) {
+  const startDate = start instanceof Date ? start : new Date(start);
+  const endDate = end instanceof Date ? end : new Date(end);
+
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    return 0;
+  }
+
+  const yearsDiff = endDate.getUTCFullYear() - startDate.getUTCFullYear();
+  const monthsDiff = endDate.getUTCMonth() - startDate.getUTCMonth();
+  return Math.max(0, yearsDiff * 12 + monthsDiff);
 }
 
 function isSameMonth(value: string | Date, month: MonthKey) {
