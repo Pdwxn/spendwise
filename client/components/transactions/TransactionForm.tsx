@@ -75,14 +75,14 @@ export function TransactionForm() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">New transaction</h2>
-        <p className="text-sm text-slate-500">Record an income or expense movement.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Nuevo movimiento</h2>
+        <p className="text-sm text-slate-500">Registra un ingreso o un gasto.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
         <Select value={type} onChange={(event) => setType(event.target.value as "income" | "expense")}> 
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
+          <option value="expense">Gasto</option>
+          <option value="income">Ingreso</option>
         </Select>
         <Input
           type="number"
@@ -90,11 +90,11 @@ export function TransactionForm() {
           min="0.01"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
-          placeholder="Amount"
-          aria-label="Amount"
+          placeholder="Importe"
+          aria-label="Importe"
         />
         <Select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
-          <option value="">Select account</option>
+          <option value="">Selecciona una cuenta</option>
           {accounts.map((account) => (
             <option key={account.id} value={account.id}>
               {account.name}
@@ -102,7 +102,7 @@ export function TransactionForm() {
           ))}
         </Select>
         <Select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-          <option value="">Select category</option>
+          <option value="">Selecciona una categoría</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.emoji} {category.name}
@@ -112,21 +112,21 @@ export function TransactionForm() {
         <Input
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="Description"
-          aria-label="Description"
+          placeholder="Descripción"
+          aria-label="Descripción"
         />
         <Input
           type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
-          aria-label="Transaction date"
+          aria-label="Fecha del movimiento"
         />
         <Button
           type="submit"
           className="w-full"
           disabled={accounts.length === 0 || categories.length === 0}
         >
-          Add transaction
+          Añadir movimiento
         </Button>
       </form>
     </Card>

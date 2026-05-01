@@ -61,13 +61,13 @@ export function BudgetForm() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">New budget</h2>
-        <p className="text-sm text-slate-500">Assign a monthly amount to a category.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Nuevo presupuesto</h2>
+        <p className="text-sm text-slate-500">Asigna un importe mensual a una categoría.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
         <Select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-          <option value="">Select category</option>
+          <option value="">Selecciona una categoría</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.emoji} {category.name}
@@ -78,7 +78,7 @@ export function BudgetForm() {
           type="month"
           value={month}
           onChange={(event) => setMonth(event.target.value as MonthKey)}
-          aria-label="Budget month"
+          aria-label="Mes del presupuesto"
         />
         <Input
           type="number"
@@ -86,11 +86,11 @@ export function BudgetForm() {
           min="0.01"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
-          placeholder="Amount"
-          aria-label="Budget amount"
+          placeholder="Importe"
+          aria-label="Importe del presupuesto"
         />
         <Button type="submit" className="w-full" disabled={categories.length === 0}>
-          Add budget
+          Añadir presupuesto
         </Button>
       </form>
     </Card>

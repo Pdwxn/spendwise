@@ -16,12 +16,12 @@ export function SavingList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Savings</h2>
-        <p className="text-sm text-slate-500">Saved items with their estimated current value.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Ahorros</h2>
+        <p className="text-sm text-slate-500">Elementos guardados con su valor estimado actual.</p>
       </div>
 
       {savings.length === 0 ? (
-        <EmptyState title="No savings yet" description="Create a static or projected saving to track growth." />
+        <EmptyState title="Aún no hay ahorros" description="Crea un ahorro fijo o proyectado para seguir su evolución." />
       ) : (
         <div className="space-y-3">
           {savings.map((saving) => {
@@ -33,18 +33,18 @@ export function SavingList() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-slate-950">{saving.name}</p>
-                    <p className="text-xs text-slate-500">Created {formatShortDate(saving.createdAt)}</p>
+                    <p className="text-xs text-slate-500">Creado {formatShortDate(saving.createdAt)}</p>
                   </div>
                   <Button variant="secondary" type="button" onClick={() => actions.removeSaving(saving.id)}>
-                    Delete
+                    Eliminar
                   </Button>
                 </div>
 
                 <div className="mt-4 space-y-1">
-                  <p className="text-sm text-slate-500">Current value</p>
+                  <p className="text-sm text-slate-500">Valor actual</p>
                   <p className="text-xl font-semibold text-slate-950">{formatCurrency(currentValue)}</p>
                   <p className="text-xs text-slate-500">
-                    Mode: {saving.mode === "static" ? "Static" : `Annual ${formatPercentage(saving.annualPercentage ?? 0)}`}
+                    Modo: {saving.mode === "static" ? "Fijo" : `Anual ${formatPercentage(saving.annualPercentage ?? 0)}`}
                   </p>
                 </div>
               </div>

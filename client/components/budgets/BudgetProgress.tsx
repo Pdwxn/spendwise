@@ -24,7 +24,7 @@ export function BudgetProgress({ spentAmount, budgetAmount, percentage, isOverBu
         indicatorClassName={barClassName}
       />
       <p className={`text-xs ${isOverBudget ? "text-rose-600" : "text-slate-500"}`}>
-        {Math.round(percentage)}% used
+        {Math.round(percentage)}% usado
       </p>
     </div>
   );

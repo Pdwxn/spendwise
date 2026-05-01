@@ -20,13 +20,13 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
   const categoryTransactions = filterTransactions(transactions, { categoryId }).sort((left, right) => right.date.localeCompare(left.date));
 
   if (!category) {
-    return (
-      <EmptyState
-        title="Category not found"
-        description="The requested category does not exist or was removed."
-        action={<Link href="/categories" className="text-sm font-medium text-slate-950 underline">Back to categories</Link>}
-      />
-    );
+      return (
+        <EmptyState
+        title="Categoría no encontrada"
+        description="La categoría solicitada no existe o fue eliminada."
+        action={<Link href="/categories" className="text-sm font-medium text-slate-950 underline">Volver a categorías</Link>}
+        />
+      );
   }
 
   return (
@@ -35,13 +35,13 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
         <div>
           <p className="text-3xl">{category.emoji}</p>
           <h2 className="mt-2 text-lg font-semibold text-slate-950">{category.name}</h2>
-          <p className="text-sm text-slate-500">Transactions linked to this category.</p>
+          <p className="text-sm text-slate-500">Movimientos vinculados a esta categoría.</p>
         </div>
         <div className="h-5 w-5 rounded-full" style={{ backgroundColor: category.color }} />
       </div>
 
       {categoryTransactions.length === 0 ? (
-        <EmptyState title="No transactions" description="There are no transactions assigned to this category yet." />
+        <EmptyState title="Sin movimientos" description="Todavía no hay movimientos asignados a esta categoría." />
       ) : (
         <div className="space-y-3">
           {categoryTransactions.map((transaction) => (

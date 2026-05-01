@@ -40,32 +40,32 @@ export function CategoryForm() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">New category</h2>
-        <p className="text-sm text-slate-500">Create a category with name, emoji, and color.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Nueva categoría</h2>
+        <p className="text-sm text-slate-500">Crea una categoría con nombre, emoji y color.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
         <Input
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Category name"
-          aria-label="Category name"
+          placeholder="Nombre de la categoría"
+          aria-label="Nombre de la categoría"
         />
         <Input
           value={emoji}
           onChange={(event) => setEmoji(event.target.value)}
           placeholder="Emoji"
-          aria-label="Category emoji"
+          aria-label="Emoji de la categoría"
         />
         <Input
           type="color"
           value={color}
           onChange={(event) => setColor(event.target.value as HexColor)}
-          aria-label="Category color"
+          aria-label="Color de la categoría"
           className="h-12 p-1"
         />
         <Button type="submit" className="w-full">
-          Add category
+          Añadir categoría
         </Button>
       </form>
     </Card>

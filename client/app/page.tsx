@@ -49,7 +49,7 @@ export default function Home() {
     <div className="space-y-6">
       <PageHeader
         title="SpendWise"
-        description={`Current view: ${formatMonthLabel(selectedMonth)}${selectedCategoryId ? " · filtered by category" : ""}`}
+        description={`Vista actual: ${formatMonthLabel(selectedMonth)}${selectedCategoryId ? " · filtrado por categoría" : ""}`}
       />
 
       <SummaryCards
@@ -72,14 +72,14 @@ export default function Home() {
         />
         <Card className="space-y-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-950">Budget overview</h2>
-            <p className="text-sm text-slate-500">Monthly progress by category.</p>
+            <h2 className="text-lg font-semibold text-slate-950">Resumen de presupuestos</h2>
+            <p className="text-sm text-slate-500">Progreso mensual por categoría.</p>
           </div>
 
           {budgetProgressItems.length === 0 ? (
             <EmptyState
-              title="No budgets yet"
-              description="Create monthly budgets in the next ticket to see progress here."
+              title="Aún no hay presupuestos"
+              description="Crea presupuestos mensuales para ver el progreso aquí."
             />
           ) : (
             <div className="space-y-4">
@@ -88,7 +88,7 @@ export default function Home() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium text-slate-950">
-                        {category?.emoji ?? "#"} {category?.name ?? "Unknown"}
+                        {category?.emoji ?? "#"} {category?.name ?? "Desconocido"}
                       </p>
                     </div>
                   </div>

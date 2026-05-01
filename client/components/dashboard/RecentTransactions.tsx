@@ -18,14 +18,14 @@ export function RecentTransactions({
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Recent transactions</h2>
-        <p className="text-sm text-slate-500">Latest activity in the selected view.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Movimientos recientes</h2>
+        <p className="text-sm text-slate-500">Actividad más reciente en la vista seleccionada.</p>
       </div>
 
       {transactions.length === 0 ? (
         <EmptyState
-          title="No transactions yet"
-          description="Add your first income or expense to populate this list."
+          title="Aún no hay movimientos"
+          description="Añade tu primer ingreso o gasto para llenar esta lista."
         />
       ) : (
         <ul className="space-y-3">
@@ -45,7 +45,7 @@ export function RecentTransactions({
                     {transaction.type === "expense" ? "-" : "+"}
                     {formatCurrency(transaction.amount)}
                   </p>
-                  <p className="text-xs text-slate-500">{category?.name ?? "Unknown"}</p>
+                  <p className="text-xs text-slate-500">{category?.name ?? "Desconocida"}</p>
                 </div>
               </li>
             );

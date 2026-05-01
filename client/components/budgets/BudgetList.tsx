@@ -19,12 +19,12 @@ export function BudgetList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Monthly budgets</h2>
-        <p className="text-sm text-slate-500">Progress for {formatMonthLabel(selectedMonth)}.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Presupuestos mensuales</h2>
+        <p className="text-sm text-slate-500">Progreso de {formatMonthLabel(selectedMonth)}.</p>
       </div>
 
       {currentBudgets.length === 0 ? (
-        <EmptyState title="No budgets yet" description="Create one budget to start tracking category spend." />
+        <EmptyState title="Aún no hay presupuestos" description="Crea un presupuesto para empezar a seguir el gasto por categoría." />
       ) : (
         <div className="space-y-3">
           {currentBudgets.map((budget) => {
@@ -36,12 +36,12 @@ export function BudgetList() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-slate-950">
-                      {category?.emoji ?? "#"} {category?.name ?? "Unknown"}
+                      {category?.emoji ?? "#"} {category?.name ?? "Desconocida"}
                     </p>
-                    <p className="text-xs text-slate-500">Budget {formatCurrency(budget.amount)}</p>
+                    <p className="text-xs text-slate-500">Presupuesto {formatCurrency(budget.amount)}</p>
                   </div>
                   <Button variant="secondary" type="button" onClick={() => actions.removeBudget(budget.id)}>
-                    Delete
+                    Eliminar
                   </Button>
                 </div>
 
@@ -52,9 +52,9 @@ export function BudgetList() {
                     percentage={progress.percentage}
                     isOverBudget={progress.isOverBudget}
                   />
-                  <p className="mt-2 text-xs text-slate-500">
-                    Remaining {formatCurrency(progress.remainingAmount)}
-                  </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Restante {formatCurrency(progress.remainingAmount)}
+                    </p>
                 </div>
               </div>
             );

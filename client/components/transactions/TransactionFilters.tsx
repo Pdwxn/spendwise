@@ -36,8 +36,8 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
     <Card className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950">Filters</h2>
-          <p className="text-sm text-slate-500">Filter the list by month and category.</p>
+          <h2 className="text-lg font-semibold text-slate-950">Filtros</h2>
+          <p className="text-sm text-slate-500">Filtra la lista por mes y categoría.</p>
         </div>
         <Button
           variant="ghost"
@@ -47,7 +47,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
             actions.setSelectedCategoryId(null);
           }}
         >
-          Reset
+          Restablecer
         </Button>
       </div>
 
@@ -64,7 +64,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
           value={selectedCategoryId ?? "all"}
           onChange={(event) => actions.setSelectedCategoryId(event.target.value === "all" ? null : (event.target.value as ID))}
         >
-          <option value="all">All categories</option>
+          <option value="all">Todas las categorías</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.emoji} {category.name}

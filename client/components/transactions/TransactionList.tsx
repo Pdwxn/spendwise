@@ -20,12 +20,12 @@ export function TransactionList({ transactions }: TransactionListProps) {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Transactions</h2>
-        <p className="text-sm text-slate-500">Filtered movements for the selected month and category.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Movimientos</h2>
+        <p className="text-sm text-slate-500">Movimientos filtrados por mes y categoría.</p>
       </div>
 
       {transactions.length === 0 ? (
-        <EmptyState title="No transactions found" description="Try adjusting the filters or create a new transaction." />
+        <EmptyState title="No se encontraron movimientos" description="Prueba a ajustar los filtros o crea un movimiento nuevo." />
       ) : (
         <div className="space-y-3">
           {transactions.map((transaction) => {
@@ -37,9 +37,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
                   <p className="truncate text-sm font-medium text-slate-950">
                     {category?.emoji ?? "#"} {transaction.description}
                   </p>
-                  <p className="text-xs text-slate-500">
-                    {formatShortDate(transaction.date)} · {category?.name ?? "Unknown"}
-                  </p>
+                  <p className="text-xs text-slate-500">{formatShortDate(transaction.date)} · {category?.name ?? "Desconocida"}</p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-600" : "text-emerald-600"}`}>
@@ -47,7 +45,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
                     {formatCurrency(transaction.amount)}
                   </p>
                   <Button variant="secondary" type="button" onClick={() => actions.removeTransaction(transaction.id)}>
-                    Delete
+                    Eliminar
                   </Button>
                 </div>
               </div>

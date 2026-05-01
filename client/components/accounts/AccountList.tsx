@@ -16,7 +16,7 @@ export function AccountList() {
 
   function handleRemoveAccount(accountId: string) {
     if (!canRemoveAccount({ transactions }, accountId)) {
-      toast.info("No puedes eliminar una cuenta con transacciones asociadas.");
+      toast.info("No puedes eliminar una cuenta con movimientos asociados.");
       return;
     }
 
@@ -26,12 +26,12 @@ export function AccountList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Accounts</h2>
-        <p className="text-sm text-slate-500">Current balances and account metadata.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Cuentas</h2>
+        <p className="text-sm text-slate-500">Saldos actuales y datos de cada cuenta.</p>
       </div>
 
       {accounts.length === 0 ? (
-        <EmptyState title="No accounts yet" description="Create one account to start tracking transactions." />
+        <EmptyState title="Aún no hay cuentas" description="Crea una cuenta para empezar a registrar movimientos." />
       ) : (
         <div className="space-y-3">
           {accounts.map((account) => {
@@ -44,14 +44,14 @@ export function AccountList() {
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: account.color }} />
                     <p className="truncate text-sm font-medium text-slate-950">{account.name}</p>
                   </div>
-                  <p className="text-xs text-slate-500">Created {formatShortDate(account.createdAt)}</p>
+                  <p className="text-xs text-slate-500">Creada {formatShortDate(account.createdAt)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-slate-950">{formatCurrency(balance)}</p>
-                  <p className="text-xs text-slate-500">Initial {formatCurrency(account.initialBalance)}</p>
+                  <p className="text-xs text-slate-500">Inicial {formatCurrency(account.initialBalance)}</p>
                 </div>
                 <Button variant="secondary" type="button" onClick={() => handleRemoveAccount(account.id)}>
-                  Delete
+                  Eliminar
                 </Button>
               </div>
             );

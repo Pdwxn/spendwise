@@ -40,28 +40,28 @@ export function SavingForm() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">New saving</h2>
-        <p className="text-sm text-slate-500">Create a static saving or an annual projection.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Nuevo ahorro</h2>
+        <p className="text-sm text-slate-500">Crea un ahorro fijo o una proyección anual.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
         <Input
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Saving name"
-          aria-label="Saving name"
+          placeholder="Nombre del ahorro"
+          aria-label="Nombre del ahorro"
         />
         <Input
           type="number"
           step="0.01"
           value={initialAmount}
           onChange={(event) => setInitialAmount(event.target.value)}
-          placeholder="Initial amount"
-          aria-label="Initial amount"
+          placeholder="Importe inicial"
+          aria-label="Importe inicial"
         />
         <Select value={mode} onChange={(event) => setMode(event.target.value as SavingMode)}>
-          <option value="static">Static</option>
-          <option value="annualPercentage">Annual percentage</option>
+          <option value="static">Fijo</option>
+          <option value="annualPercentage">Porcentaje anual</option>
         </Select>
         {mode === "annualPercentage" ? (
           <Input
@@ -69,12 +69,12 @@ export function SavingForm() {
             step="0.01"
             value={annualPercentage}
             onChange={(event) => setAnnualPercentage(event.target.value)}
-            placeholder="Annual percentage"
-            aria-label="Annual percentage"
+            placeholder="Porcentaje anual"
+            aria-label="Porcentaje anual"
           />
         ) : null}
         <Button type="submit" className="w-full">
-          Add saving
+          Añadir ahorro
         </Button>
       </form>
     </Card>

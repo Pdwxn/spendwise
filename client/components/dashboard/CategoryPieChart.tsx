@@ -13,12 +13,12 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Category mix</h2>
-        <p className="text-sm text-slate-500">Proportion of category spending.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Distribución por categoría</h2>
+        <p className="text-sm text-slate-500">Proporción del gasto por categoría.</p>
       </div>
 
       {data.length === 0 ? (
-        <EmptyState title="No chart data" description="This view will activate when expenses exist." />
+        <EmptyState title="Sin datos" description="Esta vista se activará cuando existan gastos." />
       ) : (
         <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">

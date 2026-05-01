@@ -17,7 +17,7 @@ export function CategoryList() {
 
   function handleRemoveCategory(categoryId: string) {
     if (!canRemoveCategory({ transactions, budgets }, categoryId)) {
-      toast.info("No puedes eliminar una categoría con transacciones o presupuestos asociados.");
+      toast.info("No puedes eliminar una categoría con movimientos o presupuestos asociados.");
       return;
     }
 
@@ -27,12 +27,12 @@ export function CategoryList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Categories</h2>
-        <p className="text-sm text-slate-500">All available categories in the system.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Categorías</h2>
+        <p className="text-sm text-slate-500">Todas las categorías disponibles en el sistema.</p>
       </div>
 
       {categories.length === 0 ? (
-        <EmptyState title="No categories yet" description="Create your first category to start tracking spending." />
+        <EmptyState title="Aún no hay categorías" description="Crea tu primera categoría para empezar a controlar gastos." />
       ) : (
         <div className="space-y-3">
           {categories.map((category) => (
@@ -42,11 +42,11 @@ export function CategoryList() {
                   <span className="text-lg">{category.emoji}</span>
                   <p className="truncate text-sm font-medium text-slate-950">{category.name}</p>
                 </div>
-                <p className="text-xs text-slate-500">Created {formatShortDate(category.createdAt)}</p>
+                <p className="text-xs text-slate-500">Creada {formatShortDate(category.createdAt)}</p>
               </Link>
               <div className="h-4 w-4 rounded-full" style={{ backgroundColor: category.color }} />
               <Button variant="secondary" type="button" onClick={() => handleRemoveCategory(category.id)}>
-                Delete
+                Eliminar
               </Button>
             </div>
           ))}

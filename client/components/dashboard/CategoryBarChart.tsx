@@ -27,14 +27,14 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Spending by category</h2>
-        <p className="text-sm text-slate-500">Bar chart with category emoji and color.</p>
+        <h2 className="text-lg font-semibold text-slate-950">Gastos por categoría</h2>
+        <p className="text-sm text-slate-500">Gráfico de barras con emoji y color por categoría.</p>
       </div>
 
       {data.length === 0 ? (
         <EmptyState
-          title="No category data"
-          description="Add expense transactions to see the category chart."
+          title="Sin datos por categoría"
+          description="Añade gastos para ver el gráfico por categoría."
         />
       ) : (
         <div className="h-72 w-full">
