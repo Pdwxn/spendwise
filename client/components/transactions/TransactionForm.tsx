@@ -75,8 +75,8 @@ export function TransactionForm() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Nuevo movimiento</h2>
-        <p className="text-sm text-slate-500">Registra un ingreso o un gasto.</p>
+        <h2 className="text-lg font-semibold text-cyan-50">Nuevo movimiento</h2>
+        <p className="text-sm text-cyan-100/65">Registra un ingreso o un gasto.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>

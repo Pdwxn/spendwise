@@ -27,8 +27,8 @@ export function CategoryList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Categorías</h2>
-        <p className="text-sm text-slate-500">Todas las categorías disponibles en el sistema.</p>
+        <h2 className="text-lg font-semibold text-cyan-50">Categorías</h2>
+        <p className="text-sm text-cyan-100/65">Todas las categorías disponibles en el sistema.</p>
       </div>
 
       {categories.length === 0 ? (
@@ -40,9 +40,9 @@ export function CategoryList() {
               <Link href={`/categories/${category.id}`} className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{category.emoji}</span>
-                  <p className="truncate text-sm font-medium text-slate-950">{category.name}</p>
+                <p className="truncate text-sm font-medium text-cyan-50">{category.name}</p>
                 </div>
-                <p className="text-xs text-slate-500">Creada {formatShortDate(category.createdAt)}</p>
+                <p className="text-xs text-cyan-100/65">Creada {formatShortDate(category.createdAt)}</p>
               </Link>
               <div className="h-4 w-4 rounded-full" style={{ backgroundColor: category.color }} />
               <Button variant="secondary" type="button" onClick={() => handleRemoveCategory(category.id)}>

@@ -20,8 +20,8 @@ export function TransactionList({ transactions }: TransactionListProps) {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Movimientos</h2>
-        <p className="text-sm text-slate-500">Movimientos filtrados por mes y categoría.</p>
+        <h2 className="text-lg font-semibold text-cyan-50">Movimientos</h2>
+        <p className="text-sm text-cyan-100/65">Movimientos filtrados por mes y categoría.</p>
       </div>
 
       {transactions.length === 0 ? (
@@ -34,10 +34,10 @@ export function TransactionList({ transactions }: TransactionListProps) {
             return (
               <div key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-4">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-950">
+                  <p className="truncate text-sm font-medium text-cyan-50">
                     {category?.emoji ?? "#"} {transaction.description}
                   </p>
-                  <p className="text-xs text-slate-500">{formatShortDate(transaction.date)} · {category?.name ?? "Desconocida"}</p>
+                  <p className="text-xs text-cyan-100/65">{formatShortDate(transaction.date)} · {category?.name ?? "Desconocida"}</p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-600" : "text-emerald-600"}`}>

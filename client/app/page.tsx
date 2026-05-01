@@ -72,8 +72,8 @@ export default function Home() {
         />
         <Card className="space-y-4">
           <div>
-            <h2 className="text-lg font-semibold text-slate-950">Resumen de presupuestos</h2>
-            <p className="text-sm text-slate-500">Progreso mensual por categoría.</p>
+            <h2 className="text-lg font-semibold text-cyan-50">Resumen de presupuestos</h2>
+            <p className="text-sm text-cyan-100/65">Progreso mensual por categoría.</p>
           </div>
 
           {budgetProgressItems.length === 0 ? (
@@ -87,7 +87,7 @@ export default function Home() {
                 <div key={budget.id} className="rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-medium text-slate-950">
+                      <p className="text-sm font-medium text-cyan-50">
                         {category?.emoji ?? "#"} {category?.name ?? "Desconocido"}
                       </p>
                     </div>

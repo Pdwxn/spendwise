@@ -23,7 +23,7 @@ export function BudgetProgress({ spentAmount, budgetAmount, percentage, isOverBu
         label={`${formatCurrency(spentAmount)} / ${formatCurrency(budgetAmount)}`}
         indicatorClassName={barClassName}
       />
-      <p className={`text-xs ${isOverBudget ? "text-rose-600" : "text-slate-500"}`}>
+      <p className={`text-xs ${isOverBudget ? "text-rose-300" : "text-cyan-100/65"}`}>
         {Math.round(percentage)}% usado
       </p>
     </div>

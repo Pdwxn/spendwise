@@ -16,8 +16,8 @@ export function SavingList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Ahorros</h2>
-        <p className="text-sm text-slate-500">Elementos guardados con su valor estimado actual.</p>
+        <h2 className="text-lg font-semibold text-cyan-50">Ahorros</h2>
+        <p className="text-sm text-cyan-100/65">Elementos guardados con su valor estimado actual.</p>
       </div>
 
       {savings.length === 0 ? (
@@ -32,8 +32,8 @@ export function SavingList() {
               <div key={saving.id} className="rounded-2xl border border-slate-200 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-slate-950">{saving.name}</p>
-                    <p className="text-xs text-slate-500">Creado {formatShortDate(saving.createdAt)}</p>
+                    <p className="text-sm font-medium text-cyan-50">{saving.name}</p>
+                    <p className="text-xs text-cyan-100/65">Creado {formatShortDate(saving.createdAt)}</p>
                   </div>
                   <Button variant="secondary" type="button" onClick={() => actions.removeSaving(saving.id)}>
                     Eliminar
@@ -41,9 +41,9 @@ export function SavingList() {
                 </div>
 
                 <div className="mt-4 space-y-1">
-                  <p className="text-sm text-slate-500">Valor actual</p>
-                  <p className="text-xl font-semibold text-slate-950">{formatCurrency(currentValue)}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-sm text-cyan-100/65">Valor actual</p>
+                  <p className="text-xl font-semibold text-cyan-50">{formatCurrency(currentValue)}</p>
+                  <p className="text-xs text-cyan-100/65">
                     Modo: {saving.mode === "static" ? "Fijo" : `Anual ${formatPercentage(saving.annualPercentage ?? 0)}`}
                   </p>
                 </div>

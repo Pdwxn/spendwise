@@ -36,8 +36,8 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
     <Card className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950">Filtros</h2>
-          <p className="text-sm text-slate-500">Filtra la lista por mes y categoría.</p>
+          <h2 className="text-lg font-semibold text-cyan-50">Filtros</h2>
+          <p className="text-sm text-cyan-100/65">Filtra la lista por mes y categoría.</p>
         </div>
         <Button
           variant="ghost"

@@ -26,8 +26,8 @@ export function AccountList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-slate-950">Cuentas</h2>
-        <p className="text-sm text-slate-500">Saldos actuales y datos de cada cuenta.</p>
+        <h2 className="text-lg font-semibold text-cyan-50">Cuentas</h2>
+        <p className="text-sm text-cyan-100/65">Saldos actuales y datos de cada cuenta.</p>
       </div>
 
       {accounts.length === 0 ? (
@@ -42,13 +42,13 @@ export function AccountList() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: account.color }} />
-                    <p className="truncate text-sm font-medium text-slate-950">{account.name}</p>
+                    <p className="truncate text-sm font-medium text-cyan-50">{account.name}</p>
                   </div>
-                  <p className="text-xs text-slate-500">Creada {formatShortDate(account.createdAt)}</p>
+                  <p className="text-xs text-cyan-100/65">Creada {formatShortDate(account.createdAt)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-slate-950">{formatCurrency(balance)}</p>
-                  <p className="text-xs text-slate-500">Inicial {formatCurrency(account.initialBalance)}</p>
+                  <p className="text-sm font-semibold text-cyan-50">{formatCurrency(balance)}</p>
+                  <p className="text-xs text-cyan-100/65">Inicial {formatCurrency(account.initialBalance)}</p>
                 </div>
                 <Button variant="secondary" type="button" onClick={() => handleRemoveAccount(account.id)}>
                   Eliminar

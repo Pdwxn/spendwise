@@ -10,16 +10,16 @@ export function SummaryCards({ totalBalance, monthlyIncome, monthlyExpenses }: S
   return (
     <section className="grid gap-4 sm:grid-cols-3">
       <Card>
-        <p className="text-sm text-slate-500">Saldo total</p>
-        <p className="mt-2 text-2xl font-semibold text-slate-950">{totalBalance}</p>
+        <p className="text-sm text-cyan-100/65">Saldo total</p>
+        <p className="mt-2 text-2xl font-semibold text-cyan-50">{totalBalance}</p>
       </Card>
       <Card>
-        <p className="text-sm text-slate-500">Ingresos del mes</p>
-        <p className="mt-2 text-2xl font-semibold text-emerald-600">{monthlyIncome}</p>
+        <p className="text-sm text-cyan-100/65">Ingresos del mes</p>
+        <p className="mt-2 text-2xl font-semibold text-emerald-300">{monthlyIncome}</p>
       </Card>
       <Card>
-        <p className="text-sm text-slate-500">Gastos del mes</p>
-        <p className="mt-2 text-2xl font-semibold text-rose-600">{monthlyExpenses}</p>
+        <p className="text-sm text-cyan-100/65">Gastos del mes</p>
+        <p className="mt-2 text-2xl font-semibold text-rose-300">{monthlyExpenses}</p>
       </Card>
     </section>
   );
