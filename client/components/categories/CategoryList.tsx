@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -9,9 +10,21 @@ import { formatShortDate } from "@/utils/formatters";
 
 export function CategoryList() {
   const {
-    state: { categories },
+    state: { budgets, categories, transactions },
     actions,
   } = useFinance();
+
+  function handleRemoveCategory(categoryId: string) {
+    const hasTransactions = transactions.some((transaction) => transaction.categoryId === categoryId);
+    const hasBudgets = budgets.some((budget) => budget.categoryId === categoryId);
+
+    if (hasTransactions || hasBudgets) {
+      toast.info("No puedes eliminar una categoría con transacciones o presupuestos asociados.");
+      return;
+    }
+
+    actions.removeCategory(categoryId);
+  }
 
   return (
     <Card className="space-y-4">
@@ -34,7 +47,7 @@ export function CategoryList() {
                 <p className="text-xs text-slate-500">Created {formatShortDate(category.createdAt)}</p>
               </Link>
               <div className="h-4 w-4 rounded-full" style={{ backgroundColor: category.color }} />
-              <Button variant="secondary" type="button" onClick={() => actions.removeCategory(category.id)}>
+              <Button variant="secondary" type="button" onClick={() => handleRemoveCategory(category.id)}>
                 Delete
               </Button>
             </div>

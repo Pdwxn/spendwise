@@ -19,7 +19,12 @@ export function BudgetForm() {
   const [amount, setAmount] = useState("0");
 
   useEffect(() => {
-    if (!categoryId && categories.length > 0) {
+    if (categories.length === 0) {
+      setCategoryId("");
+      return;
+    }
+
+    if (!categories.some((category) => category.id === categoryId)) {
       setCategoryId(categories[0].id);
     }
   }, [categoryId, categories]);

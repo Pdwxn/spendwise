@@ -226,9 +226,7 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
     case "remove-account":
       if (
         state.transactions.some(
-          (transaction) =>
-            transaction.accountId === action.payload.id &&
-            transaction.date.startsWith(state.selectedMonth),
+          (transaction) => transaction.accountId === action.payload.id,
         )
       ) {
         return state;
@@ -258,12 +256,10 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
     case "remove-category":
       if (
         state.transactions.some(
-          (transaction) =>
-            transaction.categoryId === action.payload.id &&
-            transaction.date.startsWith(state.selectedMonth),
+          (transaction) => transaction.categoryId === action.payload.id,
         ) ||
         state.budgets.some(
-          (budget) => budget.categoryId === action.payload.id && budget.month === state.selectedMonth,
+          (budget) => budget.categoryId === action.payload.id,
         )
       ) {
         return state;

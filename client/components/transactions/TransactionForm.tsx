@@ -21,13 +21,23 @@ export function TransactionForm() {
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
 
   useEffect(() => {
-    if (!accountId && accounts.length > 0) {
+    if (accounts.length === 0) {
+      setAccountId("");
+      return;
+    }
+
+    if (!accounts.some((account) => account.id === accountId)) {
       setAccountId(accounts[0].id);
     }
   }, [accountId, accounts]);
 
   useEffect(() => {
-    if (!categoryId && categories.length > 0) {
+    if (categories.length === 0) {
+      setCategoryId("");
+      return;
+    }
+
+    if (!categories.some((category) => category.id === categoryId)) {
       setCategoryId(categories[0].id);
     }
   }, [categoryId, categories]);

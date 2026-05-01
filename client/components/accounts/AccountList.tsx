@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -12,6 +13,17 @@ export function AccountList() {
     state: { accounts, transactions },
     actions,
   } = useFinance();
+
+  function handleRemoveAccount(accountId: string) {
+    const hasTransactions = transactions.some((transaction) => transaction.accountId === accountId);
+
+    if (hasTransactions) {
+      toast.info("No puedes eliminar una cuenta con transacciones asociadas.");
+      return;
+    }
+
+    actions.removeAccount(accountId);
+  }
 
   return (
     <Card className="space-y-4">
@@ -40,7 +52,7 @@ export function AccountList() {
                   <p className="text-sm font-semibold text-slate-950">{formatCurrency(balance)}</p>
                   <p className="text-xs text-slate-500">Initial {formatCurrency(account.initialBalance)}</p>
                 </div>
-                <Button variant="secondary" type="button" onClick={() => actions.removeAccount(account.id)}>
+                <Button variant="secondary" type="button" onClick={() => handleRemoveAccount(account.id)}>
                   Delete
                 </Button>
               </div>
