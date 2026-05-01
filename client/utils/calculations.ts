@@ -2,6 +2,7 @@ import type {
   Account,
   Budget,
   Category,
+  FinanceState,
   ID,
   MonthKey,
   Saving,
@@ -204,4 +205,16 @@ export function calculateSavingValue(saving: Saving, elapsedMonths = 0) {
 
 export function getBudgetProgressRatio(progress: BudgetProgress) {
   return Math.min(100, Math.max(0, progress.percentage));
+}
+
+export function canRemoveAccount(state: Pick<FinanceState, "transactions">, accountId: ID) {
+  return !state.transactions.some((transaction) => transaction.accountId === accountId);
+}
+
+export function canRemoveCategory(
+  state: Pick<FinanceState, "transactions" | "budgets">,
+  categoryId: ID,
+) {
+  return !state.transactions.some((transaction) => transaction.categoryId === categoryId)
+    && !state.budgets.some((budget) => budget.categoryId === categoryId);
 }

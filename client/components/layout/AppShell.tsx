@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { ToastContainer } from "react-toastify";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { ToastProvider } from "@/components/ui/ToastProvider";
 
 type AppShellProps = {
   children: ReactNode;
@@ -13,15 +13,7 @@ export function AppShell({ children }: AppShellProps) {
         <main className="flex-1">{children}</main>
       </div>
       <BottomNavigation />
-      <ToastContainer
-        position="bottom-center"
-        autoClose={2500}
-        hideProgressBar
-        closeButton={false}
-        newestOnTop
-        pauseOnFocusLoss={false}
-        toastClassName="mx-4 mb-20 rounded-2xl bg-slate-950 px-4 py-3 text-sm text-white shadow-lg"
-      />
+      <ToastProvider />
     </div>
   );
 }

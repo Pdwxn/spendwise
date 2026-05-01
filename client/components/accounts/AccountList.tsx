@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
-import { getAccountBalance } from "@/utils/calculations";
+import { canRemoveAccount, getAccountBalance } from "@/utils/calculations";
 import { formatCurrency, formatShortDate } from "@/utils/formatters";
 
 export function AccountList() {
@@ -15,9 +15,7 @@ export function AccountList() {
   } = useFinance();
 
   function handleRemoveAccount(accountId: string) {
-    const hasTransactions = transactions.some((transaction) => transaction.accountId === accountId);
-
-    if (hasTransactions) {
+    if (!canRemoveAccount({ transactions }, accountId)) {
       toast.info("No puedes eliminar una cuenta con transacciones asociadas.");
       return;
     }

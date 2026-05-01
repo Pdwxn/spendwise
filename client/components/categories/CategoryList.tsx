@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
+import { canRemoveCategory } from "@/utils/calculations";
 import { formatShortDate } from "@/utils/formatters";
 
 export function CategoryList() {
@@ -15,10 +16,7 @@ export function CategoryList() {
   } = useFinance();
 
   function handleRemoveCategory(categoryId: string) {
-    const hasTransactions = transactions.some((transaction) => transaction.categoryId === categoryId);
-    const hasBudgets = budgets.some((budget) => budget.categoryId === categoryId);
-
-    if (hasTransactions || hasBudgets) {
+    if (!canRemoveCategory({ transactions, budgets }, categoryId)) {
       toast.info("No puedes eliminar una categoría con transacciones o presupuestos asociados.");
       return;
     }

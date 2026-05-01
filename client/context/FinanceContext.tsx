@@ -11,6 +11,7 @@ import {
   STORAGE_KEY,
 } from "@/utils/constants";
 import { readStorageValue, writeStorageValue } from "@/utils/storage";
+import { canRemoveAccount, canRemoveCategory } from "@/utils/calculations";
 import type {
   Account,
   Budget,
@@ -165,7 +166,7 @@ function normalizeState(value: unknown): FinanceState {
     budgets: Array.isArray(value.budgets) ? value.budgets.filter(isBudget) : fallback.budgets,
     savings: Array.isArray(value.savings) ? value.savings.filter(isSaving) : fallback.savings,
     selectedMonth:
-      typeof value.selectedMonth === "string"
+      typeof value.selectedMonth === "string" && /^\d{4}-\d{2}$/.test(value.selectedMonth)
         ? (value.selectedMonth as MonthKey)
         : fallback.selectedMonth,
     selectedCategoryId:
@@ -224,11 +225,7 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
         accounts: mergeUpdate(state.accounts, action.payload.id, action.payload.input),
       };
     case "remove-account":
-      if (
-        state.transactions.some(
-          (transaction) => transaction.accountId === action.payload.id,
-        )
-      ) {
+      if (!canRemoveAccount(state, action.payload.id)) {
         return state;
       }
 
@@ -254,14 +251,7 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
         categories: mergeUpdate(state.categories, action.payload.id, action.payload.input),
       };
     case "remove-category":
-      if (
-        state.transactions.some(
-          (transaction) => transaction.categoryId === action.payload.id,
-        ) ||
-        state.budgets.some(
-          (budget) => budget.categoryId === action.payload.id,
-        )
-      ) {
+      if (!canRemoveCategory(state, action.payload.id)) {
         return state;
       }
 
