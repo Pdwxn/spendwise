@@ -20,8 +20,8 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Transactions"
-        description="Create, filter, and review income and expense movements."
+        title="Movimientos"
+        description="Crea, filtra y revisa ingresos y gastos."
       />
 
       <TransactionFilters categories={categories} />

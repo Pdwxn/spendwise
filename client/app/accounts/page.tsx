@@ -6,8 +6,8 @@ export default function AccountsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Accounts"
-        description="Create and review personal finance accounts."
+        title="Cuentas"
+        description="Crea y revisa tus cuentas de finanzas personales."
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

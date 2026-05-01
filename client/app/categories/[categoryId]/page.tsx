@@ -13,8 +13,8 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Category detail"
-        description="Transactions associated with a single category."
+        title="Detalle de categoría"
+        description="Movimientos asociados a una sola categoría."
       />
 
       <CategoryTransactions categoryId={categoryId} />

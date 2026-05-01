@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SpendWise",
-  description: "Personal finance app for Spanish-speaking users.",
+  description: "Aplicación de finanzas personales para usuarios hispanohablantes.",
 };
 
 export default function RootLayout({

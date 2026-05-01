@@ -8,8 +8,8 @@ export default function SavingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Savings"
-        description="Track static savings and annual percentage projections."
+        title="Ahorros"
+        description="Gestiona ahorros fijos y proyecciones con porcentaje anual."
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

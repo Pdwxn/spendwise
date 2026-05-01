@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/", label: "Home" },
-  { href: "/accounts", label: "Accounts" },
-  { href: "/transactions", label: "Transactions" },
-  { href: "/budgets", label: "Budgets" },
-  { href: "/savings", label: "Savings" },
-  { href: "/categories", label: "Categories" },
+  { href: "/", label: "Inicio" },
+  { href: "/accounts", label: "Cuentas" },
+  { href: "/transactions", label: "Movimientos" },
+  { href: "/budgets", label: "Presupuestos" },
+  { href: "/savings", label: "Ahorros" },
+  { href: "/categories", label: "Categorías" },
 ] as const;
 
 export function BottomNavigation() {

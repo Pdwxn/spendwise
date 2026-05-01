@@ -6,8 +6,8 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Categories"
-        description="Manage your custom finance categories."
+        title="Categorías"
+        description="Gestiona tus categorías personalizadas de finanzas."
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

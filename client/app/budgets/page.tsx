@@ -13,8 +13,8 @@ export default function BudgetsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Budgets"
-        description={`Monthly budgets for ${selectedMonth}.`}
+        title="Presupuestos"
+        description={`Presupuestos mensuales para ${selectedMonth}.`}
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
