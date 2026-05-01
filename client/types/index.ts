@@ -83,8 +83,3 @@ export type CreateSavingInput = Pick<Saving, "name" | "initialAmount" | "mode"> 
   annualPercentage?: number;
 };
 export type UpdateSavingInput = Partial<CreateSavingInput>;
-
-export type FinanceAction =
-  | { type: "set-selected-month"; month: MonthKey }
-  | { type: "set-selected-category"; categoryId: ID | null }
-  | { type: "reset-state" };

@@ -5,6 +5,7 @@ import { CategoryBarChart } from "@/components/dashboard/CategoryBarChart";
 import { CategoryPieChart } from "@/components/dashboard/CategoryPieChart";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
+import { BudgetProgress } from "@/components/budgets/BudgetProgress";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
@@ -89,18 +90,14 @@ export default function Home() {
                       <p className="text-sm font-medium text-slate-950">
                         {category?.emoji ?? "#"} {category?.name ?? "Unknown"}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        {formatCurrency(progress.spentAmount)} spent of {formatCurrency(progress.budgetAmount)}
-                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-slate-950">
-                      {Math.round(progress.percentage)}%
-                    </p>
                   </div>
-                  <div className="mt-3 h-2 rounded-full bg-slate-200">
-                    <div
-                      className={`h-2 rounded-full ${progress.isOverBudget ? "bg-rose-500" : "bg-slate-950"}`}
-                      style={{ width: `${Math.min(100, Math.max(0, progress.percentage))}%` }}
+                  <div className="mt-3">
+                    <BudgetProgress
+                      spentAmount={progress.spentAmount}
+                      budgetAmount={progress.budgetAmount}
+                      percentage={progress.percentage}
+                      isOverBudget={progress.isOverBudget}
                     />
                   </div>
                 </div>

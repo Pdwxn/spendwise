@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -20,6 +20,18 @@ export function TransactionForm() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
 
+  useEffect(() => {
+    if (!accountId && accounts.length > 0) {
+      setAccountId(accounts[0].id);
+    }
+  }, [accountId, accounts]);
+
+  useEffect(() => {
+    if (!categoryId && categories.length > 0) {
+      setCategoryId(categories[0].id);
+    }
+  }, [categoryId, categories]);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -28,13 +40,14 @@ export function TransactionForm() {
     }
 
     const trimmedDescription = description.trim();
-    if (!trimmedDescription) {
+    const parsedAmount = Number(amount);
+    if (!trimmedDescription || !Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       return;
     }
 
     actions.addTransaction({
       type,
-      amount: Number(amount) || 0,
+      amount: parsedAmount,
       categoryId,
       description: trimmedDescription,
       date,
@@ -64,6 +77,7 @@ export function TransactionForm() {
         <Input
           type="number"
           step="0.01"
+          min="0.01"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
           placeholder="Amount"
@@ -97,7 +111,11 @@ export function TransactionForm() {
           onChange={(event) => setDate(event.target.value)}
           aria-label="Transaction date"
         />
-        <Button type="submit" className="w-full" disabled={accounts.length === 0 || categories.length === 0}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={accounts.length === 0 || categories.length === 0}
+        >
           Add transaction
         </Button>
       </form>

@@ -1,13 +1,13 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useFinance } from "@/hooks/useFinance";
-import { getMonthKeyFromDate } from "@/utils/calculations";
+import type { MonthKey } from "@/types";
 
 export function BudgetForm() {
   const {
@@ -18,6 +18,18 @@ export function BudgetForm() {
   const [month, setMonth] = useState(selectedMonth);
   const [amount, setAmount] = useState("0");
 
+  useEffect(() => {
+    if (!categoryId && categories.length > 0) {
+      setCategoryId(categories[0].id);
+    }
+  }, [categoryId, categories]);
+
+  useEffect(() => {
+    if (!month) {
+      setMonth(selectedMonth);
+    }
+  }, [month, selectedMonth]);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -25,10 +37,15 @@ export function BudgetForm() {
       return;
     }
 
+    const parsedAmount = Number(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      return;
+    }
+
     actions.addBudget({
       categoryId,
       month,
-      amount: Number(amount) || 0,
+      amount: parsedAmount,
     });
 
     setCategoryId(categories[0]?.id ?? "");
@@ -55,12 +72,13 @@ export function BudgetForm() {
         <Input
           type="month"
           value={month}
-          onChange={(event) => setMonth(getMonthKeyFromDate(`${event.target.value}-01`))}
+          onChange={(event) => setMonth(event.target.value as MonthKey)}
           aria-label="Budget month"
         />
         <Input
           type="number"
           step="0.01"
+          min="0.01"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
           placeholder="Amount"
