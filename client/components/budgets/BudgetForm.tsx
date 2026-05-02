@@ -59,39 +59,51 @@ export function BudgetForm() {
   }
 
   return (
-    <Card className="space-y-4">
+    <Card id="budget-form" className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Nuevo presupuesto</h2>
         <p className="text-sm text-cyan-100/65">Asigna un importe mensual a una categoría.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
-        <Select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-          <option value="">Selecciona una categoría</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.emoji} {category.name}
-            </option>
-          ))}
-        </Select>
-        <Input
-          type="month"
-          value={month}
-          onChange={(event) => setMonth(event.target.value as MonthKey)}
-          aria-label="Mes del presupuesto"
-        />
-        <Input
-          type="number"
-          step="0.01"
-          min="0.01"
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-          placeholder="Importe"
-          aria-label="Importe del presupuesto"
-        />
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Categoría</span>
+          <Select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
+            <option value="">Selecciona una categoría</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.emoji} {category.name}
+              </option>
+            ))}
+          </Select>
+        </label>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Mes</span>
+          <Input
+            type="month"
+            value={month}
+            onChange={(event) => setMonth(event.target.value as MonthKey)}
+            aria-label="Mes del presupuesto"
+          />
+        </label>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Importe</span>
+          <Input
+            type="number"
+            step="0.01"
+            min="0.01"
+            value={amount}
+            onChange={(event) => setAmount(event.target.value)}
+            placeholder="0.00"
+            aria-label="Importe del presupuesto"
+          />
+        </label>
         <Button type="submit" className="w-full" disabled={categories.length === 0}>
           Añadir presupuesto
         </Button>
+        {categories.length === 0 ? (
+          <p className="text-xs text-cyan-100/60">Primero crea una categoría para poder asignarle un presupuesto.</p>
+        ) : null}
       </form>
     </Card>
   );

@@ -21,7 +21,7 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Movimientos"
-        description="Crea, filtra y revisa ingresos y gastos."
+        description="Registra, filtra y revisa ingresos y gastos."
       />
 
       <TransactionFilters categories={categories} />

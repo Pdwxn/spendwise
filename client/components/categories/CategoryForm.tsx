@@ -38,32 +38,41 @@ export function CategoryForm() {
   }
 
   return (
-    <Card className="space-y-4">
+    <Card id="category-form" className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Nueva categoría</h2>
         <p className="text-sm text-cyan-100/65">Crea una categoría con nombre, emoji y color.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
-        <Input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="Nombre de la categoría"
-          aria-label="Nombre de la categoría"
-        />
-        <Input
-          value={emoji}
-          onChange={(event) => setEmoji(event.target.value)}
-          placeholder="Emoji"
-          aria-label="Emoji de la categoría"
-        />
-        <Input
-          type="color"
-          value={color}
-          onChange={(event) => setColor(event.target.value as HexColor)}
-          aria-label="Color de la categoría"
-          className="h-12 p-1"
-        />
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Nombre</span>
+          <Input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Comida, casa, ocio..."
+            aria-label="Nombre de la categoría"
+          />
+        </label>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Emoji</span>
+          <Input
+            value={emoji}
+            onChange={(event) => setEmoji(event.target.value)}
+            placeholder="✨"
+            aria-label="Emoji de la categoría"
+          />
+        </label>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Color</span>
+          <Input
+            type="color"
+            value={color}
+            onChange={(event) => setColor(event.target.value as HexColor)}
+            aria-label="Color de la categoría"
+            className="h-12 p-1"
+          />
+        </label>
         <Button type="submit" className="w-full">
           Añadir categoría
         </Button>

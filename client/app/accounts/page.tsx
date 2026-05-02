@@ -7,7 +7,7 @@ export default function AccountsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Cuentas"
-        description="Crea y revisa tus cuentas de finanzas personales."
+        description="Gestiona tus cuentas y revisa sus saldos al instante."
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

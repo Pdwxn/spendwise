@@ -7,7 +7,7 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Categorías"
-        description="Gestiona tus categorías personalizadas de finanzas."
+        description="Organiza tus categorías con nombre, emoji y color."
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

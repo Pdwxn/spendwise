@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
 import type { Transaction } from "@/types";
 import { formatCurrency, formatShortDate } from "@/utils/formatters";
+import Link from "next/link";
 
 type TransactionListProps = {
   transactions: Transaction[];
@@ -25,26 +26,45 @@ export function TransactionList({ transactions }: TransactionListProps) {
       </div>
 
       {transactions.length === 0 ? (
-        <EmptyState title="No se encontraron movimientos" description="Prueba a ajustar los filtros o crea un movimiento nuevo." />
+        <EmptyState
+          title="No se encontraron movimientos"
+          description="Prueba a ajustar los filtros o crea un movimiento nuevo."
+          action={
+            <Link
+              href="#transaction-form"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            >
+              Crear movimiento
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {transactions.map((transaction) => {
             const category = categories.find((item) => item.id === transaction.categoryId);
+            const amountClassName = transaction.type === "expense" ? "text-rose-300" : "text-emerald-300";
 
             return (
-              <div key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-4">
-                <div className="min-w-0">
+              <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-cyan-50">
                     {category?.emoji ?? "#"} {transaction.description}
                   </p>
-                  <p className="text-xs text-cyan-100/65">{formatShortDate(transaction.date)} · {category?.name ?? "Desconocida"}</p>
+                  <p className="text-xs text-cyan-100/65">
+                    {formatShortDate(transaction.date)} · {category?.name ?? "Desconocida"}
+                  </p>
                 </div>
-                <div className="text-right">
-                  <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-600" : "text-emerald-600"}`}>
+                <div className="text-left sm:text-right">
+                  <p className={`text-sm font-semibold ${amountClassName}`}>
                     {transaction.type === "expense" ? "-" : "+"}
                     {formatCurrency(transaction.amount)}
                   </p>
-                  <Button variant="secondary" type="button" onClick={() => actions.removeTransaction(transaction.id)}>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    className="w-full px-3 py-1.5 text-xs sm:w-auto"
+                    onClick={() => actions.removeTransaction(transaction.id)}
+                  >
                     Eliminar
                   </Button>
                 </div>

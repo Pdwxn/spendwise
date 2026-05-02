@@ -11,7 +11,7 @@ export function ToastProvider() {
       closeButton={false}
       newestOnTop
       pauseOnFocusLoss={false}
-      toastClassName="mx-4 mb-20 rounded-2xl bg-slate-950 px-4 py-3 text-sm text-white shadow-lg"
+      toastClassName="mx-4 mb-20 rounded-2xl border border-white/10 bg-slate-950/95 px-4 py-3 text-sm text-cyan-50 shadow-lg"
     />
   );
 }

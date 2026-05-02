@@ -9,7 +9,7 @@ export default function SavingsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Ahorros"
-        description="Gestiona ahorros fijos y proyecciones con porcentaje anual."
+        description="Lleva ahorros fijos y proyecciones con rendimiento anual."
       />
 
       <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

@@ -7,6 +7,7 @@ import { useFinance } from "@/hooks/useFinance";
 import { calculateBudgetProgress } from "@/utils/calculations";
 import { formatCurrency, formatMonthLabel } from "@/utils/formatters";
 import { BudgetProgress } from "@/components/budgets/BudgetProgress";
+import Link from "next/link";
 
 export function BudgetList() {
   const {
@@ -24,7 +25,18 @@ export function BudgetList() {
       </div>
 
       {currentBudgets.length === 0 ? (
-        <EmptyState title="Aún no hay presupuestos" description="Crea un presupuesto para empezar a seguir el gasto por categoría." />
+        <EmptyState
+          title="Aún no hay presupuestos"
+          description="Crea un presupuesto para empezar a seguir el gasto por categoría."
+          action={
+            <Link
+              href="#budget-form"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            >
+              Crear presupuesto
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {currentBudgets.map((budget) => {
@@ -32,15 +44,20 @@ export function BudgetList() {
             const progress = calculateBudgetProgress(budget, transactions, selectedMonth);
 
             return (
-                <div key={budget.id} className="rounded-2xl border border-white/10 p-4">
-                <div className="flex items-start justify-between gap-3">
+              <div key={budget.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-cyan-50">
                       {category?.emoji ?? "#"} {category?.name ?? "Desconocida"}
                     </p>
                     <p className="text-xs text-cyan-100/65">Presupuesto {formatCurrency(budget.amount)}</p>
                   </div>
-                  <Button variant="secondary" type="button" onClick={() => actions.removeBudget(budget.id)}>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    className="w-full px-3 py-1.5 text-xs sm:w-auto"
+                    onClick={() => actions.removeBudget(budget.id)}
+                  >
                     Eliminar
                   </Button>
                 </div>
@@ -52,8 +69,8 @@ export function BudgetList() {
                     percentage={progress.percentage}
                     isOverBudget={progress.isOverBudget}
                   />
-                    <p className="mt-2 text-xs text-cyan-100/65">Restante {formatCurrency(progress.remainingAmount)}</p>
-                  </div>
+                  <p className="mt-2 text-xs text-cyan-100/65">Restante {formatCurrency(progress.remainingAmount)}</p>
+                </div>
               </div>
             );
           })}

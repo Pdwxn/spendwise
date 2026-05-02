@@ -52,25 +52,31 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Select value={selectedMonth} onChange={(event) => actions.setSelectedMonth(event.target.value as MonthKey)}>
-          {monthOptions.map((month) => (
-            <option key={month} value={month}>
-              {formatMonthLabel(month)}
-            </option>
-          ))}
-        </Select>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Mes</span>
+          <Select value={selectedMonth} onChange={(event) => actions.setSelectedMonth(event.target.value as MonthKey)}>
+            {monthOptions.map((month) => (
+              <option key={month} value={month}>
+                {formatMonthLabel(month)}
+              </option>
+            ))}
+          </Select>
+        </label>
 
-        <Select
-          value={selectedCategoryId ?? "all"}
-          onChange={(event) => actions.setSelectedCategoryId(event.target.value === "all" ? null : (event.target.value as ID))}
-        >
-          <option value="all">Todas las categorías</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.emoji} {category.name}
-            </option>
-          ))}
-        </Select>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Categoría</span>
+          <Select
+            value={selectedCategoryId ?? "all"}
+            onChange={(event) => actions.setSelectedCategoryId(event.target.value === "all" ? null : (event.target.value as ID))}
+          >
+            <option value="all">Todas las categorías</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.emoji} {category.name}
+              </option>
+            ))}
+          </Select>
+        </label>
       </div>
     </Card>
   );

@@ -3,6 +3,8 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { CategoryBreakdownItem } from "@/utils/calculations";
+import { formatCurrency } from "@/utils/formatters";
+import Link from "next/link";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 type CategoryPieChartProps = {
@@ -18,7 +20,18 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
       </div>
 
       {data.length === 0 ? (
-        <EmptyState title="Sin datos" description="Esta vista se activará cuando existan gastos." />
+        <EmptyState
+          title="Sin datos"
+          description="Esta vista se activará cuando existan gastos."
+          action={
+            <Link
+              href="/transactions#transaction-form"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            >
+              Crear gasto
+            </Link>
+          }
+        />
       ) : (
         <div className="h-56 w-full sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
@@ -35,7 +48,16 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
                   <Cell key={entry.categoryId} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, "Spent"] as [string, string]} />
+              <Tooltip
+                formatter={(value) => [formatCurrency(Number(value ?? 0)), "Gasto"] as [string, string]}
+                contentStyle={{
+                  backgroundColor: "rgba(2, 6, 23, 0.96)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "16px",
+                  color: "#ecfeff",
+                }}
+                itemStyle={{ color: "#ecfeff" }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>

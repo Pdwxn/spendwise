@@ -32,11 +32,22 @@ export function CategoryList() {
       </div>
 
       {categories.length === 0 ? (
-        <EmptyState title="Aún no hay categorías" description="Crea tu primera categoría para empezar a controlar gastos." />
+        <EmptyState
+          title="Aún no hay categorías"
+          description="Crea tu primera categoría para empezar a controlar gastos."
+          action={
+            <Link
+              href="#category-form"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            >
+              Crear categoría
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {categories.map((category) => (
-            <div key={category.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 p-4">
+            <div key={category.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
               <Link href={`/categories/${category.id}`} className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{category.emoji}</span>
@@ -44,8 +55,13 @@ export function CategoryList() {
                 </div>
                 <p className="text-xs text-cyan-100/65">Creada {formatShortDate(category.createdAt)}</p>
               </Link>
-              <div className="h-4 w-4 rounded-full" style={{ backgroundColor: category.color }} />
-              <Button variant="secondary" type="button" onClick={() => handleRemoveCategory(category.id)}>
+              <div className="h-4 w-4 self-start rounded-full sm:self-center" style={{ backgroundColor: category.color }} />
+              <Button
+                variant="secondary"
+                type="button"
+                className="w-full px-3 py-1.5 text-xs sm:w-auto"
+                onClick={() => handleRemoveCategory(category.id)}
+              >
                 Eliminar
               </Button>
             </div>

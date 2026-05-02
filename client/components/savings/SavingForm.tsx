@@ -38,40 +38,52 @@ export function SavingForm() {
   }
 
   return (
-    <Card className="space-y-4">
+    <Card id="saving-form" className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Nuevo ahorro</h2>
         <p className="text-sm text-cyan-100/65">Crea un ahorro fijo o una proyección anual.</p>
       </div>
 
       <form className="space-y-3" onSubmit={handleSubmit}>
-        <Input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="Nombre del ahorro"
-          aria-label="Nombre del ahorro"
-        />
-        <Input
-          type="number"
-          step="0.01"
-          value={initialAmount}
-          onChange={(event) => setInitialAmount(event.target.value)}
-          placeholder="Importe inicial"
-          aria-label="Importe inicial"
-        />
-        <Select value={mode} onChange={(event) => setMode(event.target.value as SavingMode)}>
-          <option value="static">Fijo</option>
-          <option value="annualPercentage">Porcentaje anual</option>
-        </Select>
-        {mode === "annualPercentage" ? (
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Nombre</span>
+          <Input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Fondo de emergencia"
+            aria-label="Nombre del ahorro"
+          />
+        </label>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Importe inicial</span>
           <Input
             type="number"
             step="0.01"
-            value={annualPercentage}
-            onChange={(event) => setAnnualPercentage(event.target.value)}
-            placeholder="Porcentaje anual"
-            aria-label="Porcentaje anual"
+            value={initialAmount}
+            onChange={(event) => setInitialAmount(event.target.value)}
+            placeholder="0.00"
+            aria-label="Importe inicial"
           />
+        </label>
+        <label className="block space-y-1 text-sm text-cyan-100/70">
+          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Modo</span>
+          <Select value={mode} onChange={(event) => setMode(event.target.value as SavingMode)}>
+            <option value="static">Fijo</option>
+            <option value="annualPercentage">Porcentaje anual</option>
+          </Select>
+        </label>
+        {mode === "annualPercentage" ? (
+          <label className="block space-y-1 text-sm text-cyan-100/70">
+            <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Porcentaje anual</span>
+            <Input
+              type="number"
+              step="0.01"
+              value={annualPercentage}
+              onChange={(event) => setAnnualPercentage(event.target.value)}
+              placeholder="0.00"
+              aria-label="Porcentaje anual"
+            />
+          </label>
         ) : null}
         <Button type="submit" className="w-full">
           Añadir ahorro

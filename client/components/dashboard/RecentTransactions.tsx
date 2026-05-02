@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Category, Transaction } from "@/types";
+import Link from "next/link";
 
 type RecentTransactionsProps = {
   transactions: Transaction[];
@@ -23,22 +24,34 @@ export function RecentTransactions({
       </div>
 
       {transactions.length === 0 ? (
-        <EmptyState title="Aún no hay movimientos" description="Añade tu primer ingreso o gasto para llenar esta lista." />
+        <EmptyState
+          title="Aún no hay movimientos"
+          description="Añade tu primer ingreso o gasto para llenar esta lista."
+          action={
+            <Link
+              href="/transactions#transaction-form"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            >
+              Ir a movimientos
+            </Link>
+          }
+        />
       ) : (
         <ul className="space-y-3">
           {transactions.map((transaction) => {
             const category = categories.find((item) => item.id === transaction.categoryId);
+            const amountClassName = transaction.type === "expense" ? "text-rose-300" : "text-emerald-300";
 
             return (
-              <li key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 px-4 py-3">
+              <li key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-950">
+                  <p className="truncate text-sm font-medium text-cyan-50">
                     {category?.emoji ?? "#"} {transaction.description}
                   </p>
                   <p className="text-xs text-cyan-100/65">{formatShortDate(transaction.date)}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-600" : "text-emerald-600"}`}>
+                  <p className={`text-sm font-semibold ${amountClassName}`}>
                     {transaction.type === "expense" ? "-" : "+"}
                     {formatCurrency(transaction.amount)}
                   </p>

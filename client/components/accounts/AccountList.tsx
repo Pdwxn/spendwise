@@ -1,6 +1,7 @@
 "use client";
 
 import { toast } from "react-toastify";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -31,26 +32,42 @@ export function AccountList() {
       </div>
 
       {accounts.length === 0 ? (
-        <EmptyState title="Aún no hay cuentas" description="Crea una cuenta para empezar a registrar movimientos." />
+        <EmptyState
+          title="Aún no hay cuentas"
+          description="Crea una cuenta para empezar a registrar movimientos."
+          action={
+            <Link
+              href="#account-form"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            >
+              Crear cuenta
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {accounts.map((account) => {
             const balance = getAccountBalance(account, transactions);
 
             return (
-              <div key={account.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-4">
-                <div className="min-w-0">
+              <div key={account.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: account.color }} />
+                    <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: account.color }} />
                     <p className="truncate text-sm font-medium text-cyan-50">{account.name}</p>
                   </div>
                   <p className="text-xs text-cyan-100/65">Creada {formatShortDate(account.createdAt)}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <p className="text-sm font-semibold text-cyan-50">{formatCurrency(balance)}</p>
                   <p className="text-xs text-cyan-100/65">Inicial {formatCurrency(account.initialBalance)}</p>
                 </div>
-                <Button variant="secondary" type="button" onClick={() => handleRemoveAccount(account.id)}>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  className="w-full px-3 py-1.5 text-xs sm:w-auto"
+                  onClick={() => handleRemoveAccount(account.id)}
+                >
                   Eliminar
                 </Button>
               </div>
