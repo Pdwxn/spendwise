@@ -8,12 +8,14 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
 import { canRemoveCategory } from "@/utils/calculations";
 import { formatShortDate } from "@/utils/formatters";
+import { isSystemCategoryId } from "@/utils/constants";
 
 export function CategoryList() {
   const {
     state: { budgets, categories, transactions },
     actions,
   } = useFinance();
+  const visibleCategories = categories.filter((category) => !isSystemCategoryId(category.id));
 
   function handleRemoveCategory(categoryId: string) {
     if (!canRemoveCategory({ transactions, budgets }, categoryId)) {
@@ -31,11 +33,11 @@ export function CategoryList() {
         <p className="text-sm text-cyan-100/65">Todas las categorías disponibles en el sistema.</p>
       </div>
 
-      {categories.length === 0 ? (
+      {visibleCategories.length === 0 ? (
         <EmptyState title="Aún no hay categorías" description="Crea tu primera categoría con el botón superior." />
       ) : (
         <div className="space-y-3">
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <div key={category.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
               <Link href={`/categories/${category.id}`} className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">

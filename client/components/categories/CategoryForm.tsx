@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useFinance } from "@/hooks/useFinance";
@@ -34,6 +35,7 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
       emoji: trimmedEmoji,
       color,
     });
+    toast.success("Categoría creada");
 
     setName("");
     setEmoji("✨");

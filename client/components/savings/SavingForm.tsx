@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -33,6 +34,7 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
       mode,
       annualPercentage: mode === "annualPercentage" ? Number(annualPercentage) || 0 : undefined,
     });
+    toast.success("Ahorro creado");
 
     setName("");
     setInitialAmount("0");

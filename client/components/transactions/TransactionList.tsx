@@ -13,8 +13,7 @@ type TransactionListProps = {
 
 export function TransactionList({ transactions }: TransactionListProps) {
   const {
-    state: { categories },
-    actions,
+    state: { categories, savings },
   } = useFinance();
 
   return (
@@ -30,16 +29,21 @@ export function TransactionList({ transactions }: TransactionListProps) {
         <div className="space-y-3">
           {transactions.map((transaction) => {
             const category = categories.find((item) => item.id === transaction.categoryId);
+            const saving = transaction.linkedSavingId ? savings.find((item) => item.id === transaction.linkedSavingId) : null;
             const amountClassName = transaction.type === "expense" ? "text-rose-300" : "text-emerald-300";
+            const subtitle = saving
+              ? `${transaction.linkedSavingAction === "contribution" ? "Abono" : "Retiro"} · ${saving.name}`
+              : category?.name ?? "Desconocida";
+            const title = saving ? transaction.description : `${category?.emoji ?? "#"} ${transaction.description}`;
 
             return (
               <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-cyan-50">
-                    {category?.emoji ?? "#"} {transaction.description}
+                    {title}
                   </p>
                   <p className="text-xs text-cyan-100/65">
-                    {formatShortDate(transaction.date)} · {category?.name ?? "Desconocida"}
+                    {formatShortDate(transaction.date)} · {subtitle}
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
@@ -47,14 +51,6 @@ export function TransactionList({ transactions }: TransactionListProps) {
                     {transaction.type === "expense" ? "-" : "+"}
                     {formatCurrency(transaction.amount)}
                   </p>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    className="w-full px-3 py-1.5 text-xs sm:w-auto"
-                    onClick={() => actions.removeTransaction(transaction.id)}
-                  >
-                    Eliminar
-                  </Button>
                 </div>
               </div>
             );

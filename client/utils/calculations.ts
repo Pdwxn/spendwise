@@ -6,6 +6,8 @@ import type {
   ID,
   MonthKey,
   Saving,
+  SavingContribution,
+  SavingWithdrawal,
   Transaction,
   TransactionType,
 } from "@/types";
@@ -201,6 +203,45 @@ export function calculateSavingValue(saving: Saving, elapsedMonths = 0) {
   const monthlyRate = annualPercentage / 100 / 12;
 
   return saving.initialAmount * Math.pow(1 + monthlyRate, months);
+}
+
+export function getSavingContributionsTotal(contributions: SavingContribution[], savingId: ID) {
+  return contributions
+    .filter((contribution) => contribution.savingId === savingId)
+    .reduce((total, contribution) => total + contribution.amount, 0);
+}
+
+export function getSavingWithdrawalsTotal(withdrawals: SavingWithdrawal[], savingId: ID) {
+  return withdrawals
+    .filter((withdrawal) => withdrawal.savingId === savingId)
+    .reduce((total, withdrawal) => total + withdrawal.amount, 0);
+}
+
+export function getSavingCurrentValue(
+  saving: Saving,
+  contributions: SavingContribution[],
+  withdrawals: SavingWithdrawal[],
+  elapsedMonths = 0,
+) {
+  const baseValue = calculateSavingValue(saving, elapsedMonths);
+  const contributionsTotal = getSavingContributionsTotal(contributions, saving.id);
+  const withdrawalsTotal = getSavingWithdrawalsTotal(withdrawals, saving.id);
+
+  return Math.max(0, baseValue + contributionsTotal - withdrawalsTotal);
+}
+
+export function canWithdrawFromSaving(
+  saving: Saving,
+  contributions: SavingContribution[],
+  withdrawals: SavingWithdrawal[],
+  amount: number,
+  elapsedMonths = 0,
+) {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return false;
+  }
+
+  return amount <= getSavingCurrentValue(saving, contributions, withdrawals, elapsedMonths);
 }
 
 export function getBudgetProgressRatio(progress: BudgetProgress) {

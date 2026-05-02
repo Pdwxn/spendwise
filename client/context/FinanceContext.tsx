@@ -9,9 +9,11 @@ import {
 import {
   DEFAULT_CATEGORIES,
   STORAGE_KEY,
+  SAVINGS_CATEGORY_ID,
+  SYSTEM_CATEGORY_IDS,
 } from "@/utils/constants";
 import { readStorageValue, writeStorageValue } from "@/utils/storage";
-import { canRemoveAccount, canRemoveCategory } from "@/utils/calculations";
+import { canRemoveAccount, canRemoveCategory, canWithdrawFromSaving } from "@/utils/calculations";
 import type {
   Account,
   Budget,
@@ -25,6 +27,8 @@ import type {
   ID,
   MonthKey,
   Saving,
+  SavingContribution,
+  SavingWithdrawal,
   Transaction,
   UpdateAccountInput,
   UpdateBudgetInput,
@@ -49,6 +53,20 @@ type FinanceActions = {
   addSaving: (input: CreateSavingInput) => void;
   updateSaving: (id: ID, input: UpdateSavingInput) => void;
   removeSaving: (id: ID) => void;
+  addSavingContribution: (input: {
+    savingId: ID;
+    accountId: ID;
+    amount: number;
+    description: string;
+    date: string;
+  }) => void;
+  addSavingWithdrawal: (input: {
+    savingId: ID;
+    accountId: ID;
+    amount: number;
+    description: string;
+    date: string;
+  }) => void;
   setSelectedMonth: (month: MonthKey) => void;
   setSelectedCategoryId: (categoryId: ID | null) => void;
   resetState: () => void;
@@ -90,6 +108,8 @@ function createInitialState(): FinanceState {
     transactions: [],
     budgets: [],
     savings: [],
+    savingContributions: [],
+    savingWithdrawals: [],
     selectedMonth: getCurrentMonthKey(),
     selectedCategoryId: null,
   };
@@ -148,6 +168,28 @@ function isSaving(value: unknown): value is Saving {
     && (value.annualPercentage === undefined || typeof value.annualPercentage === "number");
 }
 
+function isSavingContribution(value: unknown): value is SavingContribution {
+  return isObject(value)
+    && typeof value.id === "string"
+    && typeof value.savingId === "string"
+    && typeof value.accountId === "string"
+    && typeof value.amount === "number"
+    && typeof value.description === "string"
+    && typeof value.date === "string"
+    && typeof value.createdAt === "string";
+}
+
+function isSavingWithdrawal(value: unknown): value is SavingWithdrawal {
+  return isObject(value)
+    && typeof value.id === "string"
+    && typeof value.savingId === "string"
+    && typeof value.accountId === "string"
+    && typeof value.amount === "number"
+    && typeof value.description === "string"
+    && typeof value.date === "string"
+    && typeof value.createdAt === "string";
+}
+
 function normalizeState(value: unknown): FinanceState {
   const fallback = createInitialState();
 
@@ -155,23 +197,41 @@ function normalizeState(value: unknown): FinanceState {
     return fallback;
   }
 
+  const record = value as Record<string, unknown>;
+
   const categories = Array.isArray(value.categories)
     ? value.categories.filter(isCategory)
     : fallback.categories;
 
+  const categoryMap = new Map<string, Category>();
+
+  for (const category of [...DEFAULT_CATEGORIES, ...categories]) {
+    if (!categoryMap.has(category.id)) {
+      categoryMap.set(category.id, category);
+    }
+  }
+
+  const mergedCategories = Array.from(categoryMap.values());
+
   return {
     accounts: Array.isArray(value.accounts) ? value.accounts.filter(isAccount) : fallback.accounts,
-    categories: categories.length > 0 ? categories : [...DEFAULT_CATEGORIES],
+    categories: mergedCategories.length > 0 ? mergedCategories : [...DEFAULT_CATEGORIES],
     transactions: Array.isArray(value.transactions) ? value.transactions.filter(isTransaction) : fallback.transactions,
     budgets: Array.isArray(value.budgets) ? value.budgets.filter(isBudget) : fallback.budgets,
     savings: Array.isArray(value.savings) ? value.savings.filter(isSaving) : fallback.savings,
+    savingContributions: Array.isArray(record.savingContributions)
+      ? record.savingContributions.filter(isSavingContribution)
+      : fallback.savingContributions,
+    savingWithdrawals: Array.isArray(record.savingWithdrawals)
+      ? record.savingWithdrawals.filter(isSavingWithdrawal)
+      : fallback.savingWithdrawals,
     selectedMonth:
-      typeof value.selectedMonth === "string" && /^\d{4}-\d{2}$/.test(value.selectedMonth)
-        ? (value.selectedMonth as MonthKey)
+      typeof record.selectedMonth === "string" && /^\d{4}-\d{2}$/.test(record.selectedMonth)
+        ? (record.selectedMonth as MonthKey)
         : fallback.selectedMonth,
     selectedCategoryId:
-      value.selectedCategoryId === null || typeof value.selectedCategoryId === "string"
-        ? value.selectedCategoryId
+      record.selectedCategoryId === null || typeof record.selectedCategoryId === "string"
+        ? record.selectedCategoryId
         : fallback.selectedCategoryId,
   };
 }
@@ -194,6 +254,26 @@ type FinanceAction =
   | { type: "add-saving"; payload: CreateSavingInput }
   | { type: "update-saving"; payload: { id: ID; input: UpdateSavingInput } }
   | { type: "remove-saving"; payload: { id: ID } }
+  | {
+      type: "add-saving-contribution";
+      payload: {
+        savingId: ID;
+        accountId: ID;
+        amount: number;
+        description: string;
+        date: string;
+      };
+    }
+  | {
+      type: "add-saving-withdrawal";
+      payload: {
+        savingId: ID;
+        accountId: ID;
+        amount: number;
+        description: string;
+        date: string;
+      };
+    }
   | { type: "set-selected-month"; payload: MonthKey }
   | { type: "set-selected-category"; payload: ID | null };
 
@@ -251,6 +331,10 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
         categories: mergeUpdate(state.categories, action.payload.id, action.payload.input),
       };
     case "remove-category":
+      if (SYSTEM_CATEGORY_IDS.includes(action.payload.id as (typeof SYSTEM_CATEGORY_IDS)[number])) {
+        return state;
+      }
+
       if (!canRemoveCategory(state, action.payload.id)) {
         return state;
       }
@@ -327,6 +411,86 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
         ...state,
         savings: state.savings.filter((saving) => saving.id !== action.payload.id),
       };
+    case "add-saving-contribution": {
+      const saving = state.savings.find((item) => item.id === action.payload.savingId);
+
+      if (!saving || action.payload.amount <= 0) {
+        return state;
+      }
+
+      const description = action.payload.description.trim() || `Abono a ${saving.name}`;
+
+      return {
+        ...state,
+        savingContributions: [
+          ...state.savingContributions,
+          {
+            id: createId(),
+            createdAt: nowIso(),
+            savingId: action.payload.savingId,
+            accountId: action.payload.accountId,
+            amount: action.payload.amount,
+            description,
+            date: action.payload.date,
+          },
+        ],
+        transactions: [
+          ...state.transactions,
+          {
+            id: createId(),
+            createdAt: nowIso(),
+            type: "expense",
+            amount: action.payload.amount,
+            categoryId: SAVINGS_CATEGORY_ID,
+            description,
+            date: action.payload.date,
+            accountId: action.payload.accountId,
+            linkedSavingId: saving.id,
+            linkedSavingAction: "contribution",
+          },
+        ],
+      };
+    }
+    case "add-saving-withdrawal": {
+      const saving = state.savings.find((item) => item.id === action.payload.savingId);
+
+      if (!saving || action.payload.amount <= 0 || !canWithdrawFromSaving(saving, state.savingContributions, state.savingWithdrawals, action.payload.amount)) {
+        return state;
+      }
+
+      const description = action.payload.description.trim() || `Retiro de ${saving.name}`;
+
+      return {
+        ...state,
+        savingWithdrawals: [
+          ...state.savingWithdrawals,
+          {
+            id: createId(),
+            createdAt: nowIso(),
+            savingId: action.payload.savingId,
+            accountId: action.payload.accountId,
+            amount: action.payload.amount,
+            description,
+            date: action.payload.date,
+          },
+        ],
+        transactions: [
+          ...state.transactions,
+          {
+            id: createId(),
+            createdAt: nowIso(),
+            type: "income",
+            amount: action.payload.amount,
+            categoryId: SAVINGS_CATEGORY_ID,
+            description,
+            date: action.payload.date,
+            accountId: action.payload.accountId,
+            linkedSavingId: saving.id,
+            linkedSavingAction: "withdrawal",
+          },
+        ],
+      };
+    }
     case "set-selected-month":
       return {
         ...state,
@@ -376,6 +540,8 @@ export function FinanceProvider({ children }: FinanceProviderProps) {
     addSaving: (input) => dispatch({ type: "add-saving", payload: input }),
     updateSaving: (id, input) => dispatch({ type: "update-saving", payload: { id, input } }),
     removeSaving: (id) => dispatch({ type: "remove-saving", payload: { id } }),
+    addSavingContribution: (input) => dispatch({ type: "add-saving-contribution", payload: input }),
+    addSavingWithdrawal: (input) => dispatch({ type: "add-saving-withdrawal", payload: input }),
     setSelectedMonth: (month) => dispatch({ type: "set-selected-month", payload: month }),
     setSelectedCategoryId: (categoryId) => dispatch({ type: "set-selected-category", payload: categoryId }),
     resetState: () => dispatch({ type: "reset" }),

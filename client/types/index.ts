@@ -10,6 +10,8 @@ export type TransactionType = "income" | "expense";
 
 export type SavingMode = "static" | "annualPercentage";
 
+export type SavingAction = "contribution" | "withdrawal";
+
 export type Account = {
   id: ID;
   name: string;
@@ -35,6 +37,8 @@ export type Transaction = {
   date: ISODateString;
   accountId: ID;
   createdAt: ISODateString;
+  linkedSavingId?: ID;
+  linkedSavingAction?: SavingAction;
 };
 
 export type Budget = {
@@ -54,12 +58,34 @@ export type Saving = {
   createdAt: ISODateString;
 };
 
+export type SavingContribution = {
+  id: ID;
+  savingId: ID;
+  accountId: ID;
+  amount: number;
+  description: string;
+  date: ISODateString;
+  createdAt: ISODateString;
+};
+
+export type SavingWithdrawal = {
+  id: ID;
+  savingId: ID;
+  accountId: ID;
+  amount: number;
+  description: string;
+  date: ISODateString;
+  createdAt: ISODateString;
+};
+
 export type FinanceState = {
   accounts: Account[];
   categories: Category[];
   transactions: Transaction[];
   budgets: Budget[];
   savings: Saving[];
+  savingContributions: SavingContribution[];
+  savingWithdrawals: SavingWithdrawal[];
   selectedMonth: MonthKey;
   selectedCategoryId: ID | null;
 };
