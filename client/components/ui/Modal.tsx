@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 import { IconX } from "@tabler/icons-react";
 import { Button } from "@/components/ui/Button";
@@ -16,11 +16,6 @@ type ModalProps = {
 
 export function Modal({ open, title, description, children, onClose }: ModalProps) {
   const titleId = useId();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -43,7 +38,7 @@ export function Modal({ open, title, description, children, onClose }: ModalProp
     };
   }, [onClose, open]);
 
-  if (!open || !mounted) {
+  if (!open || typeof document === "undefined") {
     return null;
   }
 

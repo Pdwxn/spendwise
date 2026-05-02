@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -19,28 +19,10 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
     state: { categories, selectedMonth },
     actions,
   } = useFinance();
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
+  const visibleCategories = categories.filter((category) => !isSystemCategoryId(category.id));
+  const [categoryId, setCategoryId] = useState(visibleCategories[0]?.id ?? "");
   const [month, setMonth] = useState(selectedMonth);
   const [amount, setAmount] = useState("0");
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      setCategoryId("");
-      return;
-    }
-
-    if (!categories.some((category) => category.id === categoryId)) {
-      setCategoryId(categories[0].id);
-    }
-  }, [categoryId, categories]);
-
-  const visibleCategories = categories.filter((category) => !isSystemCategoryId(category.id));
-
-  useEffect(() => {
-    if (!month) {
-      setMonth(selectedMonth);
-    }
-  }, [month, selectedMonth]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -61,7 +43,7 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
     });
     toast.success("Presupuesto creado");
 
-    setCategoryId(categories[0]?.id ?? "");
+    setCategoryId(visibleCategories[0]?.id ?? "");
     setMonth(selectedMonth);
     setAmount("0");
     onSuccess?.();

@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -9,6 +9,8 @@ import { Select } from "@/components/ui/Select";
 import { useFinance } from "@/hooks/useFinance";
 import type { Category } from "@/types";
 import { INCOME_CATEGORY_ID, isSystemCategoryId } from "@/utils/constants";
+import { formatCurrency } from "@/utils/formatters";
+import { getAccountBalance } from "@/utils/calculations";
 
 type TransactionMode = "income" | "expense";
 
@@ -23,43 +25,18 @@ function getIncomeCategoryId(categories: Category[]) {
 
 export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
   const {
-    state: { accounts, categories },
+    state: { accounts, categories, transactions },
     actions,
   } = useFinance();
   const [amount, setAmount] = useState("0");
-  const [categoryId, setCategoryId] = useState(mode === "income" ? getIncomeCategoryId(categories) : categories[0]?.id ?? "");
+  const expenseCategories = categories.filter((category) => !isSystemCategoryId(category.id));
+  const [categoryId, setCategoryId] = useState(mode === "income" ? getIncomeCategoryId(categories) : expenseCategories[0]?.id ?? "");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
-  const expenseCategories = categories.filter((category) => !isSystemCategoryId(category.id));
   const formDisabled = accounts.length === 0 || (mode === "expense" && expenseCategories.length === 0) || (mode === "income" && !getIncomeCategoryId(categories));
-
-  useEffect(() => {
-    if (accounts.length === 0) {
-      setAccountId("");
-      return;
-    }
-
-    if (!accounts.some((account) => account.id === accountId)) {
-      setAccountId(accounts[0].id);
-    }
-  }, [accountId, accounts]);
-
-  useEffect(() => {
-    if (mode === "income") {
-      setCategoryId(getIncomeCategoryId(categories));
-      return;
-    }
-
-    if (expenseCategories.length === 0) {
-      setCategoryId("");
-      return;
-    }
-
-    if (!expenseCategories.some((category) => category.id === categoryId)) {
-      setCategoryId(expenseCategories[0].id);
-    }
-  }, [categoryId, categories, expenseCategories, mode]);
+  const selectedAccount = accounts.find((account) => account.id === accountId) ?? null;
+  const selectedAccountBalance = selectedAccount ? getAccountBalance(selectedAccount, transactions) : null;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,6 +50,11 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
     const parsedAmount = Number(amount);
     if (!trimmedDescription || !Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       toast.error("Revisa el importe y la descripción.");
+      return;
+    }
+
+    if (mode === "expense" && selectedAccountBalance !== null && parsedAmount > selectedAccountBalance) {
+      toast.error("El importe supera el saldo disponible de esta cuenta.");
       return;
     }
 
@@ -118,6 +100,11 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
             </option>
           ))}
         </Select>
+        {mode === "expense" && selectedAccount ? (
+          <p className="text-xs text-cyan-100/60">
+            Saldo disponible: {formatCurrency(selectedAccountBalance ?? 0)}
+          </p>
+        ) : null}
       </label>
       {mode === "expense" ? (
         <label className="block space-y-1 text-sm text-cyan-100/70">
