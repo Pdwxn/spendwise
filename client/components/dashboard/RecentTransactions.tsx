@@ -30,7 +30,7 @@ export function RecentTransactions({
             const category = categories.find((item) => item.id === transaction.categoryId);
 
             return (
-              <li key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 px-4 py-3">
+              <li key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 px-4 py-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-slate-950">
                     {category?.emoji ?? "#"} {transaction.description}

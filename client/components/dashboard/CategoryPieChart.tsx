@@ -20,7 +20,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
       {data.length === 0 ? (
         <EmptyState title="Sin datos" description="Esta vista se activará cuando existan gastos." />
       ) : (
-        <div className="h-72 w-full">
+        <div className="h-56 w-full sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

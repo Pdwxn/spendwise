@@ -37,7 +37,7 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
           description="Añade gastos para ver el gráfico por categoría."
         />
       ) : (
-        <div className="h-72 w-full">
+        <div className="h-56 w-full sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />

@@ -8,19 +8,21 @@ type SummaryCardsProps = {
 
 export function SummaryCards({ totalBalance, monthlyIncome, monthlyExpenses }: SummaryCardsProps) {
   return (
-    <section className="grid gap-4 sm:grid-cols-3">
-      <Card>
+    <section className="space-y-3">
+      <Card variant="highlight" className="p-4 sm:p-5">
         <p className="text-sm text-cyan-100/65">Saldo total</p>
-        <p className="mt-2 text-2xl font-semibold text-cyan-50">{totalBalance}</p>
+        <p className="mt-2 whitespace-nowrap text-2xl font-semibold tracking-tight text-cyan-50 sm:text-4xl">{totalBalance}</p>
       </Card>
-      <Card>
-        <p className="text-sm text-cyan-100/65">Ingresos del mes</p>
-        <p className="mt-2 text-2xl font-semibold text-emerald-300">{monthlyIncome}</p>
-      </Card>
-      <Card>
-        <p className="text-sm text-cyan-100/65">Gastos del mes</p>
-        <p className="mt-2 text-2xl font-semibold text-rose-300">{monthlyExpenses}</p>
-      </Card>
+      <div className="grid grid-cols-2 gap-3">
+        <Card variant="subtle" className="p-3 sm:p-4">
+          <p className="text-xs text-cyan-100/65 sm:text-sm">Ingresos del mes</p>
+          <p className="mt-2 whitespace-nowrap text-lg font-semibold text-emerald-300 sm:text-2xl">{monthlyIncome}</p>
+        </Card>
+        <Card variant="subtle" className="p-3 sm:p-4">
+          <p className="text-xs text-cyan-100/65 sm:text-sm">Gastos del mes</p>
+          <p className="mt-2 whitespace-nowrap text-lg font-semibold text-rose-300 sm:text-2xl">{monthlyExpenses}</p>
+        </Card>
+      </div>
     </section>
   );
 }

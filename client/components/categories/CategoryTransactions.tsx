@@ -20,13 +20,13 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
   const categoryTransactions = filterTransactions(transactions, { categoryId }).sort((left, right) => right.date.localeCompare(left.date));
 
   if (!category) {
-      return (
-        <EmptyState
+    return (
+      <EmptyState
         title="Categoría no encontrada"
         description="La categoría solicitada no existe o fue eliminada."
         action={<Link href="/categories" className="text-sm font-medium text-cyan-50 underline">Volver a categorías</Link>}
-        />
-      );
+      />
+    );
   }
 
   return (
@@ -45,7 +45,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
       ) : (
         <div className="space-y-3">
           {categoryTransactions.map((transaction) => (
-            <div key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-4">
+            <div key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 p-4">
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-cyan-50">{transaction.description}</p>
                 <p className="text-xs text-cyan-100/65">{formatShortDate(transaction.date)}</p>

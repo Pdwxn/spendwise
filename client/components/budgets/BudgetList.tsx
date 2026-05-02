@@ -32,7 +32,7 @@ export function BudgetList() {
             const progress = calculateBudgetProgress(budget, transactions, selectedMonth);
 
             return (
-              <div key={budget.id} className="rounded-2xl border border-slate-200 p-4">
+                <div key={budget.id} className="rounded-2xl border border-white/10 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-cyan-50">
@@ -52,10 +52,8 @@ export function BudgetList() {
                     percentage={progress.percentage}
                     isOverBudget={progress.isOverBudget}
                   />
-                    <p className="mt-2 text-xs text-cyan-100/65">
-                      Restante {formatCurrency(progress.remainingAmount)}
-                    </p>
-                </div>
+                    <p className="mt-2 text-xs text-cyan-100/65">Restante {formatCurrency(progress.remainingAmount)}</p>
+                  </div>
               </div>
             );
           })}

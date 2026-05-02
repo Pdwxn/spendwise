@@ -29,7 +29,7 @@ export function SavingList() {
             const currentValue = calculateSavingValue(saving, elapsedMonths);
 
             return (
-              <div key={saving.id} className="rounded-2xl border border-slate-200 p-4">
+              <div key={saving.id} className="rounded-2xl border border-white/10 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-medium text-cyan-50">{saving.name}</p>

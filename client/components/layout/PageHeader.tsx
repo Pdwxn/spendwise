@@ -8,7 +8,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
-    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <header className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-end sm:justify-between">
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold tracking-tight text-cyan-50">{title}</h1>
         {description ? <p className="text-sm text-cyan-100/65">{description}</p> : null}
