@@ -1,27 +1,36 @@
 "use client";
 
-import { BudgetForm } from "@/components/budgets/BudgetForm";
+import { BudgetFormModal } from "@/components/budgets/BudgetFormModal";
 import { BudgetList } from "@/components/budgets/BudgetList";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useFinance } from "@/hooks/useFinance";
 import { formatMonthLabel } from "@/utils/formatters";
+import { Button } from "@/components/ui/Button";
+import { useState } from "react";
 
 export default function BudgetsPage() {
   const {
     state: { selectedMonth },
   } = useFinance();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Presupuestos"
         description={`Presupuestos mensuales para ${formatMonthLabel(selectedMonth)}.`}
+        action={
+          <Button type="button" onClick={() => setIsOpen(true)}>
+            Nuevo presupuesto
+          </Button>
+        }
       />
 
-      <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <BudgetForm />
+      <section>
         <BudgetList />
       </section>
+
+      <BudgetFormModal open={isOpen} onClose={() => setIsOpen(false)} />
     </div>
   );
 }

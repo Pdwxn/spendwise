@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
 import type { Transaction } from "@/types";
 import { formatCurrency, formatShortDate } from "@/utils/formatters";
-import Link from "next/link";
 
 type TransactionListProps = {
   transactions: Transaction[];
@@ -26,18 +25,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
       </div>
 
       {transactions.length === 0 ? (
-        <EmptyState
-          title="No se encontraron movimientos"
-          description="Prueba a ajustar los filtros o crea un movimiento nuevo."
-          action={
-            <Link
-              href="#transaction-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Crear movimiento
-            </Link>
-          }
-        />
+        <EmptyState title="No se encontraron movimientos" description="Prueba a ajustar los filtros." />
       ) : (
         <div className="space-y-3">
           {transactions.map((transaction) => {

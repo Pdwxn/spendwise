@@ -1,7 +1,6 @@
 "use client";
 
 import { TransactionFilters } from "@/components/transactions/TransactionFilters";
-import { TransactionForm } from "@/components/transactions/TransactionForm";
 import { TransactionList } from "@/components/transactions/TransactionList";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useFinance } from "@/hooks/useFinance";
@@ -21,13 +20,12 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Movimientos"
-        description="Registra, filtra y revisa ingresos y gastos."
+        description="Filtra y revisa ingresos y gastos."
       />
 
       <TransactionFilters categories={categories} />
 
-      <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <TransactionForm />
+      <section>
         <TransactionList transactions={filteredTransactions} />
       </section>
     </div>

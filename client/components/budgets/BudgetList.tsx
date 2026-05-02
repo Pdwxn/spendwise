@@ -7,7 +7,6 @@ import { useFinance } from "@/hooks/useFinance";
 import { calculateBudgetProgress } from "@/utils/calculations";
 import { formatCurrency, formatMonthLabel } from "@/utils/formatters";
 import { BudgetProgress } from "@/components/budgets/BudgetProgress";
-import Link from "next/link";
 
 export function BudgetList() {
   const {
@@ -25,18 +24,7 @@ export function BudgetList() {
       </div>
 
       {currentBudgets.length === 0 ? (
-        <EmptyState
-          title="Aún no hay presupuestos"
-          description="Crea un presupuesto para empezar a seguir el gasto por categoría."
-          action={
-            <Link
-              href="#budget-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Crear presupuesto
-            </Link>
-          }
-        />
+        <EmptyState title="Aún no hay presupuestos" description="Crea un presupuesto con el botón superior." />
       ) : (
         <div className="space-y-3">
           {currentBudgets.map((budget) => {

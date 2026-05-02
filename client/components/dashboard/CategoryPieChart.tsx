@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { CategoryBreakdownItem } from "@/utils/calculations";
 import { formatCurrency } from "@/utils/formatters";
-import Link from "next/link";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 type CategoryPieChartProps = {
@@ -20,18 +19,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
       </div>
 
       {data.length === 0 ? (
-        <EmptyState
-          title="Sin datos"
-          description="Esta vista se activará cuando existan gastos."
-          action={
-            <Link
-              href="/transactions#transaction-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Crear gasto
-            </Link>
-          }
-        />
+        <EmptyState title="Sin datos" description="Esta vista se activará cuando existan gastos." />
       ) : (
         <div className="h-56 w-full sm:h-72">
           <ResponsiveContainer width="100%" height="100%">

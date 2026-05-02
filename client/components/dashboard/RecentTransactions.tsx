@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { Category, Transaction } from "@/types";
-import Link from "next/link";
 
 type RecentTransactionsProps = {
   transactions: Transaction[];
@@ -24,18 +23,7 @@ export function RecentTransactions({
       </div>
 
       {transactions.length === 0 ? (
-        <EmptyState
-          title="Aún no hay movimientos"
-          description="Añade tu primer ingreso o gasto para llenar esta lista."
-          action={
-            <Link
-              href="/transactions#transaction-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Ir a movimientos
-            </Link>
-          }
-        />
+        <EmptyState title="Aún no hay movimientos" description="Añade tu primer ingreso o gasto desde el home." />
       ) : (
         <ul className="space-y-3">
           {transactions.map((transaction) => {

@@ -32,18 +32,7 @@ export function CategoryList() {
       </div>
 
       {categories.length === 0 ? (
-        <EmptyState
-          title="Aún no hay categorías"
-          description="Crea tu primera categoría para empezar a controlar gastos."
-          action={
-            <Link
-              href="#category-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Crear categoría
-            </Link>
-          }
-        />
+        <EmptyState title="Aún no hay categorías" description="Crea tu primera categoría con el botón superior." />
       ) : (
         <div className="space-y-3">
           {categories.map((category) => (

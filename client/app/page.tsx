@@ -1,7 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { ExpenseBars } from "@/components/dashboard/ExpenseBars";
+import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
+import { ExpenseFormModal } from "@/components/transactions/ExpenseFormModal";
+import { IncomeFormModal } from "@/components/transactions/IncomeFormModal";
 import { useFinance } from "@/hooks/useFinance";
 import {
   filterTransactions,
@@ -10,9 +15,11 @@ import {
   getMonthlyIncome,
   getTotalBalance,
 } from "@/utils/calculations";
-import { formatCurrency, formatMonthLabel } from "@/utils/formatters";
+import { formatCurrency, formatMonthLabel, formatShortDate } from "@/utils/formatters";
 
 export default function Home() {
+  const [isExpenseOpen, setIsExpenseOpen] = useState(false);
+  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const {
     state: { accounts, budgets, categories, selectedCategoryId, selectedMonth, transactions },
   } = useFinance();
@@ -34,6 +41,9 @@ export default function Home() {
     ...item,
     budgetAmount: budgetAmountByCategory.get(item.categoryId) ?? null,
   }));
+  const recentTransactions = [...filteredTransactions]
+    .sort((left, right) => right.date.localeCompare(left.date))
+    .slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -60,7 +70,28 @@ export default function Home() {
         </div>
 
         <ExpenseBars items={expenseBars} />
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button type="button" className="flex-1" onClick={() => setIsExpenseOpen(true)}>
+            Nuevo gasto
+          </Button>
+          <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsIncomeOpen(true)}>
+            Nuevo ingreso
+          </Button>
+        </div>
       </section>
+
+      <section>
+        <RecentTransactions
+          transactions={recentTransactions}
+          categories={categories}
+          formatCurrency={formatCurrency}
+          formatShortDate={formatShortDate}
+        />
+      </section>
+
+      <ExpenseFormModal open={isExpenseOpen} onClose={() => setIsExpenseOpen(false)} />
+      <IncomeFormModal open={isIncomeOpen} onClose={() => setIsIncomeOpen(false)} />
     </div>
   );
 }

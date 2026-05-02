@@ -1,7 +1,6 @@
 "use client";
 
 import { toast } from "react-toastify";
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -32,18 +31,7 @@ export function AccountList() {
       </div>
 
       {accounts.length === 0 ? (
-        <EmptyState
-          title="Aún no hay cuentas"
-          description="Crea una cuenta para empezar a registrar movimientos."
-          action={
-            <Link
-              href="#account-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Crear cuenta
-            </Link>
-          }
-        />
+        <EmptyState title="Aún no hay cuentas" description="Crea una cuenta con el botón superior." />
       ) : (
         <div className="space-y-3">
           {accounts.map((account) => {

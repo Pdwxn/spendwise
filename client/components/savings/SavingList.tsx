@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
 import { calculateSavingValue, getElapsedMonthsBetweenDates } from "@/utils/calculations";
 import { formatCurrency, formatPercentage, formatShortDate } from "@/utils/formatters";
-import Link from "next/link";
 
 export function SavingList() {
   const {
@@ -22,18 +21,7 @@ export function SavingList() {
       </div>
 
       {savings.length === 0 ? (
-        <EmptyState
-          title="Aún no hay ahorros"
-          description="Crea un ahorro fijo o proyectado para seguir su evolución."
-          action={
-            <Link
-              href="#saving-form"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-            >
-              Crear ahorro
-            </Link>
-          }
-        />
+        <EmptyState title="Aún no hay ahorros" description="Crea un ahorro con el botón superior." />
       ) : (
         <div className="space-y-3">
           {savings.map((saving) => {

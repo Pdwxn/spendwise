@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { CategoryBreakdownItem } from "@/utils/calculations";
 import { DEFAULT_LOCALE } from "@/utils/constants";
@@ -50,18 +49,7 @@ function formatCompactValue(value: number) {
 export function ExpenseBars({ items }: ExpenseBarsProps) {
   if (items.length === 0) {
     return (
-      <EmptyState
-        title="Sin gastos"
-        description="Añade movimientos para ver las barras aquí."
-        action={
-          <Link
-            href="/transactions#transaction-form"
-            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
-          >
-            Crear gasto
-          </Link>
-        }
-      />
+      <EmptyState title="Sin gastos" description="Añade movimientos para ver las barras aquí." />
     );
   }
 
