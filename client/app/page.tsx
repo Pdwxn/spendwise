@@ -53,9 +53,7 @@ export default function Home() {
           <h1 className="text-3xl font-semibold tracking-tight text-cyan-50 sm:text-4xl">SpendWise</h1>
         </div>
         <p className="text-sm font-medium text-cyan-100/70">Bienvenido Usuario</p>
-        <p className="text-sm text-cyan-100/65">
-          Vista actual: {formatMonthLabel(selectedMonth)}{selectedCategoryId ? " · filtrado por categoría" : ""}
-        </p>
+        <p className="text-sm text-cyan-100/65">{formatMonthLabel(selectedMonth)}</p>
       </header>
 
       <SummaryCards
