@@ -42,7 +42,6 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
         <div>
           <p className="text-3xl">{category.emoji}</p>
           <h2 className="mt-2 text-lg font-semibold text-cyan-50">{category.name}</h2>
-          <p className="text-sm text-cyan-100/65">Movimientos vinculados a esta categoría.</p>
         </div>
         <div className="h-5 w-5 rounded-full" style={{ backgroundColor: category.color }} />
       </div>

@@ -22,7 +22,6 @@ export function RecentTransactions({
     <Card className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Movimientos recientes</h2>
-        <p className="text-sm text-cyan-100/65">Actividad más reciente en la vista seleccionada.</p>
       </div>
 
       {transactions.length === 0 ? (

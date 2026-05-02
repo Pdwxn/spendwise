@@ -21,7 +21,7 @@ export default function Home() {
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
   const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const {
-    state: { accounts, budgets, categories, selectedCategoryId, selectedMonth, transactions },
+    state: { accounts, budgets, categories, selectedCategoryId, selectedMonth, savings, transactions },
   } = useFinance();
 
   const filteredTransactions = filterTransactions(transactions, {
@@ -42,7 +42,7 @@ export default function Home() {
     budgetAmount: budgetAmountByCategory.get(item.categoryId) ?? null,
   }));
   const recentTransactions = [...filteredTransactions]
-    .sort((left, right) => right.date.localeCompare(left.date))
+    .sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt))
     .slice(0, 5);
 
   return (
@@ -64,27 +64,28 @@ export default function Home() {
         monthlyExpenses={formatCurrency(monthlyExpenses)}
       />
 
+      <div className="grid grid-cols-2 gap-3">
+        <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsIncomeOpen(true)}>
+          Nuevo ingreso
+        </Button>
+        <Button type="button" className="flex-1" onClick={() => setIsExpenseOpen(true)}>
+          Nuevo gasto
+        </Button>
+      </div>
+
       <section className="space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-cyan-50">Gastos</h2>
         </div>
 
         <ExpenseBars items={expenseBars} />
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button type="button" className="flex-1" onClick={() => setIsExpenseOpen(true)}>
-            Nuevo gasto
-          </Button>
-          <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsIncomeOpen(true)}>
-            Nuevo ingreso
-          </Button>
-        </div>
       </section>
 
       <section>
         <RecentTransactions
           transactions={recentTransactions}
           categories={categories}
+          savings={savings}
           formatCurrency={formatCurrency}
           formatShortDate={formatShortDate}
         />

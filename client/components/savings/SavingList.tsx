@@ -12,8 +12,8 @@ import {
   getSavingWithdrawalsTotal,
 } from "@/utils/calculations";
 import { formatCurrency, formatPercentage, formatShortDate } from "@/utils/formatters";
-import { SavingContributionModal } from "@/components/savings/SavingContributionModal";
-import { SavingWithdrawalModal } from "@/components/savings/SavingWithdrawalModal";
+import { SavingContributionFormModal } from "@/components/savings/SavingContributionFormModal";
+import { SavingWithdrawalFormModal } from "@/components/savings/SavingWithdrawalFormModal";
 import type { ID } from "@/types";
 
 export function SavingList() {
@@ -42,7 +42,6 @@ export function SavingList() {
     <Card className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Ahorros</h2>
-        <p className="text-sm text-cyan-100/65">Elementos guardados con su valor estimado actual.</p>
       </div>
 
       {savings.length === 0 ? (
@@ -90,10 +89,12 @@ export function SavingList() {
                     <p className="text-sm text-cyan-100/65">Abonado</p>
                     <p className="text-lg font-semibold text-emerald-300">{formatCurrency(contributionsTotal)}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-cyan-100/65">Retirado</p>
-                    <p className="text-lg font-semibold text-rose-300">{formatCurrency(withdrawalsTotal)}</p>
-                  </div>
+                  {withdrawalsTotal > 0 ? (
+                    <div className="space-y-1">
+                      <p className="text-sm text-cyan-100/65">Retirado</p>
+                      <p className="text-lg font-semibold text-rose-300">{formatCurrency(withdrawalsTotal)}</p>
+                    </div>
+                  ) : null}
                   <p className="sm:col-span-3 text-xs text-cyan-100/65">
                     Modo: {saving.mode === "static" ? "Fijo" : `Anual ${formatPercentage(saving.annualPercentage ?? 0)}`}
                   </p>
@@ -104,8 +105,8 @@ export function SavingList() {
         </div>
       )}
 
-      <SavingContributionModal open={activeMode === "contribution"} savingId={activeSavingId} onClose={closeModals} />
-      <SavingWithdrawalModal open={activeMode === "withdrawal"} savingId={activeSavingId} onClose={closeModals} />
+      <SavingContributionFormModal open={activeMode === "contribution"} savingId={activeSavingId} onClose={closeModals} />
+      <SavingWithdrawalFormModal open={activeMode === "withdrawal"} savingId={activeSavingId} onClose={closeModals} />
     </Card>
   );
 }

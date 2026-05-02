@@ -27,7 +27,6 @@ export function AccountList() {
     <Card className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Cuentas</h2>
-        <p className="text-sm text-cyan-100/65">Saldos actuales y datos de cada cuenta.</p>
       </div>
 
       {accounts.length === 0 ? (

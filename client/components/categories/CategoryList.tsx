@@ -30,7 +30,6 @@ export function CategoryList() {
     <Card className="space-y-4">
       <div>
         <h2 className="text-lg font-semibold text-cyan-50">Categorías</h2>
-        <p className="text-sm text-cyan-100/65">Todas las categorías disponibles en el sistema.</p>
       </div>
 
       {visibleCategories.length === 0 ? (

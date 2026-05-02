@@ -14,7 +14,7 @@ export default function TransactionsPage() {
   const filteredTransactions = filterTransactions(transactions, {
     month: selectedMonth,
     categoryId: selectedCategoryId,
-  }).sort((left, right) => right.date.localeCompare(left.date));
+  }).sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt));
 
   return (
     <div className="space-y-6">

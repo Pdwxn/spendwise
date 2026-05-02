@@ -7,6 +7,7 @@ import { useFinance } from "@/hooks/useFinance";
 import { getMonthKeyFromDate } from "@/utils/calculations";
 import { formatMonthLabel } from "@/utils/formatters";
 import type { Category, ID, MonthKey } from "@/types";
+import { isSystemCategoryId } from "@/utils/constants";
 
 type TransactionFiltersProps = {
   categories: Category[];
@@ -31,13 +32,13 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
   } = useFinance();
 
   const monthOptions = getRecentMonths(12);
+  const visibleCategories = categories.filter((category) => !isSystemCategoryId(category.id));
 
   return (
     <Card className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-cyan-50">Filtros</h2>
-          <p className="text-sm text-cyan-100/65">Filtra la lista por mes y categoría.</p>
         </div>
         <Button
           variant="ghost"
@@ -70,7 +71,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
             onChange={(event) => actions.setSelectedCategoryId(event.target.value === "all" ? null : (event.target.value as ID))}
           >
             <option value="all">Todas las categorías</option>
-            {categories.map((category) => (
+            {visibleCategories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.emoji} {category.name}
               </option>
