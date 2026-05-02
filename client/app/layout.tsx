@@ -19,6 +19,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SpendWise",
   description: "Aplicación de finanzas personales para usuarios hispanohablantes.",
+  applicationName: "SpendWise",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "SpendWise",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport = {
+  themeColor: "#041016",
 };
 
 export default function RootLayout({
