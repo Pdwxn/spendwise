@@ -63,6 +63,18 @@ class SavingSerializer(serializers.ModelSerializer):
         model = Saving
         fields = ["id", "name", "initialAmount", "mode", "annualPercentage", "createdAt"]
 
+    def validate(self, attrs):
+        mode = attrs.get("mode") or getattr(self.instance, "mode", None)
+        annual_percentage = attrs.get("annual_percentage") if "annual_percentage" in attrs else getattr(self.instance, "annual_percentage", None)
+
+        if mode == "annualPercentage" and annual_percentage is None:
+            raise serializers.ValidationError({"annualPercentage": "El porcentaje anual es obligatorio para este modo."})
+
+        if mode == "static" and annual_percentage not in (None, 0):
+            raise serializers.ValidationError({"annualPercentage": "El porcentaje anual no aplica para el modo fijo."})
+
+        return attrs
+
 
 class TransactionSerializer(serializers.ModelSerializer):
     categoryId = CategoryReferenceField(source="category", queryset=Category.objects.all())
@@ -91,6 +103,29 @@ class TransactionSerializer(serializers.ModelSerializer):
             "createdAt",
         ]
 
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("El importe debe ser mayor que 0.")
+
+        return value
+
+    def validate(self, attrs):
+        category = attrs.get("category") or getattr(self.instance, "category", None)
+        linked_saving = attrs.get("linked_saving") or getattr(self.instance, "linked_saving", None)
+        linked_saving_action = attrs.get("linked_saving_action") or getattr(self.instance, "linked_saving_action", None)
+        is_internal_saving = linked_saving is not None or linked_saving_action is not None
+
+        if category and getattr(category, "is_system", False) and category.code not in {"category-income", "category-savings"}:
+            raise serializers.ValidationError({"categoryId": "No puedes usar una categoría del sistema para este movimiento."})
+
+        if category and category.code == "category-savings" and not is_internal_saving:
+            raise serializers.ValidationError({"categoryId": "La categoría de ahorros solo puede usarse en movimientos internos."})
+
+        if category and category.code == "category-income" and attrs.get("type") == Transaction.TransactionType.EXPENSE:
+            raise serializers.ValidationError({"categoryId": "Los gastos no pueden usar la categoría interna de ingresos."})
+
+        return attrs
+
 
 class BudgetSerializer(serializers.ModelSerializer):
     categoryId = CategoryReferenceField(source="category", queryset=Category.objects.all())
@@ -99,6 +134,18 @@ class BudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Budget
         fields = ["id", "categoryId", "month", "amount", "createdAt"]
+
+    def validate_month(self, value):
+        if len(value) != 7 or value[4] != "-":
+            raise serializers.ValidationError("El mes debe tener formato YYYY-MM.")
+
+        return value
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("El importe debe ser mayor que 0.")
+
+        return value
 
 
 class SavingContributionSerializer(serializers.ModelSerializer):
