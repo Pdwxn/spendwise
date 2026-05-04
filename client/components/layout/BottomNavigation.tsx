@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react";
 
 const items = [
-  { href: "/", label: "Inicio", icon: IconHome },
+  { href: "/dashboard", label: "Inicio", icon: IconHome },
   { href: "/accounts", label: "Cuentas", icon: IconWallet },
   { href: "/transactions", label: "Movimientos", icon: IconArrowsExchange },
   { href: "/budgets", label: "Presupuestos", icon: IconChartPie },
@@ -27,7 +27,7 @@ export function BottomNavigation() {
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/95 px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
       <div className="mx-auto grid max-w-6xl grid-cols-6 gap-1 px-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-[0.625rem] font-medium text-cyan-100/70">
         {items.map((item) => {
-          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const isActive = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
           const Icon = item.icon;
 
           return (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
+import { AuthProvider } from "@/context/AuthContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { FinanceProvider } from "@/context/FinanceContext";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,9 +45,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <FinanceProvider>
-          <AppShell>{children}</AppShell>
-        </FinanceProvider>
+        <AuthProvider>
+          <FinanceProvider>
+            <AppShell>{children}</AppShell>
+          </FinanceProvider>
+        </AuthProvider>
       </body>
     </html>
   );

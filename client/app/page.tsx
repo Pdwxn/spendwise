@@ -1,96 +1,55 @@
-"use client";
+import Link from "next/link";
+import { Card } from "@/components/ui/Card";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/Button";
-import { SummaryCards } from "@/components/dashboard/SummaryCards";
-import { ExpenseBars } from "@/components/dashboard/ExpenseBars";
-import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
-import { ExpenseFormModal } from "@/components/transactions/ExpenseFormModal";
-import { IncomeFormModal } from "@/components/transactions/IncomeFormModal";
-import { useFinance } from "@/hooks/useFinance";
-import {
-  filterTransactions,
-  getCategoryBreakdown,
-  getMonthlyExpenses,
-  getMonthlyIncome,
-  getTotalBalance,
-} from "@/utils/calculations";
-import { formatCurrency, formatMonthLabel, formatShortDate } from "@/utils/formatters";
-
-export default function Home() {
-  const [isExpenseOpen, setIsExpenseOpen] = useState(false);
-  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
-  const {
-    state: { accounts, budgets, categories, selectedCategoryId, selectedMonth, savings, transactions },
-  } = useFinance();
-
-  const filteredTransactions = filterTransactions(transactions, {
-    month: selectedMonth,
-    categoryId: selectedCategoryId,
-  });
-  const totalBalance = getTotalBalance(accounts, transactions);
-  const monthlyIncome = getMonthlyIncome(filteredTransactions, selectedMonth);
-  const monthlyExpenses = getMonthlyExpenses(filteredTransactions, selectedMonth);
-  const categoryBreakdown = getCategoryBreakdown(filteredTransactions, categories, {
-    month: selectedMonth,
-    type: "expense",
-  });
-  const monthlyBudgets = budgets.filter((budget) => budget.month === selectedMonth);
-  const budgetAmountByCategory = new Map(monthlyBudgets.map((budget) => [budget.categoryId, budget.amount] as const));
-  const expenseBars = categoryBreakdown.slice(0, 5).map((item) => ({
-    ...item,
-    budgetAmount: budgetAmountByCategory.get(item.categoryId) ?? null,
-  }));
-  const recentTransactions = [...filteredTransactions]
-    .sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt))
-    .slice(0, 5);
-
+export default function LandingPage() {
   return (
-    <div className="space-y-6">
-      <header className="space-y-2 pt-1">
-        <p className="text-xs font-medium uppercase tracking-[0.24em] text-cyan-100/50">Panel principal</p>
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight text-cyan-50 sm:text-4xl">SpendWise</h1>
-        </div>
-        <p className="text-sm font-medium text-cyan-100/70">Bienvenido Usuario</p>
-        <p className="text-sm text-cyan-100/65">{formatMonthLabel(selectedMonth)}</p>
-      </header>
+    <div className="flex min-h-[calc(100vh-2rem)] items-center py-8 sm:py-10">
+      <div className="grid w-full gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <section className="space-y-6">
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.28em] text-cyan-100/50">SpendWise</p>
+            <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-cyan-50 sm:text-6xl">
+              Controla tu dinero sin perder claridad.
+            </h1>
+            <p className="max-w-lg text-base leading-relaxed text-cyan-100/68 sm:text-lg">
+              Registra ingresos, gastos, presupuestos y ahorros en un panel privado con acceso por correo o Google.
+            </p>
+          </div>
 
-      <SummaryCards
-        totalBalance={formatCurrency(totalBalance)}
-        monthlyIncome={formatCurrency(monthlyIncome)}
-        monthlyExpenses={formatCurrency(monthlyExpenses)}
-      />
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link href="/register" className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-300 px-4 py-2 text-sm font-medium text-slate-950 shadow-lg shadow-cyan-500/20 transition-all hover:brightness-110 sm:w-auto">
+              Crear cuenta
+            </Link>
+            <Link href="/login" className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 transition-all hover:bg-white/[0.1] sm:w-auto">
+              Iniciar sesión
+            </Link>
+          </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Button type="button" variant="secondary" className="flex-1" onClick={() => setIsIncomeOpen(true)}>
-          Nuevo ingreso
-        </Button>
-        <Button type="button" className="flex-1" onClick={() => setIsExpenseOpen(true)}>
-          Nuevo gasto
-        </Button>
+          <p className="text-sm text-cyan-100/45">Tu información queda separada por usuario desde el primer acceso.</p>
+        </section>
+
+        <Card variant="highlight" className="space-y-4 p-6 sm:p-8">
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-[0.24em] text-cyan-100/50">Vista previa</p>
+            <h2 className="text-2xl font-semibold text-cyan-50">Resumen privado</h2>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/45 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-cyan-100/40">Balance</p>
+              <p className="mt-2 text-2xl font-semibold text-cyan-50">$12,480</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-950/45 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-cyan-100/40">Ahorro</p>
+              <p className="mt-2 text-2xl font-semibold text-cyan-50">$4,200</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-slate-950/45 p-4">
+            <p className="text-sm font-medium text-cyan-50">Registra movimientos, revisa presupuestos y sigue metas de ahorro desde un solo lugar.</p>
+          </div>
+        </Card>
       </div>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold text-cyan-50">Gastos</h2>
-        </div>
-
-        <ExpenseBars items={expenseBars} />
-      </section>
-
-      <section>
-        <RecentTransactions
-          transactions={recentTransactions}
-          categories={categories}
-          savings={savings}
-          formatCurrency={formatCurrency}
-          formatShortDate={formatShortDate}
-        />
-      </section>
-
-      <ExpenseFormModal open={isExpenseOpen} onClose={() => setIsExpenseOpen(false)} />
-      <IncomeFormModal open={isIncomeOpen} onClose={() => setIsIncomeOpen(false)} />
     </div>
   );
 }

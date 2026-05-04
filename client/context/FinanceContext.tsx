@@ -8,15 +8,13 @@ import {
 } from "react";
 import {
   DEFAULT_CATEGORIES,
-  STORAGE_KEY,
   SAVINGS_CATEGORY_ID,
   SYSTEM_CATEGORY_IDS,
 } from "@/utils/constants";
-import { readStorageValue, writeStorageValue } from "@/utils/storage";
 import { canRemoveAccount, canRemoveCategory, canWithdrawFromSaving } from "@/utils/calculations";
+import { apiRequest } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import type {
-  Account,
-  Budget,
   Category,
   CreateAccountInput,
   CreateBudgetInput,
@@ -26,10 +24,6 @@ import type {
   FinanceState,
   ID,
   MonthKey,
-  Saving,
-  SavingContribution,
-  SavingWithdrawal,
-  Transaction,
   UpdateAccountInput,
   UpdateBudgetInput,
   UpdateCategoryInput,
@@ -81,8 +75,6 @@ type FinanceProviderProps = {
   children: ReactNode;
 };
 
-type FinanceStorageState = FinanceState;
-
 const FinanceContext = createContext<FinanceContextValue | null>(null);
 
 function pad(value: number) {
@@ -119,78 +111,12 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isAccount(value: unknown): value is Account {
-  return isObject(value)
-    && typeof value.id === "string"
-    && typeof value.name === "string"
-    && typeof value.initialBalance === "number"
-    && typeof value.color === "string"
-    && typeof value.createdAt === "string";
+function toNumber(value: unknown, fallback = 0) {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function isCategory(value: unknown): value is Category {
-  return isObject(value)
-    && typeof value.id === "string"
-    && typeof value.name === "string"
-    && typeof value.emoji === "string"
-    && typeof value.color === "string"
-    && typeof value.createdAt === "string";
-}
-
-function isTransaction(value: unknown): value is Transaction {
-  return isObject(value)
-    && typeof value.id === "string"
-    && (value.type === "income" || value.type === "expense")
-    && typeof value.amount === "number"
-    && typeof value.categoryId === "string"
-    && typeof value.description === "string"
-    && typeof value.date === "string"
-    && typeof value.accountId === "string"
-    && typeof value.createdAt === "string";
-}
-
-function isBudget(value: unknown): value is Budget {
-  return isObject(value)
-    && typeof value.id === "string"
-    && typeof value.categoryId === "string"
-    && typeof value.month === "string"
-    && typeof value.amount === "number"
-    && typeof value.createdAt === "string";
-}
-
-function isSaving(value: unknown): value is Saving {
-  return isObject(value)
-    && typeof value.id === "string"
-    && typeof value.name === "string"
-    && typeof value.initialAmount === "number"
-    && (value.mode === "static" || value.mode === "annualPercentage")
-    && typeof value.createdAt === "string"
-    && (value.annualPercentage === undefined || typeof value.annualPercentage === "number");
-}
-
-function isSavingContribution(value: unknown): value is SavingContribution {
-  return isObject(value)
-    && typeof value.id === "string"
-    && typeof value.savingId === "string"
-    && typeof value.accountId === "string"
-    && typeof value.amount === "number"
-    && typeof value.description === "string"
-    && typeof value.date === "string"
-    && typeof value.createdAt === "string";
-}
-
-function isSavingWithdrawal(value: unknown): value is SavingWithdrawal {
-  return isObject(value)
-    && typeof value.id === "string"
-    && typeof value.savingId === "string"
-    && typeof value.accountId === "string"
-    && typeof value.amount === "number"
-    && typeof value.description === "string"
-    && typeof value.date === "string"
-    && typeof value.createdAt === "string";
-}
-
-function normalizeState(value: unknown): FinanceState {
+function normalizeRemoteState(value: unknown): FinanceState {
   const fallback = createInitialState();
 
   if (!isObject(value)) {
@@ -199,8 +125,16 @@ function normalizeState(value: unknown): FinanceState {
 
   const record = value as Record<string, unknown>;
 
-  const categories = Array.isArray(value.categories)
-    ? value.categories.filter(isCategory)
+  const categories = Array.isArray(record.categories)
+    ? record.categories
+        .filter((category): category is Record<string, unknown> => isObject(category))
+        .map((category) => ({
+          id: String(category.id),
+          name: String(category.name),
+          emoji: String(category.emoji),
+          color: String(category.color),
+          createdAt: String(category.createdAt),
+        }) as FinanceState["categories"][number])
     : fallback.categories;
 
   const categoryMap = new Map<string, Category>();
@@ -213,18 +147,102 @@ function normalizeState(value: unknown): FinanceState {
 
   const mergedCategories = Array.from(categoryMap.values());
 
+  const accounts = Array.isArray(record.accounts)
+    ? record.accounts
+        .filter((account): account is Record<string, unknown> => isObject(account))
+        .map((account) => ({
+          id: String(account.id),
+          name: String(account.name),
+          initialBalance: toNumber(account.initialBalance),
+          color: String(account.color),
+          createdAt: String(account.createdAt),
+        }) as FinanceState["accounts"][number])
+    : fallback.accounts;
+
+  const transactions = Array.isArray(record.transactions)
+    ? record.transactions
+        .filter((transaction): transaction is Record<string, unknown> => isObject(transaction))
+        .map((transaction) => ({
+          id: String(transaction.id),
+          type: transaction.type === "income" ? "income" : "expense",
+          amount: toNumber(transaction.amount),
+          categoryId: String(transaction.categoryId),
+          description: String(transaction.description),
+          date: String(transaction.date),
+          accountId: String(transaction.accountId),
+          linkedSavingId: transaction.linkedSavingId ? String(transaction.linkedSavingId) : undefined,
+          linkedSavingAction:
+            transaction.linkedSavingAction === "contribution" || transaction.linkedSavingAction === "withdrawal"
+              ? transaction.linkedSavingAction
+              : undefined,
+          createdAt: String(transaction.createdAt),
+        }) as FinanceState["transactions"][number])
+    : fallback.transactions;
+
+  const budgets = Array.isArray(record.budgets)
+    ? record.budgets
+        .filter((budget): budget is Record<string, unknown> => isObject(budget))
+        .map((budget) => ({
+          id: String(budget.id),
+          categoryId: String(budget.categoryId),
+          month: String(budget.month) as MonthKey,
+          amount: toNumber(budget.amount),
+          createdAt: String(budget.createdAt),
+        }) as FinanceState["budgets"][number])
+    : fallback.budgets;
+
+  const savings = Array.isArray(record.savings)
+    ? record.savings
+        .filter((saving): saving is Record<string, unknown> => isObject(saving))
+        .map((saving) => ({
+          id: String(saving.id),
+          name: String(saving.name),
+          initialAmount: toNumber(saving.initialAmount),
+          mode: saving.mode === "annualPercentage" ? "annualPercentage" : "static",
+          annualPercentage:
+            saving.annualPercentage === null || saving.annualPercentage === undefined
+              ? undefined
+              : toNumber(saving.annualPercentage),
+          createdAt: String(saving.createdAt),
+        }) as FinanceState["savings"][number])
+    : fallback.savings;
+
+  const savingContributions = Array.isArray(record.savingContributions)
+    ? record.savingContributions
+        .filter((contribution): contribution is Record<string, unknown> => isObject(contribution))
+        .map((contribution) => ({
+          id: String(contribution.id),
+          savingId: String(contribution.savingId),
+          accountId: String(contribution.accountId),
+          amount: toNumber(contribution.amount),
+          description: String(contribution.description),
+          date: String(contribution.date),
+          createdAt: String(contribution.createdAt),
+        }) as FinanceState["savingContributions"][number])
+    : fallback.savingContributions;
+
+  const savingWithdrawals = Array.isArray(record.savingWithdrawals)
+    ? record.savingWithdrawals
+        .filter((withdrawal): withdrawal is Record<string, unknown> => isObject(withdrawal))
+        .map((withdrawal) => ({
+          id: String(withdrawal.id),
+          savingId: String(withdrawal.savingId),
+          accountId: String(withdrawal.accountId),
+          amount: toNumber(withdrawal.amount),
+          description: String(withdrawal.description),
+          date: String(withdrawal.date),
+          createdAt: String(withdrawal.createdAt),
+        }) as FinanceState["savingWithdrawals"][number])
+    : fallback.savingWithdrawals;
+
   return {
-    accounts: Array.isArray(value.accounts) ? value.accounts.filter(isAccount) : fallback.accounts,
+    accounts,
     categories: mergedCategories.length > 0 ? mergedCategories : [...DEFAULT_CATEGORIES],
-    transactions: Array.isArray(value.transactions) ? value.transactions.filter(isTransaction) : fallback.transactions,
-    budgets: Array.isArray(value.budgets) ? value.budgets.filter(isBudget) : fallback.budgets,
-    savings: Array.isArray(value.savings) ? value.savings.filter(isSaving) : fallback.savings,
-    savingContributions: Array.isArray(record.savingContributions)
-      ? record.savingContributions.filter(isSavingContribution)
-      : fallback.savingContributions,
-    savingWithdrawals: Array.isArray(record.savingWithdrawals)
-      ? record.savingWithdrawals.filter(isSavingWithdrawal)
-      : fallback.savingWithdrawals,
+    transactions,
+    budgets,
+    savings,
+    savingContributions,
+    savingWithdrawals,
     selectedMonth:
       typeof record.selectedMonth === "string" && /^\d{4}-\d{2}$/.test(record.selectedMonth)
         ? (record.selectedMonth as MonthKey)
@@ -508,40 +526,144 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
 
 export function FinanceProvider({ children }: FinanceProviderProps) {
   const [state, dispatch] = useReducer(financeReducer, undefined, createInitialState);
-  const [hasHydrated, setHasHydrated] = useReducer(() => true, false);
+  const { accessToken, isHydrated: isAuthHydrated, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const storedState = readStorageValue<FinanceStorageState>(STORAGE_KEY, createInitialState());
-    dispatch({ type: "hydrate", payload: normalizeState(storedState) });
-    setHasHydrated();
-  }, []);
-
-  useEffect(() => {
-    if (!hasHydrated) {
+    if (!isAuthHydrated) {
       return;
     }
 
-    writeStorageValue(STORAGE_KEY, state);
-  }, [hasHydrated, state]);
+    if (!accessToken || !isAuthenticated) {
+      dispatch({ type: "reset" });
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadState() {
+      const params = new URLSearchParams();
+      params.set("month", state.selectedMonth);
+
+      if (state.selectedCategoryId) {
+        params.set("categoryId", state.selectedCategoryId);
+      }
+
+      const nextState = await apiRequest(`/api/state/?${params.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!cancelled) {
+        dispatch({ type: "hydrate", payload: normalizeRemoteState(nextState) });
+      }
+    }
+
+    loadState().catch(() => {
+      if (!cancelled) {
+        dispatch({ type: "reset" });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, isAuthHydrated, isAuthenticated]);
+
+  function request(path: string, init: RequestInit = {}) {
+    if (!accessToken) {
+      throw new Error("No hay sesión activa.");
+    }
+
+    return apiRequest(path, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...(init.headers ?? {}),
+      },
+    });
+  }
+
+  async function refreshState() {
+    if (!accessToken) {
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set("month", state.selectedMonth);
+
+    if (state.selectedCategoryId) {
+      params.set("categoryId", state.selectedCategoryId);
+    }
+
+    const nextState = await request(`/api/state/?${params.toString()}`);
+    dispatch({ type: "hydrate", payload: normalizeRemoteState(nextState) });
+  }
+
+  async function mutate<T>(operation: () => Promise<T>) {
+    try {
+      await operation();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await refreshState().catch((error) => {
+        console.error(error);
+      });
+    }
+  }
 
   const actions: FinanceActions = {
-    addAccount: (input) => dispatch({ type: "add-account", payload: input }),
-    updateAccount: (id, input) => dispatch({ type: "update-account", payload: { id, input } }),
-    removeAccount: (id) => dispatch({ type: "remove-account", payload: { id } }),
-    addCategory: (input) => dispatch({ type: "add-category", payload: input }),
-    updateCategory: (id, input) => dispatch({ type: "update-category", payload: { id, input } }),
-    removeCategory: (id) => dispatch({ type: "remove-category", payload: { id } }),
-    addTransaction: (input) => dispatch({ type: "add-transaction", payload: input }),
-    updateTransaction: (id, input) => dispatch({ type: "update-transaction", payload: { id, input } }),
-    removeTransaction: (id) => dispatch({ type: "remove-transaction", payload: { id } }),
-    addBudget: (input) => dispatch({ type: "add-budget", payload: input }),
-    updateBudget: (id, input) => dispatch({ type: "update-budget", payload: { id, input } }),
-    removeBudget: (id) => dispatch({ type: "remove-budget", payload: { id } }),
-    addSaving: (input) => dispatch({ type: "add-saving", payload: input }),
-    updateSaving: (id, input) => dispatch({ type: "update-saving", payload: { id, input } }),
-    removeSaving: (id) => dispatch({ type: "remove-saving", payload: { id } }),
-    addSavingContribution: (input) => dispatch({ type: "add-saving-contribution", payload: input }),
-    addSavingWithdrawal: (input) => dispatch({ type: "add-saving-withdrawal", payload: input }),
+    addAccount: (input) => {
+      void mutate(() => request("/api/accounts/", { method: "POST", body: JSON.stringify(input) }));
+    },
+    updateAccount: (id, input) => {
+      void mutate(() => request(`/api/accounts/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
+    },
+    removeAccount: (id) => {
+      void mutate(() => request(`/api/accounts/${id}/`, { method: "DELETE" }));
+    },
+    addCategory: (input) => {
+      void mutate(() => request("/api/categories/", { method: "POST", body: JSON.stringify(input) }));
+    },
+    updateCategory: (id, input) => {
+      void mutate(() => request(`/api/categories/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
+    },
+    removeCategory: (id) => {
+      void mutate(() => request(`/api/categories/${id}/`, { method: "DELETE" }));
+    },
+    addTransaction: (input) => {
+      void mutate(() => request("/api/transactions/", { method: "POST", body: JSON.stringify(input) }));
+    },
+    updateTransaction: (id, input) => {
+      void mutate(() => request(`/api/transactions/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
+    },
+    removeTransaction: (id) => {
+      void mutate(() => request(`/api/transactions/${id}/`, { method: "DELETE" }));
+    },
+    addBudget: (input) => {
+      void mutate(() => request("/api/budgets/", { method: "POST", body: JSON.stringify(input) }));
+    },
+    updateBudget: (id, input) => {
+      void mutate(() => request(`/api/budgets/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
+    },
+    removeBudget: (id) => {
+      void mutate(() => request(`/api/budgets/${id}/`, { method: "DELETE" }));
+    },
+    addSaving: (input) => {
+      void mutate(() => request("/api/savings/", { method: "POST", body: JSON.stringify(input) }));
+    },
+    updateSaving: (id, input) => {
+      void mutate(() => request(`/api/savings/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
+    },
+    removeSaving: (id) => {
+      void mutate(() => request(`/api/savings/${id}/`, { method: "DELETE" }));
+    },
+    addSavingContribution: (input) => {
+      void mutate(() => request(`/api/savings/${input.savingId}/contributions/`, { method: "POST", body: JSON.stringify(input) }));
+    },
+    addSavingWithdrawal: (input) => {
+      void mutate(() => request(`/api/savings/${input.savingId}/withdrawals/`, { method: "POST", body: JSON.stringify(input) }));
+    },
     setSelectedMonth: (month) => dispatch({ type: "set-selected-month", payload: month }),
     setSelectedCategoryId: (categoryId) => dispatch({ type: "set-selected-category", payload: categoryId }),
     resetState: () => dispatch({ type: "reset" }),
