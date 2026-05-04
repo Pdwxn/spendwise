@@ -3,11 +3,12 @@ from decimal import Decimal
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from finance.constants import DEFAULT_CATEGORIES
 from finance.models import Account, Budget, Category, Saving, SavingContribution, SavingWithdrawal, Transaction
@@ -20,9 +21,25 @@ from finance.serializers import (
     SavingWithdrawalSerializer,
     TransactionSerializer,
 )
+from finance.services import (
+    assert_transaction_is_allowed,
+    build_dashboard_summary,
+    can_delete_account,
+    can_delete_category,
+    can_delete_saving,
+    get_internal_savings_category,
+    get_saving_available_amount,
+)
 
 
 SYSTEM_CATEGORY_CODES = {item["code"] for item in DEFAULT_CATEGORIES if item["is_system"]}
+
+
+class UserScopedViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
 
 
 def apply_month_filter(queryset, month):
@@ -33,52 +50,28 @@ def apply_month_filter(queryset, month):
     return queryset.filter(date__year=int(year), date__month=int(month_number))
 
 
-def get_account_balance(account: Account, exclude_transaction_id=None):
-    transactions = account.transactions.all()
-
-    if exclude_transaction_id is not None:
-        transactions = transactions.exclude(id=exclude_transaction_id)
-
-    income = transactions.filter(type=Transaction.TransactionType.INCOME).aggregate(total=Coalesce(Sum("amount"), Decimal("0")))["total"]
-    expenses = transactions.filter(type=Transaction.TransactionType.EXPENSE).aggregate(total=Coalesce(Sum("amount"), Decimal("0")))["total"]
-    return account.initial_balance + income - expenses
-
-
-def assert_transaction_is_allowed(account: Account, transaction_type: str, amount, exclude_transaction_id=None):
-    if transaction_type != Transaction.TransactionType.EXPENSE:
-        return
-
-    available_balance = get_account_balance(account, exclude_transaction_id=exclude_transaction_id)
-    if amount > available_balance:
-        raise ValidationError({"amount": "El importe supera el saldo disponible de esta cuenta."})
-
-
-def get_saving_available_amount(saving: Saving):
-    contributions_total = saving.contributions.aggregate(total=Coalesce(Sum("amount"), Decimal("0")))["total"]
-    withdrawals_total = saving.withdrawals.aggregate(total=Coalesce(Sum("amount"), Decimal("0")))["total"]
-    return saving.initial_amount + contributions_total - withdrawals_total
-
-
-def get_internal_savings_category():
-    return Category.objects.get(code="category-savings")
-
-
-class AccountViewSet(viewsets.ModelViewSet):
+class AccountViewSet(UserScopedViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         account = self.get_object()
 
-        if account.transactions.exists():
+        if not can_delete_account(account):
             raise ValidationError({"detail": "No puedes eliminar una cuenta con movimientos asociados."})
 
         return super().destroy(request, *args, **kwargs)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(UserScopedViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         category = self.get_object()
@@ -89,10 +82,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
         if category.transactions.exists() or category.budgets.exists():
             raise ValidationError({"detail": "No puedes eliminar una categoría con movimientos o presupuestos asociados."})
 
+        if not can_delete_category(category):
+            raise ValidationError({"detail": "No puedes eliminar una categoría con movimientos o presupuestos asociados."})
+
         return super().destroy(request, *args, **kwargs)
 
 
-class TransactionViewSet(viewsets.ModelViewSet):
+class TransactionViewSet(UserScopedViewSet):
     queryset = Transaction.objects.select_related("account", "category", "linked_saving")
     serializer_class = TransactionSerializer
 
@@ -130,8 +126,12 @@ class TransactionViewSet(viewsets.ModelViewSet):
         if category.code == "category-savings" and not is_internal_saving:
             raise ValidationError({"categoryId": "La categoría de ahorros solo puede usarse en movimientos internos."})
 
-        assert_transaction_is_allowed(account, transaction_type, amount)
-        serializer.save()
+        try:
+            assert_transaction_is_allowed(account, transaction_type, amount)
+        except ValueError as exc:
+            raise ValidationError({"amount": str(exc)}) from exc
+
+        serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
         instance = self.get_object()
@@ -151,11 +151,15 @@ class TransactionViewSet(viewsets.ModelViewSet):
         if category.code == "category-savings" and not is_internal_saving:
             raise ValidationError({"categoryId": "La categoría de ahorros solo puede usarse en movimientos internos."})
 
-        assert_transaction_is_allowed(account, transaction_type, amount, exclude_transaction_id=instance.id)
+        try:
+            assert_transaction_is_allowed(account, transaction_type, amount, exclude_transaction_id=instance.id)
+        except ValueError as exc:
+            raise ValidationError({"amount": str(exc)}) from exc
+
         serializer.save()
 
 
-class BudgetViewSet(viewsets.ModelViewSet):
+class BudgetViewSet(UserScopedViewSet):
     queryset = Budget.objects.select_related("category")
     serializer_class = BudgetSerializer
 
@@ -178,7 +182,7 @@ class BudgetViewSet(viewsets.ModelViewSet):
         if category.is_system:
             raise ValidationError({"categoryId": "No puedes crear presupuestos para categorías del sistema."})
 
-        serializer.save()
+        serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
         category = serializer.validated_data.get("category", self.get_object().category)
@@ -189,14 +193,17 @@ class BudgetViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class SavingViewSet(viewsets.ModelViewSet):
+class SavingViewSet(UserScopedViewSet):
     queryset = Saving.objects.all()
     serializer_class = SavingSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         saving = self.get_object()
 
-        if saving.contributions.exists() or saving.withdrawals.exists():
+        if not can_delete_saving(saving):
             raise ValidationError({"detail": "No puedes eliminar un ahorro con movimientos asociados."})
 
         return super().destroy(request, *args, **kwargs)
@@ -207,21 +214,23 @@ class SavingViewSet(viewsets.ModelViewSet):
         payload = request.data.copy()
         payload.setdefault("savingId", str(saving.id))
 
-        serializer = SavingContributionSerializer(data=payload)
+        serializer = SavingContributionSerializer(data=payload, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         account = serializer.validated_data["account"]
         amount = serializer.validated_data["amount"]
-        if amount <= 0:
-            raise ValidationError({"amount": "El importe debe ser mayor que 0."})
 
-        assert_transaction_is_allowed(account, Transaction.TransactionType.EXPENSE, amount)
+        try:
+            assert_transaction_is_allowed(account, Transaction.TransactionType.EXPENSE, amount)
+        except ValueError as exc:
+            raise ValidationError({"amount": str(exc)}) from exc
 
         description = serializer.validated_data["description"].strip() or f"Abono de {saving.name}"
         date = serializer.validated_data["date"]
 
         with transaction.atomic():
             movement = SavingContribution.objects.create(
+                user=request.user,
                 saving=saving,
                 account=account,
                 amount=amount,
@@ -230,9 +239,10 @@ class SavingViewSet(viewsets.ModelViewSet):
             )
 
             Transaction.objects.create(
+                user=request.user,
                 type=Transaction.TransactionType.EXPENSE,
                 amount=amount,
-                category=get_internal_savings_category(),
+                category=get_internal_savings_category(request.user),
                 description=description,
                 date=date,
                 account=account,
@@ -248,13 +258,11 @@ class SavingViewSet(viewsets.ModelViewSet):
         payload = request.data.copy()
         payload.setdefault("savingId", str(saving.id))
 
-        serializer = SavingWithdrawalSerializer(data=payload)
+        serializer = SavingWithdrawalSerializer(data=payload, context={"request": request})
         serializer.is_valid(raise_exception=True)
 
         account = serializer.validated_data["account"]
         amount = serializer.validated_data["amount"]
-        if amount <= 0:
-            raise ValidationError({"amount": "El importe debe ser mayor que 0."})
 
         available_amount = get_saving_available_amount(saving)
         if amount > available_amount:
@@ -265,6 +273,7 @@ class SavingViewSet(viewsets.ModelViewSet):
 
         with transaction.atomic():
             movement = SavingWithdrawal.objects.create(
+                user=request.user,
                 saving=saving,
                 account=account,
                 amount=amount,
@@ -273,9 +282,10 @@ class SavingViewSet(viewsets.ModelViewSet):
             )
 
             Transaction.objects.create(
+                user=request.user,
                 type=Transaction.TransactionType.INCOME,
                 amount=amount,
-                category=get_internal_savings_category(),
+                category=get_internal_savings_category(request.user),
                 description=description,
                 date=date,
                 account=account,
@@ -286,11 +296,58 @@ class SavingViewSet(viewsets.ModelViewSet):
         return Response(SavingWithdrawalSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
-class SavingContributionViewSet(viewsets.ReadOnlyModelViewSet):
+class SavingContributionViewSet(UserScopedViewSet):
     queryset = SavingContribution.objects.select_related("saving", "account")
     serializer_class = SavingContributionSerializer
 
 
-class SavingWithdrawalViewSet(viewsets.ReadOnlyModelViewSet):
+class SavingWithdrawalViewSet(UserScopedViewSet):
     queryset = SavingWithdrawal.objects.select_related("saving", "account")
     serializer_class = SavingWithdrawalSerializer
+
+
+class DashboardSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        selected_month = request.query_params.get("month")
+        selected_category_id = request.query_params.get("categoryId")
+
+        summary = build_dashboard_summary(
+            accounts=Account.objects.filter(user=request.user),
+            transactions=Transaction.objects.filter(user=request.user).select_related("account", "category", "linked_saving"),
+            budgets=Budget.objects.filter(user=request.user).select_related("category"),
+            categories=Category.objects.filter(user=request.user),
+            selected_month=selected_month,
+            selected_category_id=selected_category_id,
+        )
+
+        return Response(
+            {
+                **summary,
+                "recentTransactions": TransactionSerializer(summary["recentTransactions"], many=True, context={"request": request}).data,
+                "monthlyBudgets": BudgetSerializer(summary["monthlyBudgets"], many=True, context={"request": request}).data,
+            }
+        )
+
+
+class StateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        selected_month = request.query_params.get("month")
+        selected_category_id = request.query_params.get("categoryId")
+
+        return Response(
+            {
+                "accounts": AccountSerializer(Account.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "categories": CategorySerializer(Category.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "transactions": TransactionSerializer(Transaction.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "budgets": BudgetSerializer(Budget.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "savings": SavingSerializer(Saving.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "savingContributions": SavingContributionSerializer(SavingContribution.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "savingWithdrawals": SavingWithdrawalSerializer(SavingWithdrawal.objects.filter(user=request.user), many=True, context={"request": request}).data,
+                "selectedMonth": selected_month,
+                "selectedCategoryId": selected_category_id,
+            }
+        )

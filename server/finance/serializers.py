@@ -27,6 +27,12 @@ class CategoryReferenceField(serializers.PrimaryKeyRelatedField):
         return public_identifier(value)
 
 
+class UserScopedSerializer(serializers.ModelSerializer):
+    def _get_user(self):
+        request = self.context.get("request")
+        return getattr(request, "user", None) if request is not None else None
+
+
 class AccountSerializer(serializers.ModelSerializer):
     initialBalance = serializers.DecimalField(source="initial_balance", max_digits=12, decimal_places=2)
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
@@ -76,7 +82,7 @@ class SavingSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class TransactionSerializer(serializers.ModelSerializer):
+class TransactionSerializer(UserScopedSerializer):
     categoryId = CategoryReferenceField(source="category", queryset=Category.objects.all())
     accountId = serializers.PrimaryKeyRelatedField(source="account", queryset=Account.objects.all())
     linkedSavingId = serializers.PrimaryKeyRelatedField(
@@ -126,8 +132,16 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self._get_user()
+        if user and user.is_authenticated:
+            self.fields["categoryId"].queryset = Category.objects.filter(user=user)
+            self.fields["accountId"].queryset = Account.objects.filter(user=user)
+            self.fields["linkedSavingId"].queryset = Saving.objects.filter(user=user)
 
-class BudgetSerializer(serializers.ModelSerializer):
+
+class BudgetSerializer(UserScopedSerializer):
     categoryId = CategoryReferenceField(source="category", queryset=Category.objects.all())
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
 
@@ -147,8 +161,14 @@ class BudgetSerializer(serializers.ModelSerializer):
 
         return value
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self._get_user()
+        if user and user.is_authenticated:
+            self.fields["categoryId"].queryset = Category.objects.filter(user=user)
 
-class SavingContributionSerializer(serializers.ModelSerializer):
+
+class SavingContributionSerializer(UserScopedSerializer):
     savingId = serializers.PrimaryKeyRelatedField(source="saving", queryset=Saving.objects.all())
     accountId = serializers.PrimaryKeyRelatedField(source="account", queryset=Account.objects.all())
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
@@ -157,8 +177,15 @@ class SavingContributionSerializer(serializers.ModelSerializer):
         model = SavingContribution
         fields = ["id", "savingId", "accountId", "amount", "description", "date", "createdAt"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self._get_user()
+        if user and user.is_authenticated:
+            self.fields["savingId"].queryset = Saving.objects.filter(user=user)
+            self.fields["accountId"].queryset = Account.objects.filter(user=user)
 
-class SavingWithdrawalSerializer(serializers.ModelSerializer):
+
+class SavingWithdrawalSerializer(UserScopedSerializer):
     savingId = serializers.PrimaryKeyRelatedField(source="saving", queryset=Saving.objects.all())
     accountId = serializers.PrimaryKeyRelatedField(source="account", queryset=Account.objects.all())
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
@@ -166,3 +193,10 @@ class SavingWithdrawalSerializer(serializers.ModelSerializer):
     class Meta:
         model = SavingWithdrawal
         fields = ["id", "savingId", "accountId", "amount", "description", "date", "createdAt"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self._get_user()
+        if user and user.is_authenticated:
+            self.fields["savingId"].queryset = Saving.objects.filter(user=user)
+            self.fields["accountId"].queryset = Account.objects.filter(user=user)

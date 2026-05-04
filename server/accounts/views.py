@@ -21,6 +21,7 @@ from .serializers import (
     UserSerializer,
     build_tokens,
 )
+from finance.services import create_default_categories_for_user
 
 
 class RegisterView(APIView):
@@ -32,6 +33,7 @@ class RegisterView(APIView):
 
         with transaction.atomic():
             user = serializer.save()
+            create_default_categories_for_user(user)
 
         tokens = build_tokens(user)
         return Response({**tokens, "user": UserSerializer(user).data}, status=status.HTTP_201_CREATED)
@@ -100,6 +102,7 @@ class GoogleAuthView(APIView):
                     google_sub=google_sub,
                     auth_provider=CustomUser.AuthProvider.GOOGLE,
                 )
+                create_default_categories_for_user(user)
             else:
                 updates = []
                 if not user.google_sub and google_sub:
@@ -119,6 +122,7 @@ class GoogleAuthView(APIView):
                     updates.append("last_name")
                 if updates:
                     user.save(update_fields=updates)
+                create_default_categories_for_user(user)
 
         tokens = build_tokens(user)
         return Response({**tokens, "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
