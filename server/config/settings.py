@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from datetime import timedelta
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'accounts',
     'finance',
 ]
@@ -83,16 +85,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB', 'spendwise'),
-        'USER': env('POSTGRES_USER', 'spendwise'),
-        'PASSWORD': env('POSTGRES_PASSWORD', 'spendwise'),
-        'HOST': env('POSTGRES_HOST', 'localhost'),
-        'PORT': env('POSTGRES_PORT', '5432'),
+if env_bool("DJANGO_USE_SQLITE", False) or "test" in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('POSTGRES_DB', 'spendwise'),
+            'USER': env('POSTGRES_USER', 'spendwise'),
+            'PASSWORD': env('POSTGRES_PASSWORD', 'spendwise'),
+            'HOST': env('POSTGRES_HOST', 'localhost'),
+            'PORT': env('POSTGRES_PORT', '5432'),
+        }
+    }
 
 CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', 'http://localhost:3000')
 CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000')
@@ -113,6 +123,8 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
 }
 
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID', '')

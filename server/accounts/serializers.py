@@ -83,3 +83,7 @@ class AuthResponseSerializer(serializers.Serializer):
     access = serializers.CharField()
     refresh = serializers.CharField()
     user = UserSerializer()
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
