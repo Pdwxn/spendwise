@@ -20,7 +20,7 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
   const [emoji, setEmoji] = useState("✨");
   const [color, setColor] = useState<HexColor>(defaultColor);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const trimmedName = name.trim();
@@ -30,17 +30,21 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
       return;
     }
 
-    actions.addCategory({
-      name: trimmedName,
-      emoji: trimmedEmoji,
-      color,
-    });
-    toast.success("Categoría creada");
+    try {
+      await actions.addCategory({
+        name: trimmedName,
+        emoji: trimmedEmoji,
+        color,
+      });
+      toast.success("Categoría creada");
 
-    setName("");
-    setEmoji("✨");
-    setColor(defaultColor);
-    onSuccess?.();
+      setName("");
+      setEmoji("✨");
+      setColor(defaultColor);
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la categoría.");
+    }
   }
 
   return (

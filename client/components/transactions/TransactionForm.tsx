@@ -38,7 +38,7 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
   const selectedAccount = accounts.find((account) => account.id === accountId) ?? null;
   const selectedAccountBalance = selectedAccount ? getAccountBalance(selectedAccount, transactions) : null;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!accountId || !categoryId) {
@@ -58,22 +58,26 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
       return;
     }
 
-    actions.addTransaction({
-      type: mode,
-      amount: parsedAmount,
-      categoryId,
-      description: trimmedDescription,
-      date,
-      accountId,
-    });
-    toast.success(mode === "expense" ? "Gasto creado" : "Ingreso creado");
+    try {
+      await actions.addTransaction({
+        type: mode,
+        amount: parsedAmount,
+        categoryId,
+        description: trimmedDescription,
+        date,
+        accountId,
+      });
+      toast.success(mode === "expense" ? "Gasto creado" : "Ingreso creado");
 
-    setAmount("0");
-    setCategoryId(mode === "income" ? getIncomeCategoryId(categories) : expenseCategories[0]?.id ?? "");
-    setDescription("");
-    setDate(new Date().toISOString().slice(0, 10));
-    setAccountId(accounts[0]?.id ?? "");
-    onSuccess?.();
+      setAmount("0");
+      setCategoryId(mode === "income" ? getIncomeCategoryId(categories) : expenseCategories[0]?.id ?? "");
+      setDescription("");
+      setDate(new Date().toISOString().slice(0, 10));
+      setAccountId(accounts[0]?.id ?? "");
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear el movimiento.");
+    }
   }
 
   return (

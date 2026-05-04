@@ -31,7 +31,7 @@ export function SavingWithdrawalForm({ savingId, onSuccess }: SavingWithdrawalFo
       - savingWithdrawals.filter((item) => item.savingId === savingId).reduce((total, item) => total + item.amount, 0)
     : 0;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const parsedAmount = Number(amount);
@@ -42,20 +42,24 @@ export function SavingWithdrawalForm({ savingId, onSuccess }: SavingWithdrawalFo
       return;
     }
 
-    actions.addSavingWithdrawal({
-      savingId,
-      accountId,
-      amount: parsedAmount,
-      description: trimmedDescription || `Retiro de ${saving.name}`,
-      date,
-    });
+    try {
+      await actions.addSavingWithdrawal({
+        savingId,
+        accountId,
+        amount: parsedAmount,
+        description: trimmedDescription || `Retiro de ${saving.name}`,
+        date,
+      });
 
-    toast.success("Dinero agregado a cuenta");
-    setAccountId(accounts[0]?.id ?? "");
-    setAmount("0");
-    setDescription("");
-    setDate(new Date().toISOString().slice(0, 10));
-    onSuccess?.();
+      toast.success("Dinero agregado a cuenta");
+      setAccountId(accounts[0]?.id ?? "");
+      setAmount("0");
+      setDescription("");
+      setDate(new Date().toISOString().slice(0, 10));
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo registrar el retiro.");
+    }
   }
 
   return (

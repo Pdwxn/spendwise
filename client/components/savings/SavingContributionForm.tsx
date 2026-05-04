@@ -26,7 +26,7 @@ export function SavingContributionForm({ savingId, onSuccess }: SavingContributi
 
   const saving = savings.find((item) => item.id === savingId);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const parsedAmount = Number(amount);
@@ -37,20 +37,24 @@ export function SavingContributionForm({ savingId, onSuccess }: SavingContributi
       return;
     }
 
-    actions.addSavingContribution({
-      savingId,
-      accountId,
-      amount: parsedAmount,
-      description: trimmedDescription || `Abono a ${saving.name}`,
-      date,
-    });
+    try {
+      await actions.addSavingContribution({
+        savingId,
+        accountId,
+        amount: parsedAmount,
+        description: trimmedDescription || `Abono a ${saving.name}`,
+        date,
+      });
 
-    toast.success("Abono registrado");
-    setAccountId(accounts[0]?.id ?? "");
-    setAmount("0");
-    setDescription("");
-    setDate(new Date().toISOString().slice(0, 10));
-    onSuccess?.();
+      toast.success("Abono registrado");
+      setAccountId(accounts[0]?.id ?? "");
+      setAmount("0");
+      setDescription("");
+      setDate(new Date().toISOString().slice(0, 10));
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo registrar el abono.");
+    }
   }
 
   return (

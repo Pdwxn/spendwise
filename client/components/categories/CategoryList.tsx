@@ -17,13 +17,17 @@ export function CategoryList() {
   } = useFinance();
   const visibleCategories = categories.filter((category) => !isSystemCategoryId(category.id));
 
-  function handleRemoveCategory(categoryId: string) {
+  async function handleRemoveCategory(categoryId: string) {
     if (!canRemoveCategory({ transactions, budgets }, categoryId)) {
       toast.info("No puedes eliminar una categoría con movimientos o presupuestos asociados.");
       return;
     }
 
-    actions.removeCategory(categoryId);
+    try {
+      await actions.removeCategory(categoryId);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la categoría.");
+    }
   }
 
   return (

@@ -24,7 +24,7 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
   const [month, setMonth] = useState(selectedMonth);
   const [amount, setAmount] = useState("0");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!categoryId || !month) {
@@ -36,17 +36,21 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
       return;
     }
 
-    actions.addBudget({
-      categoryId,
-      month,
-      amount: parsedAmount,
-    });
-    toast.success("Presupuesto creado");
+    try {
+      await actions.addBudget({
+        categoryId,
+        month,
+        amount: parsedAmount,
+      });
+      toast.success("Presupuesto creado");
 
-    setCategoryId(visibleCategories[0]?.id ?? "");
-    setMonth(selectedMonth);
-    setAmount("0");
-    onSuccess?.();
+      setCategoryId(visibleCategories[0]?.id ?? "");
+      setMonth(selectedMonth);
+      setAmount("0");
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear el presupuesto.");
+    }
   }
 
   return (

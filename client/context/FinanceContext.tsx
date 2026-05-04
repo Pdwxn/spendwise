@@ -32,35 +32,35 @@ import type {
 } from "@/types";
 
 type FinanceActions = {
-  addAccount: (input: CreateAccountInput) => void;
-  updateAccount: (id: ID, input: UpdateAccountInput) => void;
-  removeAccount: (id: ID) => void;
-  addCategory: (input: CreateCategoryInput) => void;
-  updateCategory: (id: ID, input: UpdateCategoryInput) => void;
-  removeCategory: (id: ID) => void;
-  addTransaction: (input: CreateTransactionInput) => void;
-  updateTransaction: (id: ID, input: UpdateTransactionInput) => void;
-  removeTransaction: (id: ID) => void;
-  addBudget: (input: CreateBudgetInput) => void;
-  updateBudget: (id: ID, input: UpdateBudgetInput) => void;
-  removeBudget: (id: ID) => void;
-  addSaving: (input: CreateSavingInput) => void;
-  updateSaving: (id: ID, input: UpdateSavingInput) => void;
-  removeSaving: (id: ID) => void;
+  addAccount: (input: CreateAccountInput) => Promise<void>;
+  updateAccount: (id: ID, input: UpdateAccountInput) => Promise<void>;
+  removeAccount: (id: ID) => Promise<void>;
+  addCategory: (input: CreateCategoryInput) => Promise<void>;
+  updateCategory: (id: ID, input: UpdateCategoryInput) => Promise<void>;
+  removeCategory: (id: ID) => Promise<void>;
+  addTransaction: (input: CreateTransactionInput) => Promise<void>;
+  updateTransaction: (id: ID, input: UpdateTransactionInput) => Promise<void>;
+  removeTransaction: (id: ID) => Promise<void>;
+  addBudget: (input: CreateBudgetInput) => Promise<void>;
+  updateBudget: (id: ID, input: UpdateBudgetInput) => Promise<void>;
+  removeBudget: (id: ID) => Promise<void>;
+  addSaving: (input: CreateSavingInput) => Promise<void>;
+  updateSaving: (id: ID, input: UpdateSavingInput) => Promise<void>;
+  removeSaving: (id: ID) => Promise<void>;
   addSavingContribution: (input: {
     savingId: ID;
     accountId: ID;
     amount: number;
     description: string;
     date: string;
-  }) => void;
+  }) => Promise<void>;
   addSavingWithdrawal: (input: {
     savingId: ID;
     accountId: ID;
     amount: number;
     description: string;
     date: string;
-  }) => void;
+  }) => Promise<void>;
   setSelectedMonth: (month: MonthKey) => void;
   setSelectedCategoryId: (categoryId: ID | null) => void;
   resetState: () => void;
@@ -603,67 +603,31 @@ export function FinanceProvider({ children }: FinanceProviderProps) {
   async function mutate<T>(operation: () => Promise<T>) {
     try {
       await operation();
+      await refreshState();
     } catch (error) {
-      console.error(error);
-    } finally {
-      await refreshState().catch((error) => {
-        console.error(error);
-      });
+      await refreshState().catch(() => undefined);
+      throw error;
     }
   }
 
   const actions: FinanceActions = {
-    addAccount: (input) => {
-      void mutate(() => request("/api/accounts/", { method: "POST", body: JSON.stringify(input) }));
-    },
-    updateAccount: (id, input) => {
-      void mutate(() => request(`/api/accounts/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
-    },
-    removeAccount: (id) => {
-      void mutate(() => request(`/api/accounts/${id}/`, { method: "DELETE" }));
-    },
-    addCategory: (input) => {
-      void mutate(() => request("/api/categories/", { method: "POST", body: JSON.stringify(input) }));
-    },
-    updateCategory: (id, input) => {
-      void mutate(() => request(`/api/categories/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
-    },
-    removeCategory: (id) => {
-      void mutate(() => request(`/api/categories/${id}/`, { method: "DELETE" }));
-    },
-    addTransaction: (input) => {
-      void mutate(() => request("/api/transactions/", { method: "POST", body: JSON.stringify(input) }));
-    },
-    updateTransaction: (id, input) => {
-      void mutate(() => request(`/api/transactions/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
-    },
-    removeTransaction: (id) => {
-      void mutate(() => request(`/api/transactions/${id}/`, { method: "DELETE" }));
-    },
-    addBudget: (input) => {
-      void mutate(() => request("/api/budgets/", { method: "POST", body: JSON.stringify(input) }));
-    },
-    updateBudget: (id, input) => {
-      void mutate(() => request(`/api/budgets/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
-    },
-    removeBudget: (id) => {
-      void mutate(() => request(`/api/budgets/${id}/`, { method: "DELETE" }));
-    },
-    addSaving: (input) => {
-      void mutate(() => request("/api/savings/", { method: "POST", body: JSON.stringify(input) }));
-    },
-    updateSaving: (id, input) => {
-      void mutate(() => request(`/api/savings/${id}/`, { method: "PATCH", body: JSON.stringify(input) }));
-    },
-    removeSaving: (id) => {
-      void mutate(() => request(`/api/savings/${id}/`, { method: "DELETE" }));
-    },
-    addSavingContribution: (input) => {
-      void mutate(() => request(`/api/savings/${input.savingId}/contributions/`, { method: "POST", body: JSON.stringify(input) }));
-    },
-    addSavingWithdrawal: (input) => {
-      void mutate(() => request(`/api/savings/${input.savingId}/withdrawals/`, { method: "POST", body: JSON.stringify(input) }));
-    },
+    addAccount: (input) => mutate(() => request("/api/accounts/", { method: "POST", body: JSON.stringify(input) })),
+    updateAccount: (id, input) => mutate(() => request(`/api/accounts/${id}/`, { method: "PATCH", body: JSON.stringify(input) })),
+    removeAccount: (id) => mutate(() => request(`/api/accounts/${id}/`, { method: "DELETE" })),
+    addCategory: (input) => mutate(() => request("/api/categories/", { method: "POST", body: JSON.stringify(input) })),
+    updateCategory: (id, input) => mutate(() => request(`/api/categories/${id}/`, { method: "PATCH", body: JSON.stringify(input) })),
+    removeCategory: (id) => mutate(() => request(`/api/categories/${id}/`, { method: "DELETE" })),
+    addTransaction: (input) => mutate(() => request("/api/transactions/", { method: "POST", body: JSON.stringify(input) })),
+    updateTransaction: (id, input) => mutate(() => request(`/api/transactions/${id}/`, { method: "PATCH", body: JSON.stringify(input) })),
+    removeTransaction: (id) => mutate(() => request(`/api/transactions/${id}/`, { method: "DELETE" })),
+    addBudget: (input) => mutate(() => request("/api/budgets/", { method: "POST", body: JSON.stringify(input) })),
+    updateBudget: (id, input) => mutate(() => request(`/api/budgets/${id}/`, { method: "PATCH", body: JSON.stringify(input) })),
+    removeBudget: (id) => mutate(() => request(`/api/budgets/${id}/`, { method: "DELETE" })),
+    addSaving: (input) => mutate(() => request("/api/savings/", { method: "POST", body: JSON.stringify(input) })),
+    updateSaving: (id, input) => mutate(() => request(`/api/savings/${id}/`, { method: "PATCH", body: JSON.stringify(input) })),
+    removeSaving: (id) => mutate(() => request(`/api/savings/${id}/`, { method: "DELETE" })),
+    addSavingContribution: (input) => mutate(() => request(`/api/savings/${input.savingId}/contributions/`, { method: "POST", body: JSON.stringify(input) })),
+    addSavingWithdrawal: (input) => mutate(() => request(`/api/savings/${input.savingId}/withdrawals/`, { method: "POST", body: JSON.stringify(input) })),
     setSelectedMonth: (month) => dispatch({ type: "set-selected-month", payload: month }),
     setSelectedCategoryId: (categoryId) => dispatch({ type: "set-selected-category", payload: categoryId }),
     resetState: () => dispatch({ type: "reset" }),

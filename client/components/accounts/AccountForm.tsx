@@ -20,7 +20,7 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
   const [initialBalance, setInitialBalance] = useState("0");
   const [color, setColor] = useState<HexColor>(defaultColor);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const trimmedName = name.trim();
@@ -28,17 +28,21 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
       return;
     }
 
-    actions.addAccount({
-      name: trimmedName,
-      initialBalance: Number(initialBalance) || 0,
-      color,
-    });
-    toast.success("Cuenta creada");
+    try {
+      await actions.addAccount({
+        name: trimmedName,
+        initialBalance: Number(initialBalance) || 0,
+        color,
+      });
+      toast.success("Cuenta creada");
 
-    setName("");
-    setInitialBalance("0");
-    setColor(defaultColor);
-    onSuccess?.();
+      setName("");
+      setInitialBalance("0");
+      setColor(defaultColor);
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la cuenta.");
+    }
   }
 
   return (

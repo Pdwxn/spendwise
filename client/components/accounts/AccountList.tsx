@@ -14,13 +14,17 @@ export function AccountList() {
     actions,
   } = useFinance();
 
-  function handleRemoveAccount(accountId: string) {
+  async function handleRemoveAccount(accountId: string) {
     if (!canRemoveAccount({ transactions }, accountId)) {
       toast.info("No puedes eliminar una cuenta con movimientos asociados.");
       return;
     }
 
-    actions.removeAccount(accountId);
+    try {
+      await actions.removeAccount(accountId);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo eliminar la cuenta.");
+    }
   }
 
   return (

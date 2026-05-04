@@ -20,7 +20,7 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
   const [mode, setMode] = useState<SavingMode>("static");
   const [annualPercentage, setAnnualPercentage] = useState("0");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const trimmedName = name.trim();
@@ -28,19 +28,23 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
       return;
     }
 
-    actions.addSaving({
-      name: trimmedName,
-      initialAmount: Number(initialAmount) || 0,
-      mode,
-      annualPercentage: mode === "annualPercentage" ? Number(annualPercentage) || 0 : undefined,
-    });
-    toast.success("Ahorro creado");
+    try {
+      await actions.addSaving({
+        name: trimmedName,
+        initialAmount: Number(initialAmount) || 0,
+        mode,
+        annualPercentage: mode === "annualPercentage" ? Number(annualPercentage) || 0 : undefined,
+      });
+      toast.success("Ahorro creado");
 
-    setName("");
-    setInitialAmount("0");
-    setMode("static");
-    setAnnualPercentage("0");
-    onSuccess?.();
+      setName("");
+      setInitialAmount("0");
+      setMode("static");
+      setAnnualPercentage("0");
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear el ahorro.");
+    }
   }
 
   return (
