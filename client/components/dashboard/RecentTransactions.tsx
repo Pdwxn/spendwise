@@ -32,7 +32,9 @@ export function RecentTransactions({
             const category = categories.find((item) => item.id === transaction.categoryId);
             const saving = transaction.linkedSavingId ? savings.find((item) => item.id === transaction.linkedSavingId) : null;
             const amountClassName = transaction.type === "expense" ? "text-rose-300" : "text-emerald-300";
-            const title = saving ? transaction.description : `${category?.emoji ?? "#"} ${transaction.description}`;
+            const title = saving
+              ? `${category?.emoji ?? "🏦"} ${transaction.linkedSavingAction === "contribution" ? "Abono a ahorro" : "Retiro de ahorro"}`
+              : `${category?.emoji ?? "#"} ${transaction.description}`;
             const subtitle = saving
               ? `${transaction.linkedSavingAction === "contribution" ? "Abono" : "Retiro"} · ${saving.name}`
               : category?.name ?? "Desconocida";
