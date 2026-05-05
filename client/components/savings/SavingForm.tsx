@@ -14,11 +14,15 @@ type SavingFormProps = {
 };
 
 export function SavingForm({ onSuccess }: SavingFormProps) {
-  const { actions } = useFinance();
+  const {
+    state: { accounts },
+    actions,
+  } = useFinance();
   const [name, setName] = useState("");
   const [initialAmount, setInitialAmount] = useState("0");
   const [mode, setMode] = useState<SavingMode>("static");
   const [annualPercentage, setAnnualPercentage] = useState("0");
+  const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,12 +32,21 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
       return;
     }
 
+    const parsedInitialAmount = Number(initialAmount) || 0;
+    const needsAccount = parsedInitialAmount > 0;
+
+    if (needsAccount && !accountId) {
+      toast.error("Selecciona una cuenta para registrar el aporte inicial.");
+      return;
+    }
+
     try {
       await actions.addSaving({
         name: trimmedName,
-        initialAmount: Number(initialAmount) || 0,
+        initialAmount: parsedInitialAmount,
         mode,
         annualPercentage: mode === "annualPercentage" ? Number(annualPercentage) || 0 : undefined,
+        accountId: needsAccount ? accountId : undefined,
       });
       toast.success("Ahorro creado");
 
@@ -41,6 +54,7 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
       setInitialAmount("0");
       setMode("static");
       setAnnualPercentage("0");
+      setAccountId(accounts[0]?.id ?? "");
       onSuccess?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo crear el ahorro.");
@@ -70,6 +84,18 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
         />
       </label>
       <label className="block space-y-1 text-sm text-cyan-100/70">
+        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Cuenta origen</span>
+        <Select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
+          <option value="">Selecciona una cuenta</option>
+          {accounts.map((account) => (
+            <option key={account.id} value={account.id}>
+              {account.name}
+            </option>
+          ))}
+        </Select>
+        <p className="text-xs text-cyan-100/50">Se usará solo si el importe inicial es mayor que cero.</p>
+      </label>
+      <label className="block space-y-1 text-sm text-cyan-100/70">
         <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Modo</span>
         <Select value={mode} onChange={(event) => setMode(event.target.value as SavingMode)}>
           <option value="static">Fijo</option>
@@ -89,7 +115,7 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
           />
         </label>
       ) : null}
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full" disabled={accounts.length === 0 && Number(initialAmount) > 0}>
         Añadir ahorro
       </Button>
     </form>

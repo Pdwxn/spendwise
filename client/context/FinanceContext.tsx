@@ -12,7 +12,7 @@ import {
   SYSTEM_CATEGORY_IDS,
 } from "@/utils/constants";
 import { canRemoveAccount, canRemoveCategory, canWithdrawFromSaving } from "@/utils/calculations";
-import { apiRequest } from "@/lib/api";
+import { ApiError, apiRequest } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import type {
   Category,
@@ -526,7 +526,7 @@ function financeReducer(state: FinanceState, action: FinanceAction): FinanceStat
 
 export function FinanceProvider({ children }: FinanceProviderProps) {
   const [state, dispatch] = useReducer(financeReducer, undefined, createInitialState);
-  const { accessToken, isHydrated: isAuthHydrated, isAuthenticated } = useAuth();
+  const { accessToken, isHydrated: isAuthHydrated, isAuthenticated, refreshSession } = useAuth();
 
   useEffect(() => {
     if (!isAuthHydrated) {
@@ -570,18 +570,36 @@ export function FinanceProvider({ children }: FinanceProviderProps) {
     };
   }, [accessToken, isAuthHydrated, isAuthenticated]);
 
-  function request(path: string, init: RequestInit = {}) {
+  async function request(path: string, init: RequestInit = {}, retry = true) {
     if (!accessToken) {
       throw new Error("No hay sesión activa.");
     }
 
-    return apiRequest(path, {
-      ...init,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        ...(init.headers ?? {}),
-      },
-    });
+    try {
+      return await apiRequest(path, {
+        ...init,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          ...(init.headers ?? {}),
+        },
+      });
+    } catch (error) {
+      if (retry && error instanceof ApiError && error.status === 401) {
+        const nextAccessToken = await refreshSession();
+
+        if (nextAccessToken) {
+          return apiRequest(path, {
+            ...init,
+            headers: {
+              Authorization: `Bearer ${nextAccessToken}`,
+              ...(init.headers ?? {}),
+            },
+          });
+        }
+      }
+
+      throw error;
+    }
   }
 
   async function refreshState() {

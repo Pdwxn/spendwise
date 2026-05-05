@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -198,7 +199,43 @@ class SavingViewSet(UserScopedViewSet):
     serializer_class = SavingSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        account = serializer.validated_data.get("account")
+        initial_amount = serializer.validated_data.get("initial_amount") or Decimal("0")
+
+        if initial_amount > 0 and account is None:
+            raise ValidationError({"accountId": "Selecciona una cuenta para registrar el aporte inicial."})
+
+        with transaction.atomic():
+            saving = serializer.save(user=self.request.user, initial_amount=Decimal("0"))
+
+            if initial_amount > 0 and account is not None:
+                try:
+                    assert_transaction_is_allowed(account, Transaction.TransactionType.EXPENSE, initial_amount)
+                except ValueError as exc:
+                    raise ValidationError({"amount": str(exc)}) from exc
+
+                description = f"Aporte inicial de {saving.name}"
+
+                SavingContribution.objects.create(
+                    user=self.request.user,
+                    saving=saving,
+                    account=account,
+                    amount=initial_amount,
+                    description=description,
+                    date=timezone.localdate(),
+                )
+
+                Transaction.objects.create(
+                    user=self.request.user,
+                    type=Transaction.TransactionType.EXPENSE,
+                    amount=initial_amount,
+                    category=get_internal_savings_category(self.request.user),
+                    description=description,
+                    date=timezone.localdate(),
+                    account=account,
+                    linked_saving=saving,
+                    linked_saving_action=Transaction.SavingAction.CONTRIBUTION,
+                )
 
     def destroy(self, request, *args, **kwargs):
         saving = self.get_object()

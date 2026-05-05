@@ -9,19 +9,22 @@ def public_identifier(instance):
 
 
 class CategoryReferenceField(serializers.PrimaryKeyRelatedField):
+    def use_pk_only_optimization(self):
+        return False
+
     def to_internal_value(self, data):
         queryset = self.get_queryset()
+
+        if isinstance(data, str):
+            try:
+                return queryset.get(code=data)
+            except queryset.model.DoesNotExist:
+                pass
 
         try:
             return queryset.get(pk=data)
         except (queryset.model.DoesNotExist, TypeError, ValueError, serializers.ValidationError):
-            if hasattr(queryset.model, "code"):
-                try:
-                    return queryset.get(code=data)
-                except queryset.model.DoesNotExist as exc:
-                    raise serializers.ValidationError("Categoría no encontrada.") from exc
-
-        raise serializers.ValidationError("Categoría no encontrada.")
+            raise serializers.ValidationError("Categoría no encontrada.")
 
     def to_representation(self, value):
         return public_identifier(value)
@@ -56,6 +59,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class SavingSerializer(serializers.ModelSerializer):
     initialAmount = serializers.DecimalField(source="initial_amount", max_digits=12, decimal_places=2)
+    accountId = serializers.PrimaryKeyRelatedField(
+        source="account",
+        queryset=Account.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True,
+    )
     annualPercentage = serializers.DecimalField(
         source="annual_percentage",
         max_digits=6,
@@ -67,7 +77,7 @@ class SavingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Saving
-        fields = ["id", "name", "initialAmount", "mode", "annualPercentage", "createdAt"]
+        fields = ["id", "name", "initialAmount", "accountId", "mode", "annualPercentage", "createdAt"]
 
     def validate(self, attrs):
         mode = attrs.get("mode") or getattr(self.instance, "mode", None)
@@ -80,6 +90,10 @@ class SavingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"annualPercentage": "El porcentaje anual no aplica para el modo fijo."})
 
         return attrs
+
+    def create(self, validated_data):
+        validated_data.pop("account", None)
+        return super().create(validated_data)
 
 
 class TransactionSerializer(UserScopedSerializer):
@@ -136,8 +150,8 @@ class TransactionSerializer(UserScopedSerializer):
         super().__init__(*args, **kwargs)
         user = self._get_user()
         if user and user.is_authenticated:
-            self.fields["categoryId"].queryset = Category.objects.filter(user=user)
             self.fields["accountId"].queryset = Account.objects.filter(user=user)
+            self.fields["categoryId"].queryset = Category.objects.filter(user=user)
             self.fields["linkedSavingId"].queryset = Saving.objects.filter(user=user)
 
 

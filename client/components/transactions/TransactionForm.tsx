@@ -76,7 +76,7 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
       setAccountId(accounts[0]?.id ?? "");
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "No se pudo crear el movimiento.");
+      toast.error(mode === "expense" ? "Error al crear el gasto." : "Error al crear el ingreso.");
     }
   }
 

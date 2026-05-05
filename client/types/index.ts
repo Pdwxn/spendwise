@@ -107,5 +107,6 @@ export type UpdateBudgetInput = Partial<CreateBudgetInput>;
 
 export type CreateSavingInput = Pick<Saving, "name" | "initialAmount" | "mode"> & {
   annualPercentage?: number;
+  accountId?: ID;
 };
 export type UpdateSavingInput = Partial<CreateSavingInput>;

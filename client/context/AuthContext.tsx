@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { apiRequest } from "@/lib/api";
+import { ApiError, apiRequest } from "@/lib/api";
 
 type AuthUser = {
   id: string;
@@ -28,7 +28,7 @@ type AuthContextValue = {
   register: (input: { firstName: string; lastName: string; email: string; password: string }) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => Promise<void>;
-  refreshSession: () => Promise<void>;
+  refreshSession: () => Promise<string | null>;
 };
 
 type AuthUserPayload = {
@@ -100,7 +100,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     let cancelled = false;
 
-    loadCurrentUser(session.access)
+    async function hydrateUser(accessToken: string) {
+      try {
+        return await loadCurrentUser(accessToken);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401 && session?.refresh) {
+          const nextAccessToken = ((await apiRequest("/api/auth/refresh/", {
+            method: "POST",
+            body: JSON.stringify({ refresh: session.refresh }),
+          })) as { access: string }).access;
+
+          setSession((current) => (current ? { ...current, access: nextAccessToken } : current));
+
+          if (nextAccessToken) {
+            return loadCurrentUser(nextAccessToken);
+          }
+        }
+
+        throw error;
+      }
+    }
+
+    hydrateUser(session.access)
       .then((user) => {
         if (!cancelled) {
           setSession((current) => (current ? { ...current, user: normalizeUser(user) } : current));
@@ -148,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function refreshSession() {
       if (!session?.refresh) {
-        return;
+        return null;
       }
 
       const nextSession = (await apiRequest("/api/auth/refresh/", {
@@ -157,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })) as { access: string };
 
       setSession((current) => (current ? { ...current, access: nextSession.access } : current));
+      return nextSession.access;
     }
 
     async function logout() {

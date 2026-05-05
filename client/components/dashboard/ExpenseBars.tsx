@@ -68,7 +68,7 @@ export function ExpenseBars({ items }: ExpenseBarsProps) {
         const glowColorTwo = mixHexColors(item.color, "#a78bfa", 0.26);
         const percentage = hasBudget
           ? Math.round((item.amount / budgetAmount) * 100)
-          : Math.round((item.amount / maxSpent) * 100);
+          : null;
 
         return (
           <article
@@ -101,9 +101,11 @@ export function ExpenseBars({ items }: ExpenseBarsProps) {
               <span className="whitespace-nowrap text-[12px] font-semibold leading-none text-cyan-50">
                 {formatCompactValue(item.amount)}
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-100/70">
-                {percentage}%
-              </span>
+              {percentage !== null ? (
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-100/70">
+                  {percentage}%
+                </span>
+              ) : null}
             </div>
           </article>
         );

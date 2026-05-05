@@ -53,6 +53,11 @@ export function SavingList() {
             const currentValue = getSavingCurrentValue(saving, savingContributions, savingWithdrawals, elapsedMonths);
             const contributionsTotal = getSavingContributionsTotal(savingContributions, saving.id);
             const withdrawalsTotal = getSavingWithdrawalsTotal(savingWithdrawals, saving.id);
+            const initialContributionTotal = savingContributions
+              .filter(
+                (contribution) => contribution.savingId === saving.id && contribution.description.startsWith("Aporte inicial de "),
+              )
+              .reduce((total, contribution) => total + contribution.amount, 0);
 
             return (
               <div key={saving.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -60,6 +65,11 @@ export function SavingList() {
                   <div>
                     <p className="text-sm font-medium text-cyan-50">{saving.name}</p>
                     <p className="text-xs text-cyan-100/65">Creado {formatShortDate(saving.createdAt)}</p>
+                    {initialContributionTotal > 0 ? (
+                      <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300/80">
+                        Aporte inicial {formatCurrency(initialContributionTotal)}
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex flex-col gap-2 sm:min-w-40">
                     <Button

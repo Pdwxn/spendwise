@@ -96,6 +96,45 @@ class FinanceOwnershipTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Transaction.objects.filter(user=self.user1).count(), 1)
 
+    def test_transaction_category_can_be_referenced_by_code(self):
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/transactions/",
+            {
+                "type": "expense",
+                "amount": 25,
+                "categoryId": self.user1_food.code,
+                "description": "Compra con code",
+                "date": "2026-05-04",
+                "accountId": str(self.user1_account.id),
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Transaction.objects.filter(user=self.user1).count(), 1)
+        self.assertEqual(response.data["categoryId"], self.user1_food.code)
+
+    def test_saving_initial_amount_is_registered_as_contribution(self):
+        self.client.force_authenticate(user=self.user1)
+
+        response = self.client.post(
+            "/api/savings/",
+            {
+                "name": "Fondo",
+                "initialAmount": 100,
+                "accountId": str(self.user1_account.id),
+                "mode": "static",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Saving.objects.filter(user=self.user1).count(), 1)
+        self.assertEqual(SavingContribution.objects.filter(user=self.user1).count(), 1)
+        self.assertEqual(Transaction.objects.filter(user=self.user1, linked_saving_action="contribution").count(), 1)
+
     def test_state_endpoint_returns_only_authenticated_user_data(self):
         self.client.force_authenticate(user=self.user1)
 
