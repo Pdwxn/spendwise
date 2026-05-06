@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from accounts.models import CustomUser
+from accounts.services import create_default_preferences_for_user
 from finance.services import create_default_categories_for_user
 
 
@@ -9,3 +10,4 @@ from finance.services import create_default_categories_for_user
 def create_categories_for_new_user(sender, instance, created, **kwargs):
     if created:
         create_default_categories_for_user(instance)
+        create_default_preferences_for_user(instance)

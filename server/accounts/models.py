@@ -59,3 +59,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.email
+
+
+class UserPreference(models.Model):
+    class Currency(models.TextChoices):
+        CLP = "CLP", "CLP"
+        COP = "COP", "COP"
+        USD = "USD", "USD"
+        EUR = "EUR", "EUR"
+
+    class Theme(models.TextChoices):
+        DARK = "dark", "Dark"
+        LIGHT = "light", "Light"
+
+    class Language(models.TextChoices):
+        ES = "es", "Español"
+        EN = "en", "English"
+
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="preferences")
+    currency = models.CharField(max_length=3, choices=Currency.choices, default=Currency.USD)
+    theme = models.CharField(max_length=10, choices=Theme.choices, default=Theme.DARK)
+    language = models.CharField(max_length=5, choices=Language.choices, default=Language.ES)
+
+    class Meta:
+        ordering = ["user__created_at"]
+
+    def __str__(self) -> str:
+        return f"Preferences for {self.user.email}"

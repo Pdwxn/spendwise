@@ -3,7 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from .models import CustomUser
+from .models import CustomUser, UserPreference
 
 
 def build_tokens(user):
@@ -21,10 +21,60 @@ class UserSerializer(serializers.ModelSerializer):
     lastName = serializers.CharField(source="last_name")
     avatarUrl = serializers.URLField(source="avatar_url", allow_null=True, allow_blank=True, required=False)
     authProvider = serializers.CharField(source="auth_provider")
+    lastLogin = serializers.DateTimeField(source="last_login", read_only=True, allow_null=True)
 
     class Meta:
         model = CustomUser
-        fields = ["id", "firstName", "lastName", "email", "avatarUrl", "authProvider"]
+        fields = ["id", "firstName", "lastName", "email", "avatarUrl", "authProvider", "lastLogin"]
+
+
+class MeUpdateSerializer(serializers.ModelSerializer):
+    firstName = serializers.CharField(source="first_name", max_length=150)
+    lastName = serializers.CharField(source="last_name", max_length=150)
+    avatarUrl = serializers.URLField(source="avatar_url", allow_null=True, allow_blank=True, required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ["firstName", "lastName", "avatarUrl"]
+
+    def update(self, instance, validated_data):
+        avatar_url = validated_data.get("avatar_url", serializers.empty)
+        if avatar_url == "":
+            validated_data["avatar_url"] = None
+
+        return super().update(instance, validated_data)
+
+
+class UserPreferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPreference
+        fields = ["currency", "theme", "language"]
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    currentPassword = serializers.CharField(write_only=True)
+    newPassword = serializers.CharField(write_only=True, min_length=8)
+    confirmPassword = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        if attrs["newPassword"] != attrs["confirmPassword"]:
+            raise serializers.ValidationError({"confirmPassword": "Las contraseñas no coinciden."})
+
+        user = self.context["request"].user
+        if not user.has_usable_password():
+            raise serializers.ValidationError({"currentPassword": "Esta cuenta no tiene contraseña configurada."})
+
+        if not user.check_password(attrs["currentPassword"]):
+            raise serializers.ValidationError({"currentPassword": "La contraseña actual no es correcta."})
+
+        validate_password(attrs["newPassword"], user=user)
+        return attrs
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        user.set_password(self.validated_data["newPassword"])
+        user.save(update_fields=["password"])
+        return user
 
 
 class RegisterSerializer(serializers.Serializer):

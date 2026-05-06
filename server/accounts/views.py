@@ -14,13 +14,17 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser
 from .serializers import (
+    ChangePasswordSerializer,
     GoogleAuthSerializer,
     LoginSerializer,
     LogoutSerializer,
+    MeUpdateSerializer,
     RegisterSerializer,
+    UserPreferenceSerializer,
     UserSerializer,
     build_tokens,
 )
+from .models import UserPreference
 from finance.services import create_default_categories_for_user
 
 
@@ -34,6 +38,7 @@ class RegisterView(APIView):
         with transaction.atomic():
             user = serializer.save()
             create_default_categories_for_user(user)
+            update_last_login(None, user)
 
         tokens = build_tokens(user)
         return Response({**tokens, "user": UserSerializer(user).data}, status=status.HTTP_201_CREATED)
@@ -124,6 +129,8 @@ class GoogleAuthView(APIView):
                     user.save(update_fields=updates)
                 create_default_categories_for_user(user)
 
+            update_last_login(None, user)
+
         tokens = build_tokens(user)
         return Response({**tokens, "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
@@ -133,6 +140,41 @@ class MeView(APIView):
 
     def get(self, request):
         return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        serializer = MeUpdateSerializer(instance=request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
+
+
+class PreferenceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, user):
+        preference, _ = UserPreference.objects.get_or_create(user=user)
+        return preference
+
+    def get(self, request):
+        preference = self.get_object(request.user)
+        return Response(UserPreferenceSerializer(preference).data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        preference = self.get_object(request.user)
+        serializer = UserPreferenceSerializer(instance=preference, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Contraseña actualizada."}, status=status.HTTP_200_OK)
 
 
 class RefreshView(APIView):
