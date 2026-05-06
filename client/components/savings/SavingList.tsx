@@ -43,7 +43,7 @@ export function SavingList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Ahorros</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Ahorros</h2>
       </div>
 
       {savings.length === 0 ? (
@@ -62,11 +62,11 @@ export function SavingList() {
               .reduce((total, contribution) => total + contribution.amount, 0);
 
             return (
-              <div key={saving.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div key={saving.id} className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="text-sm font-medium text-cyan-50">{saving.name}</p>
-                    <p className="text-xs text-cyan-100/65">Creado {formatShortDate(saving.createdAt)}</p>
+                    <p className="text-sm font-medium text-[color:var(--foreground)]">{saving.name}</p>
+                    <p className="text-xs text-[color:var(--foreground)]/65">Creado {formatShortDate(saving.createdAt)}</p>
                     {initialContributionTotal > 0 ? (
                       <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300/80">
                         Aporte inicial {formatCurrency(initialContributionTotal, { currency: preferences.currency })}
@@ -94,20 +94,20 @@ export function SavingList() {
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <div className="space-y-1">
-                    <p className="text-sm text-cyan-100/65">Valor actual</p>
-                    <p className="text-xl font-semibold text-cyan-50">{formatCurrency(currentValue, { currency: preferences.currency })}</p>
+                    <p className="text-sm text-[color:var(--foreground)]/65">Valor actual</p>
+                    <p className="text-xl font-semibold text-[color:var(--foreground)]">{formatCurrency(currentValue, { currency: preferences.currency })}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm text-cyan-100/65">Abonado</p>
+                    <p className="text-sm text-[color:var(--foreground)]/65">Abonado</p>
                     <p className="text-lg font-semibold text-emerald-300">{formatCurrency(contributionsTotal, { currency: preferences.currency })}</p>
                   </div>
                   {withdrawalsTotal > 0 ? (
                     <div className="space-y-1">
-                      <p className="text-sm text-cyan-100/65">Retirado</p>
+                      <p className="text-sm text-[color:var(--foreground)]/65">Retirado</p>
                       <p className="text-lg font-semibold text-rose-300">{formatCurrency(withdrawalsTotal, { currency: preferences.currency })}</p>
                     </div>
                   ) : null}
-                  <p className="sm:col-span-3 text-xs text-cyan-100/65">
+                  <p className="sm:col-span-3 text-xs text-[color:var(--foreground)]/65">
                     Modo: {saving.mode === "static" ? "Fijo" : `Anual ${formatPercentage(saving.annualPercentage ?? 0)}`}
                   </p>
                 </div>

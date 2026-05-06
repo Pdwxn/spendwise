@@ -44,23 +44,24 @@ export function Modal({ open, title, description, children, onClose }: ModalProp
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 p-3 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center p-3 backdrop-blur-sm sm:items-center sm:p-6"
+      style={{ backgroundColor: "color-mix(in srgb, var(--background) 78%, black)" }}
       onClick={onClose}
       role="presentation"
     >
       <div
         aria-labelledby={titleId}
         aria-modal="true"
-        className="relative w-full max-w-xl rounded-[32px] border border-white/10 bg-slate-950/95 p-4 text-cyan-50 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:p-6"
+        className="relative w-full max-w-xl rounded-[32px] border border-[color:var(--border)] bg-[color:var(--surface-strong)] p-4 text-[color:var(--foreground)] shadow-[0_24px_80px_rgba(0,0,0,0.25)] backdrop-blur-2xl sm:p-6"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h2 id={titleId} className="text-xl font-semibold tracking-tight text-cyan-50">
+            <h2 id={titleId} className="text-xl font-semibold tracking-tight text-[color:var(--foreground)]">
               {title}
             </h2>
-            {description ? <p className="text-sm text-cyan-100/65">{description}</p> : null}
+            {description ? <p className="text-sm text-[color:var(--foreground)]/65">{description}</p> : null}
           </div>
           <Button variant="ghost" type="button" onClick={onClose} className="h-10 w-10 rounded-full p-0">
             <IconX size={18} />

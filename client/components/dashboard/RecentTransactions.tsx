@@ -24,7 +24,7 @@ export function RecentTransactions({
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Movimientos recientes</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Movimientos recientes</h2>
       </div>
 
       {transactions.length === 0 ? (
@@ -43,19 +43,19 @@ export function RecentTransactions({
               : category?.name ?? "Desconocida";
 
             return (
-              <li key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+              <li key={transaction.id} className="flex items-center justify-between gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-cyan-50">
+                  <p className="truncate text-sm font-medium text-[color:var(--foreground)]">
                     {title}
                   </p>
-                  <p className="text-xs text-cyan-100/65">{formatShortDate(transaction.date)} · {subtitle}</p>
+                  <p className="text-xs text-[color:var(--foreground)]/65">{formatShortDate(transaction.date)} · {subtitle}</p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${amountClassName}`}>
                     {transaction.type === "expense" ? "-" : "+"}
                     {formatCurrency(transaction.amount, { currency: preferences.currency })}
                   </p>
-                  <p className="text-xs text-cyan-100/65">{category?.name ?? "Desconocida"}</p>
+                  <p className="text-xs text-[color:var(--foreground)]/65">{category?.name ?? "Desconocida"}</p>
                 </div>
               </li>
             );

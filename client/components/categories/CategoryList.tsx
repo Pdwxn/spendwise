@@ -33,7 +33,7 @@ export function CategoryList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Categorías</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Categorías</h2>
       </div>
 
       {visibleCategories.length === 0 ? (
@@ -41,13 +41,13 @@ export function CategoryList() {
       ) : (
         <div className="space-y-3">
           {visibleCategories.map((category) => (
-            <div key={category.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div key={category.id} className="flex flex-col gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
               <Link href={`/categories/${category.id}`} className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{category.emoji}</span>
-                  <p className="truncate text-sm font-medium text-cyan-50">{category.name}</p>
+                  <p className="truncate text-sm font-medium text-[color:var(--foreground)]">{category.name}</p>
                 </div>
-                <p className="text-xs text-cyan-100/65">Creada {formatShortDate(category.createdAt)}</p>
+                <p className="text-xs text-[color:var(--foreground)]/65">Creada {formatShortDate(category.createdAt)}</p>
               </Link>
               <div className="h-4 w-4 self-start rounded-full sm:self-center" style={{ backgroundColor: category.color }} />
               <Button

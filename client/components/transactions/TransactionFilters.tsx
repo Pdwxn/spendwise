@@ -38,7 +38,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
     <Card className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-cyan-50">Filtros</h2>
+          <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Filtros</h2>
         </div>
         <Button
           variant="ghost"
@@ -53,8 +53,8 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block space-y-1 text-sm text-cyan-100/70">
-          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Mes</span>
+        <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+          <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Mes</span>
           <Select value={selectedMonth} onChange={(event) => actions.setSelectedMonth(event.target.value as MonthKey)}>
             {monthOptions.map((month) => (
               <option key={month} value={month}>
@@ -64,8 +64,8 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
           </Select>
         </label>
 
-        <label className="block space-y-1 text-sm text-cyan-100/70">
-          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Categoría</span>
+        <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+          <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Categoría</span>
           <Select
             value={selectedCategoryId ?? "all"}
             onChange={(event) => actions.setSelectedCategoryId(event.target.value === "all" ? null : (event.target.value as ID))}

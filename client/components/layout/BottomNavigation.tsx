@@ -24,8 +24,8 @@ export function BottomNavigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-slate-950/95 px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
-      <div className="mx-auto grid max-w-6xl grid-cols-6 gap-1 px-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-[0.625rem] font-medium text-cyan-100/70">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--border)] bg-[color:var(--surface-strong)] px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl">
+      <div className="mx-auto grid max-w-6xl grid-cols-6 gap-1 px-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-[0.625rem] font-medium text-[color:var(--foreground)]/70">
         {items.map((item) => {
           const isActive = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
           const Icon = item.icon;
@@ -40,7 +40,7 @@ export function BottomNavigation() {
               className={`flex min-h-14 flex-col items-center justify-center rounded-2xl px-1 py-2 transition-colors ${
                 isActive
                   ? "bg-cyan-300 text-slate-950 shadow-lg shadow-cyan-500/20"
-                  : "hover:bg-white/8 hover:text-cyan-50"
+                  : "hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
               }`}
             >
               <Icon size={20} stroke={1.85} />

@@ -49,8 +49,8 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Nombre</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Nombre</span>
         <Input
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -58,8 +58,8 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
           aria-label="Nombre de la categoría"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Emoji</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Emoji</span>
         <Input
           value={emoji}
           onChange={(event) => setEmoji(event.target.value)}
@@ -67,8 +67,8 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
           aria-label="Emoji de la categoría"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Color</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Color</span>
         <Input
           type="color"
           value={color}

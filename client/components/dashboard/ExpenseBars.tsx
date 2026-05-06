@@ -73,22 +73,22 @@ export function ExpenseBars({ items }: ExpenseBarsProps) {
         return (
           <article
             key={item.categoryId}
-            className="relative h-[330px] min-w-[126px] flex-1 overflow-hidden rounded-[32px] border bg-white/[0.03] p-3 backdrop-blur-2xl sm:min-w-[140px]"
+            className="relative h-[330px] min-w-[126px] flex-1 overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[color:var(--surface)] p-3 backdrop-blur-2xl sm:min-w-[140px]"
             style={{
               borderColor: item.color,
               boxShadow: `0 0 0 1px ${item.color}30, 0 18px 50px rgba(0, 0, 0, 0.22), 0 0 24px ${glowColor}22`,
             }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_55%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_55%)]" />
 
             <div
-              className="absolute inset-x-2 bottom-3 rounded-[26px] border border-white/18 bg-[linear-gradient(180deg,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0.1)_46%,rgba(255,255,255,0.03)_100%)]"
+                className="absolute inset-x-2 bottom-3 rounded-[26px] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0.08)_46%,rgba(255,255,255,0.02)_100%)]"
               style={{ height: `calc(${fillRatio * 100}% - 0.75rem)` }}
             />
 
             {hasBudget ? (
               <div
-                className="absolute left-3 right-3 z-10 border-t border-dashed border-white/55"
+                className="absolute left-3 right-3 z-10 border-t border-dashed border-[color:var(--foreground)]/45"
                 style={{ bottom: lineBottom }}
               />
             ) : null}
@@ -98,11 +98,11 @@ export function ExpenseBars({ items }: ExpenseBarsProps) {
               style={{ textShadow: `0 1px 0 ${glowColorTwo}` }}
             >
               <span className="text-[1.7rem] leading-none">{item.emoji}</span>
-              <span className="whitespace-nowrap text-[12px] font-semibold leading-none text-cyan-50">
+              <span className="whitespace-nowrap text-[12px] font-semibold leading-none text-[color:var(--foreground)]">
                 {formatCompactValue(item.amount)}
               </span>
               {percentage !== null ? (
-                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-100/70">
+                <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[color:var(--foreground)]/70">
                   {percentage}%
                 </span>
               ) : null}

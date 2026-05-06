@@ -81,25 +81,25 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
                   );
                 })}
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
               <XAxis
                 dataKey="label"
                 tickLine={false}
                 axisLine={false}
                 interval={0}
-                tick={{ fontSize: 12, fill: "rgba(236,254,255,0.7)" }}
+                tick={{ fontSize: 12, fill: "var(--foreground)" }}
               />
-              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "rgba(236,254,255,0.7)" }} />
+              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--foreground)" }} />
               <Tooltip
                 formatter={(value) => [formatCurrency(Number(value ?? 0), { currency: preferences.currency }), "Gasto"] as [string, string]}
                 labelFormatter={(label) => `Categoría: ${String(label)}`}
                 contentStyle={{
-                  backgroundColor: "rgba(2, 6, 23, 0.96)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  backgroundColor: "var(--surface-strong)",
+                  border: "1px solid var(--border)",
                   borderRadius: "16px",
-                  color: "#ecfeff",
+                  color: "var(--foreground)",
                 }}
-                itemStyle={{ color: "#ecfeff" }}
+                itemStyle={{ color: "var(--foreground)" }}
               />
               <Bar dataKey="amount" radius={[12, 12, 0, 0]}>
                 {chartData.map((entry) => (

@@ -84,8 +84,8 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Importe</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Importe</span>
         <Input
           type="number"
           step="0.01"
@@ -96,8 +96,8 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
           aria-label="Importe"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Cuenta</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Cuenta</span>
         <Select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
           <option value="">Selecciona una cuenta</option>
           {accounts.map((account) => (
@@ -107,14 +107,14 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
           ))}
         </Select>
         {mode === "expense" && selectedAccount ? (
-          <p className="text-xs text-cyan-100/60">
+          <p className="text-xs text-[color:var(--foreground)]/60">
             Saldo disponible: {formatCurrency(selectedAccountBalance ?? 0, { currency: preferences.currency })}
           </p>
         ) : null}
       </label>
       {mode === "expense" ? (
-        <label className="block space-y-1 text-sm text-cyan-100/70">
-          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Categoría</span>
+        <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+          <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Categoría</span>
           <Select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
             <option value="">Selecciona una categoría</option>
             {expenseCategories.map((category) => (
@@ -125,8 +125,8 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
           </Select>
         </label>
       ) : null}
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Descripción</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Descripción</span>
         <Input
           value={description}
           onChange={(event) => setDescription(event.target.value)}
@@ -134,8 +134,8 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
           aria-label="Descripción"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Fecha</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Fecha</span>
         <Input
           type="date"
           value={date}
@@ -147,7 +147,7 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
         Añadir {mode === "expense" ? "gasto" : "ingreso"}
       </Button>
       {formDisabled ? (
-        <p className="text-xs text-cyan-100/60">
+        <p className="text-xs text-[color:var(--foreground)]/60">
           Necesitas al menos una cuenta {mode === "expense" ? "y una categoría visible" : "y la categoría interna de ingresos"} para registrar movimientos.
         </p>
       ) : null}

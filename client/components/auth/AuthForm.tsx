@@ -135,17 +135,17 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <Card className="space-y-6 border-white/10 bg-white/[0.045] p-6 sm:p-8">
+    <Card className="space-y-6 p-6 sm:p-8">
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-[0.24em] text-cyan-100/50">SpendWise</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-cyan-50">{copy[mode].title}</h1>
-        <p className="text-sm leading-relaxed text-cyan-100/65">{copy[mode].description}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.24em] text-[color:var(--foreground)]/50">SpendWise</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--foreground)]">{copy[mode].title}</h1>
+        <p className="text-sm leading-relaxed text-[color:var(--foreground)]/65">{copy[mode].description}</p>
       </div>
 
       <form className="space-y-4" noValidate onSubmit={handleSubmit}>
         {mode === "register" ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2 text-sm font-medium text-cyan-50">
+            <label className="space-y-2 text-sm font-medium text-[color:var(--foreground)]">
               <span>Nombre</span>
               <Input
                 value={firstName}
@@ -156,7 +156,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               />
               {fieldErrors.firstName ? <p className="text-xs text-rose-200">{fieldErrors.firstName}</p> : null}
             </label>
-            <label className="space-y-2 text-sm font-medium text-cyan-50">
+            <label className="space-y-2 text-sm font-medium text-[color:var(--foreground)]">
               <span>Apellido</span>
               <Input
                 value={lastName}
@@ -170,7 +170,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           </div>
         ) : null}
 
-        <label className="space-y-2 text-sm font-medium text-cyan-50">
+        <label className="space-y-2 text-sm font-medium text-[color:var(--foreground)]">
           <span>Correo electrónico</span>
           <Input
             type="email"
@@ -184,7 +184,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           {fieldErrors.email ? <p className="text-xs text-rose-200">{fieldErrors.email}</p> : null}
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-cyan-50">
+        <label className="space-y-2 text-sm font-medium text-[color:var(--foreground)]">
           <span>Contraseña</span>
           <Input
             type="password"
@@ -199,7 +199,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           {fieldErrors.password ? (
             <p className="text-xs text-rose-200">{fieldErrors.password}</p>
           ) : mode === "register" ? (
-            <p className="text-xs text-cyan-100/50">Usa 8 caracteres o más. Las contraseñas comunes se rechazan.</p>
+            <p className="text-xs text-[color:var(--foreground)]/50">Usa 8 caracteres o más. Las contraseñas comunes se rechazan.</p>
           ) : null}
         </label>
 
@@ -213,7 +213,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-white/10" />
-          <span className="text-xs uppercase tracking-[0.2em] text-cyan-100/40">o</span>
+          <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--foreground)]/40">o</span>
           <div className="h-px flex-1 bg-white/10" />
         </div>
 
@@ -235,8 +235,8 @@ export function AuthForm({ mode }: AuthFormProps) {
         />
       </div>
 
-      <p className="text-sm text-cyan-100/65">
-        {copy[mode].footer.label} <Link href={copy[mode].footer.href} className="font-medium text-cyan-200 hover:text-cyan-50">{copy[mode].footer.linkText}</Link>
+      <p className="text-sm text-[color:var(--foreground)]/65">
+        {copy[mode].footer.label} <Link href={copy[mode].footer.href} className="font-medium text-cyan-700 hover:text-cyan-900">{copy[mode].footer.linkText}</Link>
       </p>
     </Card>
   );

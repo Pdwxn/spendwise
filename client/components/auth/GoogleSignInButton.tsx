@@ -91,7 +91,7 @@ export function GoogleSignInButton({ onToken }: GoogleSignInButtonProps) {
       <button
         type="button"
         disabled
-        className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-sm font-medium text-cyan-50/50"
+        className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] text-sm font-medium text-[color:var(--foreground)]/50"
       >
         Google no configurado
       </button>
@@ -101,7 +101,7 @@ export function GoogleSignInButton({ onToken }: GoogleSignInButtonProps) {
   return (
     <div className="space-y-2">
       <div ref={containerRef} />
-      {!isReady ? <p className="text-xs text-cyan-100/45">Cargando Google...</p> : null}
+      {!isReady ? <p className="text-xs text-[color:var(--foreground)]/45">Cargando Google...</p> : null}
     </div>
   );
 }

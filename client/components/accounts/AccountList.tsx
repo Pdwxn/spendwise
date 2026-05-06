@@ -32,7 +32,7 @@ export function AccountList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Cuentas</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Cuentas</h2>
       </div>
 
       {accounts.length === 0 ? (
@@ -43,17 +43,17 @@ export function AccountList() {
             const balance = getAccountBalance(account, transactions);
 
             return (
-              <div key={account.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div key={account.id} className="flex flex-col gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: account.color }} />
-                    <p className="truncate text-sm font-medium text-cyan-50">{account.name}</p>
+                    <p className="truncate text-sm font-medium text-[color:var(--foreground)]">{account.name}</p>
                   </div>
-                  <p className="text-xs text-cyan-100/65">Creada {formatShortDate(account.createdAt)}</p>
+                  <p className="text-xs text-[color:var(--foreground)]/65">Creada {formatShortDate(account.createdAt)}</p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <p className="text-sm font-semibold text-cyan-50">{formatCurrency(balance, { currency: preferences.currency })}</p>
-                  <p className="text-xs text-cyan-100/65">Inicial {formatCurrency(account.initialBalance, { currency: preferences.currency })}</p>
+                  <p className="text-sm font-semibold text-[color:var(--foreground)]">{formatCurrency(balance, { currency: preferences.currency })}</p>
+                  <p className="text-xs text-[color:var(--foreground)]/65">Inicial {formatCurrency(account.initialBalance, { currency: preferences.currency })}</p>
                 </div>
                 <Button
                   variant="secondary"

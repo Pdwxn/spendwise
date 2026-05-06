@@ -55,8 +55,8 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Categoría</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Categoría</span>
         <Select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
           <option value="">Selecciona una categoría</option>
           {visibleCategories.map((category) => (
@@ -66,8 +66,8 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
           ))}
         </Select>
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Mes</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Mes</span>
         <Input
           type="month"
           value={month}
@@ -75,8 +75,8 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
           aria-label="Mes del presupuesto"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Importe</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Importe</span>
         <Input
           type="number"
           step="0.01"
@@ -91,7 +91,7 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
         Añadir presupuesto
       </Button>
       {visibleCategories.length === 0 ? (
-        <p className="text-xs text-cyan-100/60">Primero crea una categoría para poder asignarle un presupuesto.</p>
+        <p className="text-xs text-[color:var(--foreground)]/60">Primero crea una categoría para poder asignarle un presupuesto.</p>
       ) : null}
     </form>
   );

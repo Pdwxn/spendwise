@@ -64,8 +64,8 @@ export function SavingWithdrawalForm({ savingId, onSuccess }: SavingWithdrawalFo
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Cuenta destino</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Cuenta destino</span>
         <Select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
           <option value="">Selecciona una cuenta</option>
           {accounts.map((account) => (
@@ -75,8 +75,8 @@ export function SavingWithdrawalForm({ savingId, onSuccess }: SavingWithdrawalFo
           ))}
         </Select>
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Importe</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Importe</span>
         <Input
           type="number"
           step="0.01"
@@ -88,8 +88,8 @@ export function SavingWithdrawalForm({ savingId, onSuccess }: SavingWithdrawalFo
           aria-label="Importe del retiro"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Descripción</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Descripción</span>
         <Input
           value={description}
           onChange={(event) => setDescription(event.target.value)}
@@ -97,8 +97,8 @@ export function SavingWithdrawalForm({ savingId, onSuccess }: SavingWithdrawalFo
           aria-label="Descripción del retiro"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Fecha</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Fecha</span>
         <Input
           type="date"
           value={date}

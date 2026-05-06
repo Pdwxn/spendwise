@@ -341,32 +341,36 @@ export function UserMenu() {
         type="button"
         aria-label="Abrir menú de usuario"
         onClick={() => setOpen(true)}
-        className="fixed right-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.08] text-sm font-semibold text-cyan-50 shadow-[0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-all hover:bg-white/[0.12] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-300/60 sm:right-6 sm:top-6"
+        className="fixed right-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-sm font-semibold text-[color:var(--foreground)] shadow-[0_12px_30px_rgba(0,0,0,0.14)] backdrop-blur-xl transition-all hover:bg-[color:var(--surface-strong)] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-300/60 sm:right-6 sm:top-6"
       >
         {initials}
       </button>
 
       {open ? (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-sm" onClick={closeDrawer} />
-          <aside className="absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col overflow-hidden border-l border-white/10 bg-slate-950/96 p-5 text-cyan-50 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
+          <div
+            className="absolute inset-0 backdrop-blur-sm"
+            style={{ backgroundColor: "color-mix(in srgb, var(--background) 78%, black)" }}
+            onClick={closeDrawer}
+          />
+          <aside className="absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col overflow-hidden border-l border-[color:var(--border)] bg-[color:var(--surface-strong)] p-5 text-[color:var(--foreground)] shadow-[0_24px_80px_rgba(0,0,0,0.32)] backdrop-blur-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.22em] text-cyan-100/45">Cuenta</p>
+                <p className="text-xs font-medium uppercase tracking-[0.22em] text-[color:var(--foreground)]/45">Cuenta</p>
                 <h2 className="mt-2 text-2xl font-semibold tracking-tight">{activeSection?.title ?? `${user?.firstName ?? "Usuario"} ${user?.lastName ?? ""}`}</h2>
-                <p className="text-sm text-cyan-100/65">{activeSection?.status ?? user?.email ?? "sin correo"}</p>
+                <p className="text-sm text-[color:var(--foreground)]/65">{activeSection?.status ?? user?.email ?? "sin correo"}</p>
               </div>
               <button
                 type="button"
                 aria-label={view === "menu" ? "Cerrar menú de usuario" : "Volver al menú"}
                 onClick={view === "menu" ? closeDrawer : goBack}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-cyan-50 transition hover:bg-white/[0.1]"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-strong)]"
               >
                 {view === "menu" ? <IconX size={18} /> : <IconChevronLeft size={18} />}
               </button>
             </div>
 
-            <div className="mt-6 flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+            <div className="mt-6 flex items-center gap-3 rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4">
               <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-cyan-300 via-teal-300 to-violet-300 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20">
                 {user?.avatarUrl && !avatarFailed ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -381,16 +385,16 @@ export function UserMenu() {
                 )}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-cyan-50">{user?.firstName} {user?.lastName}</p>
-                <p className="truncate text-xs text-cyan-100/60">Proveedor: {providerLabel}</p>
+                <p className="truncate text-sm font-medium text-[color:var(--foreground)]">{user?.firstName} {user?.lastName}</p>
+                <p className="truncate text-xs text-[color:var(--foreground)]/60">Proveedor: {providerLabel}</p>
               </div>
             </div>
 
             <div className="mt-6 min-h-0 flex-1 overflow-y-auto pr-1">
               {view === "menu" ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm font-medium text-cyan-50">
-                    <IconSettings size={18} className="text-cyan-200/80" />
+                  <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--foreground)]">
+                    <IconSettings size={18} className="text-[color:var(--foreground)]/80" />
                     <span>Configuración</span>
                   </div>
 
@@ -407,16 +411,16 @@ export function UserMenu() {
                           key={item.title}
                           type="button"
                           onClick={() => openSection(item.view)}
-                          className="flex w-full items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-cyan-300/30 hover:bg-white/[0.06]"
+                          className="flex w-full items-center gap-3 rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-left transition hover:border-cyan-300/30 hover:bg-[color:var(--surface-strong)]"
                         >
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/10 text-cyan-200">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/10 text-[color:var(--foreground)]">
                             <Icon size={18} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-cyan-50">{item.title}</p>
-                            <p className="text-xs text-cyan-100/60">{item.description}</p>
+                            <p className="text-sm font-medium text-[color:var(--foreground)]">{item.title}</p>
+                            <p className="text-xs text-[color:var(--foreground)]/60">{item.description}</p>
                           </div>
-                          <IconChevronLeft size={16} className="rotate-180 text-cyan-100/40" />
+                          <IconChevronLeft size={16} className="rotate-180 text-[color:var(--foreground)]/40" />
                         </button>
                       );
                     })}

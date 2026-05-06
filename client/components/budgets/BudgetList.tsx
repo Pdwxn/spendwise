@@ -21,7 +21,7 @@ export function BudgetList() {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Presupuestos mensuales</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Presupuestos mensuales</h2>
       </div>
 
       {currentBudgets.length === 0 ? (
@@ -33,13 +33,13 @@ export function BudgetList() {
             const progress = calculateBudgetProgress(budget, transactions, selectedMonth);
 
             return (
-              <div key={budget.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div key={budget.id} className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <p className="text-sm font-medium text-cyan-50">
+                    <p className="text-sm font-medium text-[color:var(--foreground)]">
                       {category?.emoji ?? "#"} {category?.name ?? "Desconocida"}
                     </p>
-                     <p className="text-xs text-cyan-100/65">Presupuesto {formatCurrency(budget.amount, { currency: preferences.currency })}</p>
+                      <p className="text-xs text-[color:var(--foreground)]/65">Presupuesto {formatCurrency(budget.amount, { currency: preferences.currency })}</p>
                   </div>
                   <Button
                     variant="secondary"
@@ -58,7 +58,7 @@ export function BudgetList() {
                     percentage={progress.percentage}
                     isOverBudget={progress.isOverBudget}
                   />
-                  <p className="mt-2 text-xs text-cyan-100/65">Restante {formatCurrency(progress.remainingAmount, { currency: preferences.currency })}</p>
+                  <p className="mt-2 text-xs text-[color:var(--foreground)]/65">Restante {formatCurrency(progress.remainingAmount, { currency: preferences.currency })}</p>
                 </div>
               </div>
             );

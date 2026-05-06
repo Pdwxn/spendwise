@@ -47,8 +47,8 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Nombre</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Nombre</span>
         <Input
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -56,8 +56,8 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
           aria-label="Nombre de la cuenta"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Saldo inicial</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Saldo inicial</span>
         <Input
           type="number"
           step="0.01"
@@ -67,8 +67,8 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
           aria-label="Saldo inicial"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Color</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Color</span>
         <Input
           type="color"
           value={color}

@@ -17,7 +17,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Distribución por categoría</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Distribución por categoría</h2>
       </div>
 
       {data.length === 0 ? (
@@ -41,12 +41,12 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
               <Tooltip
                 formatter={(value) => [formatCurrency(Number(value ?? 0), { currency: preferences.currency }), "Gasto"] as [string, string]}
                 contentStyle={{
-                  backgroundColor: "rgba(2, 6, 23, 0.96)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  backgroundColor: "var(--surface-strong)",
+                  border: "1px solid var(--border)",
                   borderRadius: "16px",
-                  color: "#ecfeff",
+                  color: "var(--foreground)",
                 }}
-                itemStyle={{ color: "#ecfeff" }}
+                itemStyle={{ color: "var(--foreground)" }}
               />
             </PieChart>
           </ResponsiveContainer>

@@ -63,8 +63,8 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Nombre</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Nombre</span>
         <Input
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -72,8 +72,8 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
           aria-label="Nombre del ahorro"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Importe inicial</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Importe inicial</span>
         <Input
           type="number"
           step="0.01"
@@ -83,8 +83,8 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
           aria-label="Importe inicial"
         />
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Cuenta origen</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Cuenta origen</span>
         <Select value={accountId} onChange={(event) => setAccountId(event.target.value)}>
           <option value="">Selecciona una cuenta</option>
           {accounts.map((account) => (
@@ -93,18 +93,18 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
             </option>
           ))}
         </Select>
-        <p className="text-xs text-cyan-100/50">Se usará solo si el importe inicial es mayor que cero.</p>
+        <p className="text-xs text-[color:var(--foreground)]/50">Se usará solo si el importe inicial es mayor que cero.</p>
       </label>
-      <label className="block space-y-1 text-sm text-cyan-100/70">
-        <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Modo</span>
+      <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+        <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Modo</span>
         <Select value={mode} onChange={(event) => setMode(event.target.value as SavingMode)}>
           <option value="static">Fijo</option>
           <option value="annualPercentage">Porcentaje anual</option>
         </Select>
       </label>
       {mode === "annualPercentage" ? (
-        <label className="block space-y-1 text-sm text-cyan-100/70">
-          <span className="text-xs uppercase tracking-[0.18em] text-cyan-100/50">Porcentaje anual</span>
+        <label className="block space-y-1 text-sm text-[color:var(--foreground)]/75">
+          <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Porcentaje anual</span>
           <Input
             type="number"
             step="0.01"

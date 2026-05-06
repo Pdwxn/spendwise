@@ -21,7 +21,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
   return (
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-cyan-50">Movimientos</h2>
+        <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Movimientos</h2>
       </div>
 
       {transactions.length === 0 ? (
@@ -50,17 +50,17 @@ export function TransactionList({ transactions }: TransactionListProps) {
                   : "+";
 
             return (
-              <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 flex-1">
                   {isSavingMovement ? (
-                    <span className="mb-2 inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                    <span className="mb-2 inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground)]">
                       Ahorro
                     </span>
                   ) : null}
-                  <p className="truncate text-sm font-medium text-cyan-50">
+                  <p className="truncate text-sm font-medium text-[color:var(--foreground)]">
                     {title}
                   </p>
-                  <p className="text-xs text-cyan-100/65">
+                  <p className="text-xs text-[color:var(--foreground)]/65">
                     {formatShortDate(transaction.date)} · {subtitle}
                   </p>
                 </div>

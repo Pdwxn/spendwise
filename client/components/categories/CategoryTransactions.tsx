@@ -29,7 +29,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
         action={
           <Link
             href="/categories"
-            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+            className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-medium text-[color:var(--foreground)] hover:bg-[color:var(--surface-strong)]"
           >
             Volver a categorías
           </Link>
@@ -43,7 +43,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-3xl">{category.emoji}</p>
-          <h2 className="mt-2 text-lg font-semibold text-cyan-50">{category.name}</h2>
+          <h2 className="mt-2 text-lg font-semibold text-[color:var(--foreground)]">{category.name}</h2>
         </div>
         <div className="h-5 w-5 rounded-full" style={{ backgroundColor: category.color }} />
       </div>
@@ -55,7 +55,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
           action={
             <Link
               href="/categories"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm font-medium text-cyan-50 hover:bg-white/[0.1]"
+              className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-medium text-[color:var(--foreground)] hover:bg-[color:var(--surface-strong)]"
             >
               Volver a categorías
             </Link>
@@ -64,10 +64,10 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
       ) : (
         <div className="space-y-3">
           {categoryTransactions.map((transaction) => (
-            <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-cyan-50">{transaction.description}</p>
-                <p className="text-xs text-cyan-100/65">{formatShortDate(transaction.date)}</p>
+                <p className="truncate text-sm font-medium text-[color:var(--foreground)]">{transaction.description}</p>
+                <p className="text-xs text-[color:var(--foreground)]/65">{formatShortDate(transaction.date)}</p>
               </div>
               <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-300" : "text-emerald-300"}`}>
                 {transaction.type === "expense" ? "-" : "+"}

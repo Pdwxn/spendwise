@@ -3,11 +3,11 @@
 import { ToastContainer } from "react-toastify";
 
 const toastStyles = {
-  default: "border-cyan-300/20 bg-slate-950/95 text-cyan-50 shadow-[0_18px_50px_rgba(0,0,0,0.38)] before:bg-cyan-300",
-  success: "border-emerald-300/25 bg-slate-950/95 text-cyan-50 shadow-[0_18px_50px_rgba(0,0,0,0.38)] before:bg-emerald-300",
-  error: "border-rose-300/25 bg-slate-950/95 text-cyan-50 shadow-[0_18px_50px_rgba(0,0,0,0.38)] before:bg-rose-300",
-  info: "border-sky-300/25 bg-slate-950/95 text-cyan-50 shadow-[0_18px_50px_rgba(0,0,0,0.38)] before:bg-sky-300",
-  warning: "border-amber-300/25 bg-slate-950/95 text-cyan-50 shadow-[0_18px_50px_rgba(0,0,0,0.38)] before:bg-amber-300",
+  default: "border-cyan-300/20 bg-[color:var(--surface-strong)] text-[color:var(--foreground)] shadow-[0_18px_50px_rgba(0,0,0,0.2)] before:bg-cyan-300",
+  success: "border-emerald-300/25 bg-[color:var(--surface-strong)] text-[color:var(--foreground)] shadow-[0_18px_50px_rgba(0,0,0,0.2)] before:bg-emerald-300",
+  error: "border-rose-300/25 bg-[color:var(--surface-strong)] text-[color:var(--foreground)] shadow-[0_18px_50px_rgba(0,0,0,0.2)] before:bg-rose-300",
+  info: "border-sky-300/25 bg-[color:var(--surface-strong)] text-[color:var(--foreground)] shadow-[0_18px_50px_rgba(0,0,0,0.2)] before:bg-sky-300",
+  warning: "border-amber-300/25 bg-[color:var(--surface-strong)] text-[color:var(--foreground)] shadow-[0_18px_50px_rgba(0,0,0,0.2)] before:bg-amber-300",
 } as const;
 
 const progressStyles = {
