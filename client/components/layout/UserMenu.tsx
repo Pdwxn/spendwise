@@ -1,0 +1,136 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import { IconChevronLeft, IconLogout, IconSettings } from "@tabler/icons-react";
+import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/context/AuthContext";
+
+function getInitials(firstName?: string | null, lastName?: string | null, email?: string | null) {
+  const initials = `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.trim();
+
+  if (initials) {
+    return initials.toUpperCase();
+  }
+
+  if (email?.[0]) {
+    return email[0].toUpperCase();
+  }
+
+  return "U";
+}
+
+export function UserMenu() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const initials = useMemo(() => getInitials(user?.firstName, user?.lastName, user?.email), [user]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMounted(true), 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  async function handleLogout() {
+    await logout();
+    setOpen(false);
+    router.replace("/login");
+  }
+
+  if (!mounted) {
+    return null;
+  }
+
+  return createPortal(
+    <>
+      <button
+        type="button"
+        aria-label="Abrir menú de usuario"
+        onClick={() => setOpen(true)}
+        className="fixed right-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.08] text-sm font-semibold text-cyan-50 shadow-[0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-all hover:bg-white/[0.12] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-300/60 sm:right-6 sm:top-6"
+      >
+        {initials}
+      </button>
+
+      {open ? (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <aside className="absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col border-l border-white/10 bg-slate-950/96 p-5 text-cyan-50 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.22em] text-cyan-100/45">Cuenta</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">{user?.firstName ?? "Usuario"} {user?.lastName ?? ""}</h2>
+                <p className="text-sm text-cyan-100/65">{user?.email ?? "sin correo"}</p>
+              </div>
+              <button
+                type="button"
+                aria-label="Cerrar menú de usuario"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-cyan-50 transition hover:bg-white/[0.1]"
+              >
+                <IconChevronLeft size={18} />
+              </button>
+            </div>
+
+            <div className="mt-6 flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-teal-300 to-violet-300 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20">
+                {initials}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-cyan-50">{user?.firstName} {user?.lastName}</p>
+                <p className="truncate text-xs text-cyan-100/60">Proveedor: {user?.authProvider ?? "email"}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-cyan-50">
+                <IconSettings size={18} className="text-cyan-200/80" />
+                <span>Configuración</span>
+              </div>
+              <div className="space-y-2 rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm text-cyan-100/65">
+                <p>Preferencias de cuenta</p>
+                <p>Notificaciones</p>
+                <p>Seguridad</p>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-6">
+              <Button variant="secondary" className="w-full justify-center" onClick={() => void handleLogout()}>
+                <IconLogout size={18} />
+                Cerrar sesión
+              </Button>
+            </div>
+          </aside>
+        </div>
+      ) : null}
+    </>,
+    document.body,
+  );
+}

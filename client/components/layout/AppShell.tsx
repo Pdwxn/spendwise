@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { useAuth } from "@/context/AuthContext";
 
@@ -49,6 +50,7 @@ export function AppShell({ children }: AppShellProps) {
         <main className="flex-1">{children}</main>
       </div>
       {showBottomNavigation ? <BottomNavigation /> : null}
+      {showBottomNavigation ? <UserMenu /> : null}
       <ToastProvider />
     </div>
   );
