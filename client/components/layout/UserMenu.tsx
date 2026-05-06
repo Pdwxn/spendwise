@@ -3,7 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { IconChevronLeft, IconLogout, IconSettings } from "@tabler/icons-react";
+import { toast } from "react-toastify";
+import {
+  IconBell,
+  IconChevronLeft,
+  IconLogout,
+  IconSettings,
+  IconShieldLock,
+  IconUserCircle,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 
@@ -26,8 +34,19 @@ export function UserMenu() {
   const { user, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   const initials = useMemo(() => getInitials(user?.firstName, user?.lastName, user?.email), [user]);
+  const providerLabel = useMemo(() => {
+    switch (user?.authProvider) {
+      case "google":
+        return "Google";
+      case "both":
+        return "Email + Google";
+      default:
+        return "Email";
+    }
+  }, [user?.authProvider]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setMounted(true), 0);
@@ -36,6 +55,14 @@ export function UserMenu() {
       window.clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setAvatarFailed(false), 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [user?.avatarUrl]);
 
   useEffect(() => {
     if (!open) {
@@ -60,6 +87,7 @@ export function UserMenu() {
 
   async function handleLogout() {
     await logout();
+    toast.success("Sesión cerrada");
     setOpen(false);
     router.replace("/login");
   }
@@ -100,12 +128,22 @@ export function UserMenu() {
             </div>
 
             <div className="mt-6 flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-cyan-300 via-teal-300 to-violet-300 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20">
-                {initials}
+              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-cyan-300 via-teal-300 to-violet-300 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20">
+                {user?.avatarUrl && !avatarFailed ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={user.avatarUrl}
+                    alt="Avatar del usuario"
+                    className="h-full w-full object-cover"
+                    onError={() => setAvatarFailed(true)}
+                  />
+                ) : (
+                  initials
+                )}
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-cyan-50">{user?.firstName} {user?.lastName}</p>
-                <p className="truncate text-xs text-cyan-100/60">Proveedor: {user?.authProvider ?? "email"}</p>
+                <p className="truncate text-xs text-cyan-100/60">Proveedor: {providerLabel}</p>
               </div>
             </div>
 
@@ -114,15 +152,40 @@ export function UserMenu() {
                 <IconSettings size={18} className="text-cyan-200/80" />
                 <span>Configuración</span>
               </div>
-              <div className="space-y-2 rounded-3xl border border-white/10 bg-white/[0.03] p-4 text-sm text-cyan-100/65">
-                <p>Preferencias de cuenta</p>
-                <p>Notificaciones</p>
-                <p>Seguridad</p>
+
+              <div className="space-y-2">
+                {[
+                  { icon: IconUserCircle, title: "Perfil", description: "Nombre, correo y foto" },
+                  { icon: IconBell, title: "Preferencias", description: "Notificaciones y visualización" },
+                  { icon: IconShieldLock, title: "Seguridad", description: "Contraseña y sesión" },
+                ].map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <button
+                      key={item.title}
+                      type="button"
+                      className="flex w-full items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-cyan-300/30 hover:bg-white/[0.06]"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/10 text-cyan-200">
+                        <Icon size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-cyan-50">{item.title}</p>
+                        <p className="text-xs text-cyan-100/60">{item.description}</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <div className="mt-auto pt-6">
-              <Button variant="secondary" className="w-full justify-center" onClick={() => void handleLogout()}>
+              <Button
+                variant="secondary"
+                className="w-full justify-center border border-rose-400/20 bg-rose-500/10 text-rose-100 hover:bg-rose-500/15"
+                onClick={() => void handleLogout()}
+              >
                 <IconLogout size={18} />
                 Cerrar sesión
               </Button>
