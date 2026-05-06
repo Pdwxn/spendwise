@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyState } from "@/components/ui/EmptyState";
+import { usePreferences } from "@/context/PreferencesContext";
 import type { CategoryBreakdownItem } from "@/utils/calculations";
 import { formatCurrency } from "@/utils/formatters";
 import {
@@ -51,6 +52,7 @@ function getGradientId(categoryId: string) {
 }
 
 export function CategoryBarChart({ data }: CategoryBarChartProps) {
+  const { preferences } = usePreferences();
   const chartData = data.map((item) => ({
     ...item,
     label: `${item.emoji} ${item.categoryName}`,
@@ -89,7 +91,7 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
               />
               <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "rgba(236,254,255,0.7)" }} />
               <Tooltip
-                formatter={(value) => [formatCurrency(Number(value ?? 0)), "Gasto"] as [string, string]}
+                formatter={(value) => [formatCurrency(Number(value ?? 0), { currency: preferences.currency }), "Gasto"] as [string, string]}
                 labelFormatter={(label) => `Categoría: ${String(label)}`}
                 contentStyle={{
                   backgroundColor: "rgba(2, 6, 23, 0.96)",

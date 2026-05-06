@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
+import { usePreferences } from "@/context/PreferencesContext";
 import { calculateBudgetProgress } from "@/utils/calculations";
 import { formatCurrency, formatMonthLabel } from "@/utils/formatters";
 import { BudgetProgress } from "@/components/budgets/BudgetProgress";
@@ -13,6 +14,7 @@ export function BudgetList() {
     state: { budgets, categories, selectedMonth, transactions },
     actions,
   } = useFinance();
+  const { preferences } = usePreferences();
 
   const currentBudgets = budgets.filter((budget) => budget.month === selectedMonth);
 
@@ -37,7 +39,7 @@ export function BudgetList() {
                     <p className="text-sm font-medium text-cyan-50">
                       {category?.emoji ?? "#"} {category?.name ?? "Desconocida"}
                     </p>
-                    <p className="text-xs text-cyan-100/65">Presupuesto {formatCurrency(budget.amount)}</p>
+                     <p className="text-xs text-cyan-100/65">Presupuesto {formatCurrency(budget.amount, { currency: preferences.currency })}</p>
                   </div>
                   <Button
                     variant="secondary"
@@ -56,7 +58,7 @@ export function BudgetList() {
                     percentage={progress.percentage}
                     isOverBudget={progress.isOverBudget}
                   />
-                  <p className="mt-2 text-xs text-cyan-100/65">Restante {formatCurrency(progress.remainingAmount)}</p>
+                  <p className="mt-2 text-xs text-cyan-100/65">Restante {formatCurrency(progress.remainingAmount, { currency: preferences.currency })}</p>
                 </div>
               </div>
             );

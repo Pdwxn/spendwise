@@ -8,6 +8,7 @@ import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { ExpenseFormModal } from "@/components/transactions/ExpenseFormModal";
 import { IncomeFormModal } from "@/components/transactions/IncomeFormModal";
 import { useAuth } from "@/context/AuthContext";
+import { usePreferences } from "@/context/PreferencesContext";
 import { useFinance } from "@/hooks/useFinance";
 import {
   filterTransactions,
@@ -25,6 +26,7 @@ export default function DashboardPage() {
     state: { accounts, budgets, categories, selectedCategoryId, selectedMonth, savings, transactions },
   } = useFinance();
   const { user } = useAuth();
+  const { preferences } = usePreferences();
 
   const filteredTransactions = filterTransactions(transactions, {
     month: selectedMonth,
@@ -61,9 +63,9 @@ export default function DashboardPage() {
       </header>
 
       <SummaryCards
-        totalBalance={formatCurrency(totalBalance)}
-        monthlyIncome={formatCurrency(monthlyIncome)}
-        monthlyExpenses={formatCurrency(monthlyExpenses)}
+        totalBalance={formatCurrency(totalBalance, { currency: preferences.currency })}
+        monthlyIncome={formatCurrency(monthlyIncome, { currency: preferences.currency })}
+        monthlyExpenses={formatCurrency(monthlyExpenses, { currency: preferences.currency })}
       />
 
       <div className="grid grid-cols-2 gap-3">

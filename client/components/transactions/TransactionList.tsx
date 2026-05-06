@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
+import { usePreferences } from "@/context/PreferencesContext";
 import type { Transaction } from "@/types";
 import { formatCurrency, formatShortDate } from "@/utils/formatters";
 
@@ -15,6 +16,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
   const {
     state: { categories, savings },
   } = useFinance();
+  const { preferences } = usePreferences();
 
   return (
     <Card className="space-y-4">
@@ -65,7 +67,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
                 <div className="text-left sm:text-right">
                   <p className={`text-sm font-semibold ${amountClassName}`}>
                     {amountSign}
-                    {formatCurrency(transaction.amount)}
+                    {formatCurrency(transaction.amount, { currency: preferences.currency })}
                   </p>
                 </div>
               </div>

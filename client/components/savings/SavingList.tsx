@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { usePreferences } from "@/context/PreferencesContext";
 import { useFinance } from "@/hooks/useFinance";
 import {
   getElapsedMonthsBetweenDates,
@@ -20,6 +21,7 @@ export function SavingList() {
   const {
     state: { savings, savingContributions, savingWithdrawals },
   } = useFinance();
+  const { preferences } = usePreferences();
   const [activeSavingId, setActiveSavingId] = useState<ID | null>(null);
   const [activeMode, setActiveMode] = useState<"contribution" | "withdrawal" | null>(null);
 
@@ -67,7 +69,7 @@ export function SavingList() {
                     <p className="text-xs text-cyan-100/65">Creado {formatShortDate(saving.createdAt)}</p>
                     {initialContributionTotal > 0 ? (
                       <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300/80">
-                        Aporte inicial {formatCurrency(initialContributionTotal)}
+                        Aporte inicial {formatCurrency(initialContributionTotal, { currency: preferences.currency })}
                       </p>
                     ) : null}
                   </div>
@@ -93,16 +95,16 @@ export function SavingList() {
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <div className="space-y-1">
                     <p className="text-sm text-cyan-100/65">Valor actual</p>
-                    <p className="text-xl font-semibold text-cyan-50">{formatCurrency(currentValue)}</p>
+                    <p className="text-xl font-semibold text-cyan-50">{formatCurrency(currentValue, { currency: preferences.currency })}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-cyan-100/65">Abonado</p>
-                    <p className="text-lg font-semibold text-emerald-300">{formatCurrency(contributionsTotal)}</p>
+                    <p className="text-lg font-semibold text-emerald-300">{formatCurrency(contributionsTotal, { currency: preferences.currency })}</p>
                   </div>
                   {withdrawalsTotal > 0 ? (
                     <div className="space-y-1">
                       <p className="text-sm text-cyan-100/65">Retirado</p>
-                      <p className="text-lg font-semibold text-rose-300">{formatCurrency(withdrawalsTotal)}</p>
+                      <p className="text-lg font-semibold text-rose-300">{formatCurrency(withdrawalsTotal, { currency: preferences.currency })}</p>
                     </div>
                   ) : null}
                   <p className="sm:col-span-3 text-xs text-cyan-100/65">

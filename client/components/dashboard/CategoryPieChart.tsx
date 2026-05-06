@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { usePreferences } from "@/context/PreferencesContext";
 import type { CategoryBreakdownItem } from "@/utils/calculations";
 import { formatCurrency } from "@/utils/formatters";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
@@ -11,6 +12,8 @@ type CategoryPieChartProps = {
 };
 
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
+  const { preferences } = usePreferences();
+
   return (
     <Card className="space-y-4">
       <div>
@@ -36,7 +39,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value) => [formatCurrency(Number(value ?? 0)), "Gasto"] as [string, string]}
+                formatter={(value) => [formatCurrency(Number(value ?? 0), { currency: preferences.currency }), "Gasto"] as [string, string]}
                 contentStyle={{
                   backgroundColor: "rgba(2, 6, 23, 0.96)",
                   border: "1px solid rgba(255,255,255,0.1)",

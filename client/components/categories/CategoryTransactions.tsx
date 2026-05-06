@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { usePreferences } from "@/context/PreferencesContext";
 import { useFinance } from "@/hooks/useFinance";
 import { filterTransactions } from "@/utils/calculations";
 import { formatCurrency, formatShortDate } from "@/utils/formatters";
@@ -15,6 +16,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
   const {
     state: { categories, transactions },
   } = useFinance();
+  const { preferences } = usePreferences();
 
   const category = categories.find((item) => item.id === categoryId);
   const categoryTransactions = filterTransactions(transactions, { categoryId }).sort((left, right) => right.date.localeCompare(left.date));
@@ -69,7 +71,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
               </div>
               <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-300" : "text-emerald-300"}`}>
                 {transaction.type === "expense" ? "-" : "+"}
-                {formatCurrency(transaction.amount)}
+                {formatCurrency(transaction.amount, { currency: preferences.currency })}
               </p>
             </div>
           ))}

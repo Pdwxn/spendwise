@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { FinanceProvider } from "@/context/FinanceContext";
+import { PreferencesProvider } from "@/context/PreferencesContext";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
@@ -46,9 +47,11 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <FinanceProvider>
-            <AppShell>{children}</AppShell>
-          </FinanceProvider>
+          <PreferencesProvider>
+            <FinanceProvider>
+              <AppShell>{children}</AppShell>
+            </FinanceProvider>
+          </PreferencesProvider>
         </AuthProvider>
       </body>
     </html>

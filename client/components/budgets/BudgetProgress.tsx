@@ -1,4 +1,7 @@
+"use client";
+
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { usePreferences } from "@/context/PreferencesContext";
 import { formatCurrency } from "@/utils/formatters";
 
 type BudgetProgressProps = {
@@ -9,6 +12,7 @@ type BudgetProgressProps = {
 };
 
 export function BudgetProgress({ spentAmount, budgetAmount, percentage, isOverBudget }: BudgetProgressProps) {
+  const { preferences } = usePreferences();
   const barClassName = isOverBudget
     ? "bg-rose-500"
     : percentage >= 80
@@ -20,7 +24,7 @@ export function BudgetProgress({ spentAmount, budgetAmount, percentage, isOverBu
       <ProgressBar
         value={spentAmount}
         max={budgetAmount}
-        label={`${formatCurrency(spentAmount)} / ${formatCurrency(budgetAmount)}`}
+        label={`${formatCurrency(spentAmount, { currency: preferences.currency })} / ${formatCurrency(budgetAmount, { currency: preferences.currency })}`}
         indicatorClassName={barClassName}
       />
       <p className={`text-xs ${isOverBudget ? "text-rose-300" : "text-cyan-100/65"}`}>

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { usePreferences } from "@/context/PreferencesContext";
 import { useFinance } from "@/hooks/useFinance";
 import type { Category } from "@/types";
 import { INCOME_CATEGORY_ID, isSystemCategoryId } from "@/utils/constants";
@@ -28,6 +29,7 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
     state: { accounts, categories, transactions },
     actions,
   } = useFinance();
+  const { preferences } = usePreferences();
   const [amount, setAmount] = useState("0");
   const expenseCategories = categories.filter((category) => !isSystemCategoryId(category.id));
   const [categoryId, setCategoryId] = useState(mode === "income" ? getIncomeCategoryId(categories) : expenseCategories[0]?.id ?? "");
@@ -106,7 +108,7 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
         </Select>
         {mode === "expense" && selectedAccount ? (
           <p className="text-xs text-cyan-100/60">
-            Saldo disponible: {formatCurrency(selectedAccountBalance ?? 0)}
+            Saldo disponible: {formatCurrency(selectedAccountBalance ?? 0, { currency: preferences.currency })}
           </p>
         ) : null}
       </label>

@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { usePreferences } from "@/context/PreferencesContext";
 import type { Category, Transaction } from "@/types";
 import type { Saving } from "@/types";
 
@@ -7,7 +8,7 @@ type RecentTransactionsProps = {
   transactions: Transaction[];
   categories: Category[];
   savings?: Saving[];
-  formatCurrency: (value: number) => string;
+  formatCurrency: (value: number, options?: { locale?: string; currency?: string }) => string;
   formatShortDate: (value: string) => string;
 };
 
@@ -18,6 +19,8 @@ export function RecentTransactions({
   formatCurrency,
   formatShortDate,
 }: RecentTransactionsProps) {
+  const { preferences } = usePreferences();
+
   return (
     <Card className="space-y-4">
       <div>
@@ -50,7 +53,7 @@ export function RecentTransactions({
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${amountClassName}`}>
                     {transaction.type === "expense" ? "-" : "+"}
-                    {formatCurrency(transaction.amount)}
+                    {formatCurrency(transaction.amount, { currency: preferences.currency })}
                   </p>
                   <p className="text-xs text-cyan-100/65">{category?.name ?? "Desconocida"}</p>
                 </div>

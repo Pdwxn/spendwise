@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFinance } from "@/hooks/useFinance";
+import { usePreferences } from "@/context/PreferencesContext";
 import { canRemoveAccount, getAccountBalance } from "@/utils/calculations";
 import { formatCurrency, formatShortDate } from "@/utils/formatters";
 
@@ -13,6 +14,7 @@ export function AccountList() {
     state: { accounts, transactions },
     actions,
   } = useFinance();
+  const { preferences } = usePreferences();
 
   async function handleRemoveAccount(accountId: string) {
     if (!canRemoveAccount({ transactions }, accountId)) {
@@ -50,8 +52,8 @@ export function AccountList() {
                   <p className="text-xs text-cyan-100/65">Creada {formatShortDate(account.createdAt)}</p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <p className="text-sm font-semibold text-cyan-50">{formatCurrency(balance)}</p>
-                  <p className="text-xs text-cyan-100/65">Inicial {formatCurrency(account.initialBalance)}</p>
+                  <p className="text-sm font-semibold text-cyan-50">{formatCurrency(balance, { currency: preferences.currency })}</p>
+                  <p className="text-xs text-cyan-100/65">Inicial {formatCurrency(account.initialBalance, { currency: preferences.currency })}</p>
                 </div>
                 <Button
                   variant="secondary"
