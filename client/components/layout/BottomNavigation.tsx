@@ -1,8 +1,8 @@
 "use client";
 
-import { type CSSProperties } from "react";
+import { useEffect, type CSSProperties } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   IconArrowsExchange,
   IconChartPie,
@@ -23,11 +23,18 @@ const items = [
 
 export function BottomNavigation() {
   const pathname = usePathname();
+  const router = useRouter();
   const activeStyle: CSSProperties = {
     backgroundImage: "linear-gradient(90deg, var(--button-primary-from) 0%, var(--button-primary-via) 50%, var(--button-primary-to) 100%)",
     color: "var(--button-primary-text)",
     boxShadow: "0 10px 26px var(--button-shadow)",
   };
+
+  useEffect(() => {
+    items.forEach((item) => {
+      router.prefetch(item.href);
+    });
+  }, [router]);
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--border)] bg-[color:var(--surface-strong)] px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl">

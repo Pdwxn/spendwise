@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { ExpenseBars } from "@/components/dashboard/ExpenseBars";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
-import { ExpenseFormModal } from "@/components/transactions/ExpenseFormModal";
-import { IncomeFormModal } from "@/components/transactions/IncomeFormModal";
 import { useAuth } from "@/context/AuthContext";
 import { usePreferences } from "@/context/PreferencesContext";
 import { useFinance } from "@/hooks/useFinance";
@@ -19,6 +18,14 @@ import {
 } from "@/utils/calculations";
 import { formatCurrency, formatMonthLabel, formatShortDate } from "@/utils/formatters";
 
+const ExpenseFormModal = dynamic(() => import("@/components/transactions/ExpenseFormModal").then((module) => module.ExpenseFormModal), {
+  ssr: false,
+});
+
+const IncomeFormModal = dynamic(() => import("@/components/transactions/IncomeFormModal").then((module) => module.IncomeFormModal), {
+  ssr: false,
+});
+
 export default function DashboardPage() {
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
   const [isIncomeOpen, setIsIncomeOpen] = useState(false);
@@ -28,26 +35,45 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { preferences } = usePreferences();
 
-  const filteredTransactions = filterTransactions(transactions, {
-    month: selectedMonth,
-    categoryId: selectedCategoryId,
-  });
-  const totalBalance = getTotalBalance(accounts, transactions);
-  const monthlyIncome = getMonthlyIncome(filteredTransactions, selectedMonth);
-  const monthlyExpenses = getMonthlyExpenses(filteredTransactions, selectedMonth);
-  const categoryBreakdown = getCategoryBreakdown(filteredTransactions, categories, {
-    month: selectedMonth,
-    type: "expense",
-  });
-  const monthlyBudgets = budgets.filter((budget) => budget.month === selectedMonth);
-  const budgetAmountByCategory = new Map(monthlyBudgets.map((budget) => [budget.categoryId, budget.amount] as const));
-  const expenseBars = categoryBreakdown.slice(0, 5).map((item) => ({
-    ...item,
-    budgetAmount: budgetAmountByCategory.get(item.categoryId) ?? null,
-  }));
-  const recentTransactions = [...filteredTransactions]
-    .sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt))
-    .slice(0, 5);
+  const filteredTransactions = useMemo(
+    () =>
+      filterTransactions(transactions, {
+        month: selectedMonth,
+        categoryId: selectedCategoryId,
+      }),
+    [transactions, selectedCategoryId, selectedMonth],
+  );
+  const totalBalance = useMemo(() => getTotalBalance(accounts, transactions), [accounts, transactions]);
+  const monthlyIncome = useMemo(() => getMonthlyIncome(filteredTransactions, selectedMonth), [filteredTransactions, selectedMonth]);
+  const monthlyExpenses = useMemo(() => getMonthlyExpenses(filteredTransactions, selectedMonth), [filteredTransactions, selectedMonth]);
+  const categoryBreakdown = useMemo(
+    () =>
+      getCategoryBreakdown(filteredTransactions, categories, {
+        month: selectedMonth,
+        type: "expense",
+      }),
+    [categories, filteredTransactions, selectedMonth],
+  );
+  const monthlyBudgets = useMemo(() => budgets.filter((budget) => budget.month === selectedMonth), [budgets, selectedMonth]);
+  const budgetAmountByCategory = useMemo(
+    () => new Map(monthlyBudgets.map((budget) => [budget.categoryId, budget.amount] as const)),
+    [monthlyBudgets],
+  );
+  const expenseBars = useMemo(
+    () =>
+      categoryBreakdown.slice(0, 5).map((item) => ({
+        ...item,
+        budgetAmount: budgetAmountByCategory.get(item.categoryId) ?? null,
+      })),
+    [budgetAmountByCategory, categoryBreakdown],
+  );
+  const recentTransactions = useMemo(
+    () =>
+      [...filteredTransactions]
+        .sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt))
+        .slice(0, 5),
+    [filteredTransactions],
+  );
 
   const displayName = user?.firstName ?? "Usuario";
 

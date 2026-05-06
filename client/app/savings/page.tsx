@@ -1,10 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { SavingFormModal } from "@/components/savings/SavingFormModal";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SavingList } from "@/components/savings/SavingList";
+
+const SavingFormModal = dynamic(() => import("@/components/savings/SavingFormModal").then((module) => module.SavingFormModal), {
+  ssr: false,
+});
 
 export default function SavingsPage() {
   const [isOpen, setIsOpen] = useState(false);

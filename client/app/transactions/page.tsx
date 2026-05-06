@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { TransactionFilters } from "@/components/transactions/TransactionFilters";
 import { TransactionList } from "@/components/transactions/TransactionList";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -11,10 +12,14 @@ export default function TransactionsPage() {
     state: { categories, selectedCategoryId, selectedMonth, transactions },
   } = useFinance();
 
-  const filteredTransactions = filterTransactions(transactions, {
-    month: selectedMonth,
-    categoryId: selectedCategoryId,
-  }).sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt));
+  const filteredTransactions = useMemo(
+    () =>
+      filterTransactions(transactions, {
+        month: selectedMonth,
+        categoryId: selectedCategoryId,
+      }).sort((left, right) => right.date.localeCompare(left.date) || right.createdAt.localeCompare(left.createdAt)),
+    [transactions, selectedCategoryId, selectedMonth],
+  );
 
   return (
     <div className="space-y-6">
