@@ -54,12 +54,12 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <header className="space-y-2 pt-1">
-        <p className="text-xs font-medium uppercase tracking-[0.24em] text-cyan-100/50">Panel principal</p>
+        <p className="text-xs font-medium uppercase tracking-[0.24em] text-[color:var(--foreground)]/50">Panel principal</p>
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight text-cyan-50 sm:text-4xl">SpendWise</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--foreground)] sm:text-4xl">SpendWise</h1>
         </div>
-        <p className="text-sm font-medium text-cyan-100/70">Bienvenido {displayName}</p>
-        <p className="text-sm text-cyan-100/65">{formatMonthLabel(selectedMonth)}</p>
+        <p className="text-sm font-medium text-[color:var(--foreground)]/70">Bienvenido {displayName}</p>
+        <p className="text-sm text-[color:var(--foreground)]/65">{formatMonthLabel(selectedMonth)}</p>
       </header>
 
       <SummaryCards
@@ -79,7 +79,7 @@ export default function DashboardPage() {
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-lg font-semibold text-cyan-50">Gastos</h2>
+          <h2 className="text-lg font-semibold text-[color:var(--foreground)]">Gastos</h2>
         </div>
 
         <ExpenseBars items={expenseBars} />

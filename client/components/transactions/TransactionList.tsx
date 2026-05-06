@@ -31,7 +31,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
           {transactions.map((transaction) => {
             const category = categories.find((item) => item.id === transaction.categoryId);
             const saving = transaction.linkedSavingId ? savings.find((item) => item.id === transaction.linkedSavingId) : null;
-            const amountClassName = transaction.type === "expense" ? "text-rose-300" : "text-emerald-300";
+            const amountClassName = transaction.type === "expense" ? "text-rose-600" : "text-emerald-600";
             const isSavingMovement = transaction.linkedSavingAction !== undefined;
             const title = transaction.linkedSavingAction === "contribution"
               ? "Abono a ahorro"
@@ -53,7 +53,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
               <div key={transaction.id} className="flex flex-col gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 flex-1">
                   {isSavingMovement ? (
-                    <span className="mb-2 inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground)]">
+                    <span className="mb-2 inline-flex rounded-full border border-amber-300/20 bg-amber-300/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-900">
                       Ahorro
                     </span>
                   ) : null}

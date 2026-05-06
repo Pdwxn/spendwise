@@ -34,7 +34,7 @@ export function RecentTransactions({
           {transactions.map((transaction) => {
             const category = categories.find((item) => item.id === transaction.categoryId);
             const saving = transaction.linkedSavingId ? savings.find((item) => item.id === transaction.linkedSavingId) : null;
-            const amountClassName = transaction.type === "expense" ? "text-rose-300" : "text-emerald-300";
+            const amountClassName = transaction.type === "expense" ? "text-rose-600" : "text-emerald-600";
             const title = saving
               ? `${category?.emoji ?? "🏦"} ${transaction.linkedSavingAction === "contribution" ? "Abono a ahorro" : "Retiro de ahorro"}`
               : `${category?.emoji ?? "#"} ${transaction.description}`;

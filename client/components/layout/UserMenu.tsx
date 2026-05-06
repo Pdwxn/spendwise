@@ -77,6 +77,7 @@ export function UserMenu() {
   const router = useRouter();
   const { user, accessToken, logout, refreshSession, updateUser } = useAuth();
   const { preferences, updatePreferences } = usePreferences();
+  const [theme] = useState<"dark" | "light">(() => (typeof document !== "undefined" && document.documentElement.dataset.theme === "light" ? "light" : "dark"));
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<DrawerView>("menu");
@@ -371,7 +372,13 @@ export function UserMenu() {
             </div>
 
             <div className="mt-6 flex items-center gap-3 rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4">
-              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-cyan-300 via-teal-300 to-violet-300 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20">
+              <div
+                className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-full text-base font-semibold text-slate-950 shadow-lg ${
+                  theme === "light"
+                    ? "bg-gradient-to-br from-amber-300 via-orange-200 to-rose-200 shadow-amber-500/20"
+                    : "bg-gradient-to-br from-cyan-300 via-teal-300 to-violet-300 shadow-cyan-500/20"
+                }`}
+              >
                 {user?.avatarUrl && !avatarFailed ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -434,6 +441,7 @@ export function UserMenu() {
                   onBack={goBack}
                   onSave={() => void handleProfileSave()}
                   isSaving={isProfileSaving}
+                  theme={theme}
                 />
               ) : view === "preferences" ? (
                 <PreferencesPanel
@@ -443,6 +451,7 @@ export function UserMenu() {
                   onLanguageChange={(value) => void handlePreferenceChange("language", value)}
                   onBack={goBack}
                   isSaving={isPreferencesSaving}
+                  theme={theme}
                   statusText={
                     preferencesStatus === "saving"
                       ? "Guardando cambios..."
@@ -458,6 +467,7 @@ export function UserMenu() {
                   onBack={goBack}
                   onSave={() => void handleSecuritySave()}
                   isSaving={isSecuritySaving}
+                  theme={theme}
                 />
               )}
             </div>
@@ -465,7 +475,7 @@ export function UserMenu() {
             <div className="mt-auto pt-6">
               <Button
                 variant="secondary"
-                className="w-full justify-center border border-rose-400/20 bg-rose-500/10 text-rose-100 hover:bg-rose-500/15"
+                className="w-full justify-center border border-[color:var(--danger-border)] bg-[color:var(--danger-bg)] text-[color:var(--danger-text)] hover:brightness-105"
                 onClick={() => void handleLogout()}
               >
                 <IconLogout size={18} />

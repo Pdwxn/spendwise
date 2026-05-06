@@ -154,7 +154,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 required
                 className={fieldErrors.firstName ? inputErrorClass : undefined}
               />
-              {fieldErrors.firstName ? <p className="text-xs text-rose-200">{fieldErrors.firstName}</p> : null}
+              {fieldErrors.firstName ? <p className="text-xs text-rose-600">{fieldErrors.firstName}</p> : null}
             </label>
             <label className="space-y-2 text-sm font-medium text-[color:var(--foreground)]">
               <span>Apellido</span>
@@ -165,7 +165,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 required
                 className={fieldErrors.lastName ? inputErrorClass : undefined}
               />
-              {fieldErrors.lastName ? <p className="text-xs text-rose-200">{fieldErrors.lastName}</p> : null}
+              {fieldErrors.lastName ? <p className="text-xs text-rose-600">{fieldErrors.lastName}</p> : null}
             </label>
           </div>
         ) : null}
@@ -181,7 +181,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             required
             className={fieldErrors.email ? inputErrorClass : undefined}
           />
-          {fieldErrors.email ? <p className="text-xs text-rose-200">{fieldErrors.email}</p> : null}
+          {fieldErrors.email ? <p className="text-xs text-rose-600">{fieldErrors.email}</p> : null}
         </label>
 
         <label className="space-y-2 text-sm font-medium text-[color:var(--foreground)]">
@@ -197,13 +197,13 @@ export function AuthForm({ mode }: AuthFormProps) {
             className={fieldErrors.password ? inputErrorClass : undefined}
           />
           {fieldErrors.password ? (
-            <p className="text-xs text-rose-200">{fieldErrors.password}</p>
+            <p className="text-xs text-rose-600">{fieldErrors.password}</p>
           ) : mode === "register" ? (
             <p className="text-xs text-[color:var(--foreground)]/50">Usa 8 caracteres o más. Las contraseñas comunes se rechazan.</p>
           ) : null}
         </label>
 
-        {error ? <p className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">{error}</p> : null}
+        {error ? <p className="rounded-2xl border border-rose-300/40 bg-rose-100/80 px-4 py-3 text-sm text-rose-800">{error}</p> : null}
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Procesando..." : copy[mode].submit}
@@ -212,9 +212,9 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-[color:var(--border)]" />
           <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--foreground)]/40">o</span>
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-[color:var(--border)]" />
         </div>
 
         <GoogleSignInButton

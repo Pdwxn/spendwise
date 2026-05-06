@@ -68,7 +68,7 @@ export function SavingList() {
                     <p className="text-sm font-medium text-[color:var(--foreground)]">{saving.name}</p>
                     <p className="text-xs text-[color:var(--foreground)]/65">Creado {formatShortDate(saving.createdAt)}</p>
                     {initialContributionTotal > 0 ? (
-                      <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300/80">
+                        <p className="mt-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-600/80">
                         Aporte inicial {formatCurrency(initialContributionTotal, { currency: preferences.currency })}
                       </p>
                     ) : null}
@@ -99,12 +99,12 @@ export function SavingList() {
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-[color:var(--foreground)]/65">Abonado</p>
-                    <p className="text-lg font-semibold text-emerald-300">{formatCurrency(contributionsTotal, { currency: preferences.currency })}</p>
+                    <p className="text-lg font-semibold text-emerald-600">{formatCurrency(contributionsTotal, { currency: preferences.currency })}</p>
                   </div>
                   {withdrawalsTotal > 0 ? (
                     <div className="space-y-1">
                       <p className="text-sm text-[color:var(--foreground)]/65">Retirado</p>
-                      <p className="text-lg font-semibold text-rose-300">{formatCurrency(withdrawalsTotal, { currency: preferences.currency })}</p>
+                      <p className="text-lg font-semibold text-rose-600">{formatCurrency(withdrawalsTotal, { currency: preferences.currency })}</p>
                     </div>
                   ) : null}
                   <p className="sm:col-span-3 text-xs text-[color:var(--foreground)]/65">

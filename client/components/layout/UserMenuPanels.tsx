@@ -19,6 +19,8 @@ export type SecurityFormState = {
   confirmPassword: string;
 };
 
+type ThemeMode = "dark" | "light";
+
 type DrawerPanelShellProps = {
   icon: ComponentType<{ size?: number; className?: string }>;
   title: string;
@@ -55,15 +57,16 @@ type ProfilePanelProps = {
   onBack: () => void;
   onSave: () => void;
   isSaving: boolean;
+  theme: ThemeMode;
 };
 
-export function ProfilePanel({ userEmail, form, setForm, onBack, onSave, isSaving }: ProfilePanelProps) {
+export function ProfilePanel({ userEmail, form, setForm, onBack, onSave, isSaving, theme }: ProfilePanelProps) {
   return (
     <DrawerPanelShell
       icon={IconUserCircle}
       title="Perfil"
       description="Actualiza nombre, correo y avatar desde un solo lugar."
-      accent="from-cyan-300/20 to-teal-300/10"
+      accent={theme === "light" ? "from-amber-100/55 to-orange-100/45" : "from-cyan-300/20 to-teal-300/10"}
       footer={
         <>
           <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
@@ -90,7 +93,7 @@ export function ProfilePanel({ userEmail, form, setForm, onBack, onSave, isSavin
       </div>
       <div>
         <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Avatar URL</label>
-      <Input value={form.avatarUrl} onChange={(event) => setForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
+        <Input value={form.avatarUrl} onChange={(event) => setForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
       </div>
       <p className="text-xs text-[color:var(--foreground)]/55">El correo queda solo de lectura por ahora.</p>
     </DrawerPanelShell>
@@ -105,6 +108,7 @@ type PreferencesPanelProps = {
   onBack: () => void;
   isSaving: boolean;
   statusText: string;
+  theme: ThemeMode;
 };
 
 export function PreferencesPanel({
@@ -115,13 +119,14 @@ export function PreferencesPanel({
   onBack,
   isSaving,
   statusText,
+  theme,
 }: PreferencesPanelProps) {
   return (
     <DrawerPanelShell
       icon={IconBell}
       title="Preferencias"
       description="Configura moneda, idioma y apariencia para toda la app."
-      accent="from-violet-300/20 to-fuchsia-300/10"
+      accent={theme === "light" ? "from-amber-100/55 to-rose-100/45" : "from-violet-300/20 to-fuchsia-300/10"}
       footer={
         <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
           <IconChevronLeft size={18} />
@@ -164,15 +169,16 @@ type SecurityPanelProps = {
   onBack: () => void;
   onSave: () => void;
   isSaving: boolean;
+  theme: ThemeMode;
 };
 
-export function SecurityPanel({ form, setForm, onBack, onSave, isSaving }: SecurityPanelProps) {
+export function SecurityPanel({ form, setForm, onBack, onSave, isSaving, theme }: SecurityPanelProps) {
   return (
     <DrawerPanelShell
       icon={IconShieldLock}
       title="Seguridad"
       description="Gestiona contraseña y futuras opciones de sesión."
-      accent="from-rose-300/20 to-orange-300/10"
+      accent={theme === "light" ? "from-rose-100/55 to-amber-100/45" : "from-rose-300/20 to-orange-300/10"}
       footer={
         <>
           <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>

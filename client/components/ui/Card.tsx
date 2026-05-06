@@ -10,7 +10,8 @@ type CardOwnProps = {
 
 const variantClasses: Record<CardVariant, string> = {
   default: "border-[color:var(--border)] bg-[color:var(--surface)] shadow-[0_18px_50px_rgba(0,0,0,0.18)]",
-  highlight: "border-cyan-300/20 bg-gradient-to-br from-cyan-400/20 via-teal-300/12 to-violet-400/10 shadow-[0_20px_70px_rgba(34,211,238,0.14)]",
+  highlight:
+    "border-[color:var(--border)] bg-gradient-to-br from-[color:var(--card-highlight-from)] via-[color:var(--card-highlight-via)] to-[color:var(--card-highlight-to)] shadow-[0_20px_70px_var(--card-highlight-shadow)]",
   subtle: "border-[color:var(--border)] bg-[color:var(--surface)] shadow-[0_12px_34px_rgba(0,0,0,0.12)]",
 };
 

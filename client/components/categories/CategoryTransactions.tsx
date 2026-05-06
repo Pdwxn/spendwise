@@ -69,7 +69,7 @@ export function CategoryTransactions({ categoryId }: CategoryTransactionsProps) 
                 <p className="truncate text-sm font-medium text-[color:var(--foreground)]">{transaction.description}</p>
                 <p className="text-xs text-[color:var(--foreground)]/65">{formatShortDate(transaction.date)}</p>
               </div>
-              <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-300" : "text-emerald-300"}`}>
+              <p className={`text-sm font-semibold ${transaction.type === "expense" ? "text-rose-600" : "text-emerald-600"}`}>
                 {transaction.type === "expense" ? "-" : "+"}
                 {formatCurrency(transaction.amount, { currency: preferences.currency })}
               </p>

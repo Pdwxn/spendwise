@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -22,6 +23,12 @@ const items = [
 
 export function BottomNavigation() {
   const pathname = usePathname();
+  const [theme] = useState<"dark" | "light">(() => (typeof document !== "undefined" && document.documentElement.dataset.theme === "light" ? "light" : "dark"));
+
+  const activeClassName =
+    theme === "light"
+      ? "bg-amber-300 text-slate-950 shadow-lg shadow-amber-500/20"
+      : "bg-cyan-300 text-slate-950 shadow-lg shadow-cyan-500/20";
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--border)] bg-[color:var(--surface-strong)] px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl">
@@ -39,7 +46,7 @@ export function BottomNavigation() {
               title={item.label}
               className={`flex min-h-14 flex-col items-center justify-center rounded-2xl px-1 py-2 transition-colors ${
                 isActive
-                  ? "bg-cyan-300 text-slate-950 shadow-lg shadow-cyan-500/20"
+                  ? activeClassName
                   : "hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]"
               }`}
             >
