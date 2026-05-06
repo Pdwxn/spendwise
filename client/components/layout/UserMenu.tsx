@@ -14,9 +14,25 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { useAuth } from "@/context/AuthContext";
+import { usePreferences } from "@/context/PreferencesContext";
+import { ApiError, apiRequest } from "@/lib/api";
 
 type DrawerView = "menu" | "profile" | "preferences" | "security";
+
+type ProfileFormState = {
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
+};
+
+type SecurityFormState = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
 
 function getInitials(firstName?: string | null, lastName?: string | null, email?: string | null) {
   const initials = `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.trim();
@@ -34,11 +50,21 @@ function getInitials(firstName?: string | null, lastName?: string | null, email?
 
 export function UserMenu() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, accessToken, logout, refreshSession, updateUser } = useAuth();
+  const { preferences, updatePreferences } = usePreferences();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<DrawerView>("menu");
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [profileForm, setProfileForm] = useState<ProfileFormState>({ firstName: "", lastName: "", avatarUrl: "" });
+  const [securityForm, setSecurityForm] = useState<SecurityFormState>({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isProfileSaving, setIsProfileSaving] = useState(false);
+  const [isPreferencesSaving, setIsPreferencesSaving] = useState(false);
+  const [isSecuritySaving, setIsSecuritySaving] = useState(false);
 
   const initials = useMemo(() => getInitials(user?.firstName, user?.lastName, user?.email), [user]);
   const providerLabel = useMemo(() => {
@@ -67,6 +93,38 @@ export function UserMenu() {
       window.clearTimeout(timer);
     };
   }, [user?.avatarUrl]);
+
+  useEffect(() => {
+    if (!open || view !== "profile") {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setProfileForm({
+        firstName: user?.firstName ?? "",
+        lastName: user?.lastName ?? "",
+        avatarUrl: user?.avatarUrl ?? "",
+      });
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [open, user, view]);
+
+  useEffect(() => {
+    if (!open || view !== "security") {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSecurityForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [open, view]);
 
   useEffect(() => {
     if (!open) {
@@ -107,6 +165,132 @@ export function UserMenu() {
 
   function goBack() {
     setView("menu");
+  }
+
+  async function requestWithAuth(path: string, init: RequestInit = {}) {
+    if (!accessToken) {
+      throw new Error("No hay sesión activa.");
+    }
+
+    try {
+      return await apiRequest(path, {
+        ...init,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          ...(init.headers ?? {}),
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        const nextAccessToken = await refreshSession();
+
+        if (nextAccessToken) {
+          return apiRequest(path, {
+            ...init,
+            headers: {
+              Authorization: `Bearer ${nextAccessToken}`,
+              ...(init.headers ?? {}),
+            },
+          });
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  async function handleProfileSave() {
+    if (isProfileSaving) {
+      return;
+    }
+
+    const firstName = profileForm.firstName.trim();
+    const lastName = profileForm.lastName.trim();
+    const avatarUrl = profileForm.avatarUrl.trim();
+
+    if (!firstName || !lastName) {
+      toast.error("El nombre y el apellido son obligatorios.");
+      return;
+    }
+
+    setIsProfileSaving(true);
+
+    try {
+      const response = (await requestWithAuth("/api/auth/me/", {
+        method: "PATCH",
+        body: JSON.stringify({ firstName, lastName, avatarUrl }),
+      })) as {
+        firstName: string;
+        lastName: string;
+        email: string;
+        avatarUrl?: string | null;
+        authProvider: "email" | "google" | "both";
+      };
+
+      updateUser({
+        firstName: response.firstName,
+        lastName: response.lastName,
+        email: response.email,
+        avatarUrl: response.avatarUrl ?? null,
+        authProvider: response.authProvider,
+      });
+      toast.success("Perfil actualizado");
+      setAvatarFailed(false);
+      setView("menu");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el perfil.");
+    } finally {
+      setIsProfileSaving(false);
+    }
+  }
+
+  async function handlePreferenceChange<K extends keyof typeof preferences>(key: K, value: (typeof preferences)[K]) {
+    if (isPreferencesSaving) {
+      return;
+    }
+
+    setIsPreferencesSaving(true);
+
+    try {
+      await updatePreferences({ [key]: value } as Partial<typeof preferences>);
+      toast.success("Preferencias guardadas");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudieron guardar las preferencias.");
+    } finally {
+      setIsPreferencesSaving(false);
+    }
+  }
+
+  async function handleSecuritySave() {
+    if (isSecuritySaving) {
+      return;
+    }
+
+    if (securityForm.newPassword !== securityForm.confirmPassword) {
+      toast.error("Las contraseñas no coinciden.");
+      return;
+    }
+
+    setIsSecuritySaving(true);
+
+    try {
+      await requestWithAuth("/api/auth/change-password/", {
+        method: "POST",
+        body: JSON.stringify({
+          currentPassword: securityForm.currentPassword,
+          newPassword: securityForm.newPassword,
+          confirmPassword: securityForm.confirmPassword,
+        }),
+      });
+
+      toast.success("Contraseña actualizada");
+      setSecurityForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setView("menu");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo actualizar la contraseña.");
+    } finally {
+      setIsSecuritySaving(false);
+    }
   }
 
   const activeSection =
@@ -228,7 +412,7 @@ export function UserMenu() {
                   })}
                 </div>
               </div>
-            ) : activeSection ? (
+            ) : activeSection?.title === "Perfil" ? (
               <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${activeSection.accent} p-4`}>
                 <div className="flex items-start gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
@@ -240,17 +424,117 @@ export function UserMenu() {
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-2 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Vista interna</p>
-                  <p className="text-sm text-cyan-50/80">
-                    Esta sección ya queda preparada para abrir su pantalla completa sin salir del flujo del drawer.
-                  </p>
+                <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nombre</label>
+                    <Input value={profileForm.firstName} onChange={(event) => setProfileForm((current) => ({ ...current, firstName: event.target.value }))} placeholder="Tu nombre" />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Apellido</label>
+                    <Input value={profileForm.lastName} onChange={(event) => setProfileForm((current) => ({ ...current, lastName: event.target.value }))} placeholder="Tu apellido" />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Correo</label>
+                    <Input value={user?.email ?? ""} disabled />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Avatar URL</label>
+                    <Input value={profileForm.avatarUrl} onChange={(event) => setProfileForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
+                  </div>
+                  <p className="text-xs text-cyan-100/55">El correo queda solo de lectura por ahora.</p>
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack}>
+                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack} disabled={isProfileSaving}>
                     <IconChevronLeft size={18} />
                     Volver
+                  </Button>
+                  <Button className="flex-1 justify-center" onClick={() => void handleProfileSave()} disabled={isProfileSaving}>
+                    {isProfileSaving ? "Guardando..." : "Guardar"}
+                  </Button>
+                </div>
+              </div>
+            ) : activeSection?.title === "Preferencias" ? (
+              <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${activeSection.accent} p-4`}>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
+                    <activeSection.icon size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-lg font-semibold text-cyan-50">{activeSection.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-cyan-50/80">{activeSection.description}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Moneda</label>
+                    <Select value={preferences.currency} onChange={(event) => void handlePreferenceChange("currency", event.target.value as typeof preferences.currency)} disabled={isPreferencesSaving}>
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                      <option value="CLP">CLP</option>
+                      <option value="COP">COP</option>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Tema</label>
+                    <Select value={preferences.theme} onChange={(event) => void handlePreferenceChange("theme", event.target.value as typeof preferences.theme)} disabled={isPreferencesSaving}>
+                      <option value="dark">Oscuro</option>
+                      <option value="light">Claro</option>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Idioma</label>
+                    <Select value={preferences.language} onChange={(event) => void handlePreferenceChange("language", event.target.value as typeof preferences.language)} disabled={isPreferencesSaving}>
+                      <option value="es">Español</option>
+                      <option value="en">English</option>
+                    </Select>
+                  </div>
+                  <p className="text-xs text-cyan-100/55">Los cambios se guardan al instante y actualizan la interfaz.</p>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack} disabled={isPreferencesSaving}>
+                    <IconChevronLeft size={18} />
+                    Volver
+                  </Button>
+                </div>
+              </div>
+            ) : activeSection?.title === "Seguridad" ? (
+              <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${activeSection.accent} p-4`}>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
+                    <activeSection.icon size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-lg font-semibold text-cyan-50">{activeSection.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-cyan-50/80">{activeSection.description}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Contraseña actual</label>
+                    <Input type="password" value={securityForm.currentPassword} onChange={(event) => setSecurityForm((current) => ({ ...current, currentPassword: event.target.value }))} placeholder="Contraseña actual" />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nueva contraseña</label>
+                    <Input type="password" value={securityForm.newPassword} onChange={(event) => setSecurityForm((current) => ({ ...current, newPassword: event.target.value }))} placeholder="Nueva contraseña" />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Confirmar contraseña</label>
+                    <Input type="password" value={securityForm.confirmPassword} onChange={(event) => setSecurityForm((current) => ({ ...current, confirmPassword: event.target.value }))} placeholder="Repite la nueva contraseña" />
+                  </div>
+                  <p className="text-xs text-cyan-100/55">Si tu cuenta es Google-only, primero necesitas configurar una contraseña.</p>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack} disabled={isSecuritySaving}>
+                    <IconChevronLeft size={18} />
+                    Volver
+                  </Button>
+                  <Button className="flex-1 justify-center" onClick={() => void handleSecuritySave()} disabled={isSecuritySaving}>
+                    {isSecuritySaving ? "Guardando..." : "Actualizar"}
                   </Button>
                 </div>
               </div>

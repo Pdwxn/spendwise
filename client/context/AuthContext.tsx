@@ -29,6 +29,7 @@ type AuthContextValue = {
   login: (input: { email: string; password: string }) => Promise<void>;
   register: (input: { firstName: string; lastName: string; email: string; password: string }) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
+  updateUser: (input: Partial<AuthUser>) => void;
   logout: () => Promise<void>;
   refreshSession: () => Promise<string | null>;
 };
@@ -191,6 +192,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession({ ...nextSession, user: normalizeUser(nextSession.user) });
     }
 
+    function updateUser(input: Partial<AuthUser>) {
+      setSession((current) =>
+        current
+          ? {
+              ...current,
+              user: {
+                ...current.user,
+                ...input,
+              },
+            }
+          : current,
+      );
+    }
+
     async function refreshSession() {
       if (!session?.refresh) {
         return null;
@@ -237,6 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       loginWithGoogle,
+      updateUser,
       logout,
       refreshSession,
     };
