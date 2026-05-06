@@ -76,13 +76,13 @@ export function ExpenseBars({ items }: ExpenseBarsProps) {
             className="relative h-[330px] min-w-[126px] flex-1 overflow-hidden rounded-[32px] border border-[color:var(--border)] bg-[color:var(--surface)] p-3 backdrop-blur-2xl sm:min-w-[140px]"
             style={{
               borderColor: item.color,
-              boxShadow: `0 0 0 1px ${item.color}30, 0 18px 50px rgba(0, 0, 0, 0.22), 0 0 24px ${glowColor}22`,
+              boxShadow: `0 0 0 1px ${item.color}30, 0 10px 24px rgba(0, 0, 0, 0.08), 0 0 18px ${glowColor}18`,
             }}
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_55%)]" />
 
             <div
-                className="absolute inset-x-2 bottom-3 rounded-[26px] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0.08)_46%,rgba(255,255,255,0.02)_100%)]"
+              className="absolute inset-x-2 bottom-3 rounded-[26px] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.06)_46%,rgba(255,255,255,0.015)_100%)]"
               style={{ height: `calc(${fillRatio * 100}% - 0.75rem)` }}
             />
 

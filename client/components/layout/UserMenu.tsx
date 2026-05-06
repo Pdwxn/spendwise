@@ -342,9 +342,19 @@ export function UserMenu() {
         type="button"
         aria-label="Abrir menú de usuario"
         onClick={() => setOpen(true)}
-        className="fixed right-4 top-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-sm font-semibold text-[color:var(--foreground)] shadow-[0_12px_30px_rgba(0,0,0,0.14)] backdrop-blur-xl transition-all hover:bg-[color:var(--surface-strong)] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-300/60 sm:right-6 sm:top-6"
+        className="fixed right-4 top-4 z-50 flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-sm font-semibold text-[color:var(--foreground)] shadow-[0_12px_30px_rgba(0,0,0,0.14)] backdrop-blur-xl transition-all hover:bg-[color:var(--surface-strong)] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-300/60 sm:right-6 sm:top-6"
       >
-        {initials}
+        {user?.avatarUrl && !avatarFailed ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={user.avatarUrl}
+            alt="Avatar del usuario"
+            className="h-full w-full object-cover"
+            onError={() => setAvatarFailed(true)}
+          />
+        ) : (
+          initials
+        )}
       </button>
 
       {open ? (
