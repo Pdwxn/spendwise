@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -14,24 +14,49 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { useAuth } from "@/context/AuthContext";
 import { usePreferences } from "@/context/PreferencesContext";
-import { ApiError, apiRequest } from "@/lib/api";
+import { requestWithAuth } from "@/lib/authRequest";
+import {
+  PreferencesPanel,
+  ProfilePanel,
+  SecurityPanel,
+  type ProfileFormState,
+  type SecurityFormState,
+} from "@/components/layout/UserMenuPanels";
 
 type DrawerView = "menu" | "profile" | "preferences" | "security";
 
-type ProfileFormState = {
-  firstName: string;
-  lastName: string;
-  avatarUrl: string;
+type SectionMeta = {
+  title: string;
+  description: string;
+  icon: typeof IconUserCircle;
+  accent: string;
+  status: string;
 };
 
-type SecurityFormState = {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
+const SECTION_META: Record<Exclude<DrawerView, "menu">, SectionMeta> = {
+  profile: {
+    title: "Perfil",
+    description: "Actualiza nombre, correo y avatar desde un solo lugar.",
+    icon: IconUserCircle,
+    accent: "from-cyan-300/20 to-teal-300/10",
+    status: "Información de cuenta",
+  },
+  preferences: {
+    title: "Preferencias",
+    description: "Configura moneda, idioma y apariencia para toda la app.",
+    icon: IconBell,
+    accent: "from-violet-300/20 to-fuchsia-300/10",
+    status: "Visualización y notificaciones",
+  },
+  security: {
+    title: "Seguridad",
+    description: "Gestiona contraseña y futuras opciones de sesión.",
+    icon: IconShieldLock,
+    accent: "from-rose-300/20 to-orange-300/10",
+    status: "Acceso y protección",
+  },
 };
 
 function getInitials(firstName?: string | null, lastName?: string | null, email?: string | null) {
@@ -65,6 +90,8 @@ export function UserMenu() {
   const [isProfileSaving, setIsProfileSaving] = useState(false);
   const [isPreferencesSaving, setIsPreferencesSaving] = useState(false);
   const [isSecuritySaving, setIsSecuritySaving] = useState(false);
+  const [preferencesStatus, setPreferencesStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const preferencesStatusTimer = useRef<number | null>(null);
 
   const initials = useMemo(() => getInitials(user?.firstName, user?.lastName, user?.email), [user]);
   const providerLabel = useMemo(() => {
@@ -127,13 +154,21 @@ export function UserMenu() {
   }, [open, view]);
 
   useEffect(() => {
+    return () => {
+      if (preferencesStatusTimer.current !== null) {
+        window.clearTimeout(preferencesStatusTimer.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!open) {
       return;
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setOpen(false);
+        closeDrawer();
       }
     }
 
@@ -150,7 +185,7 @@ export function UserMenu() {
   async function handleLogout() {
     await logout();
     toast.success("Sesión cerrada");
-    setOpen(false);
+    closeDrawer();
     router.replace("/login");
   }
 
@@ -167,40 +202,13 @@ export function UserMenu() {
     setView("menu");
   }
 
-  async function requestWithAuth(path: string, init: RequestInit = {}) {
-    if (!accessToken) {
-      throw new Error("No hay sesión activa.");
-    }
-
-    try {
-      return await apiRequest(path, {
-        ...init,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          ...(init.headers ?? {}),
-        },
-      });
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        const nextAccessToken = await refreshSession();
-
-        if (nextAccessToken) {
-          return apiRequest(path, {
-            ...init,
-            headers: {
-              Authorization: `Bearer ${nextAccessToken}`,
-              ...(init.headers ?? {}),
-            },
-          });
-        }
-      }
-
-      throw error;
-    }
-  }
-
   async function handleProfileSave() {
     if (isProfileSaving) {
+      return;
+    }
+
+    if (!accessToken) {
+      toast.error("No hay sesión activa.");
       return;
     }
 
@@ -216,7 +224,7 @@ export function UserMenu() {
     setIsProfileSaving(true);
 
     try {
-      const response = (await requestWithAuth("/api/auth/me/", {
+      const response = (await requestWithAuth(accessToken, refreshSession, "/api/auth/me/", {
         method: "PATCH",
         body: JSON.stringify({ firstName, lastName, avatarUrl }),
       })) as {
@@ -250,11 +258,19 @@ export function UserMenu() {
     }
 
     setIsPreferencesSaving(true);
+    setPreferencesStatus("saving");
 
     try {
       await updatePreferences({ [key]: value } as Partial<typeof preferences>);
-      toast.success("Preferencias guardadas");
+      setPreferencesStatus("saved");
+      if (preferencesStatusTimer.current !== null) {
+        window.clearTimeout(preferencesStatusTimer.current);
+      }
+      preferencesStatusTimer.current = window.setTimeout(() => {
+        setPreferencesStatus("idle");
+      }, 1500);
     } catch (error) {
+      setPreferencesStatus("idle");
       toast.error(error instanceof Error ? error.message : "No se pudieron guardar las preferencias.");
     } finally {
       setIsPreferencesSaving(false);
@@ -266,6 +282,26 @@ export function UserMenu() {
       return;
     }
 
+    if (!accessToken) {
+      toast.error("No hay sesión activa.");
+      return;
+    }
+
+    if (!securityForm.currentPassword.trim()) {
+      toast.error("La contraseña actual es obligatoria.");
+      return;
+    }
+
+    if (securityForm.newPassword.trim().length < 8) {
+      toast.error("La nueva contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
+    if (!securityForm.confirmPassword.trim()) {
+      toast.error("Confirma la nueva contraseña.");
+      return;
+    }
+
     if (securityForm.newPassword !== securityForm.confirmPassword) {
       toast.error("Las contraseñas no coinciden.");
       return;
@@ -274,7 +310,7 @@ export function UserMenu() {
     setIsSecuritySaving(true);
 
     try {
-      await requestWithAuth("/api/auth/change-password/", {
+      await requestWithAuth(accessToken, refreshSession, "/api/auth/change-password/", {
         method: "POST",
         body: JSON.stringify({
           currentPassword: securityForm.currentPassword,
@@ -293,32 +329,7 @@ export function UserMenu() {
     }
   }
 
-  const activeSection =
-    view === "profile"
-      ? {
-          title: "Perfil",
-          description: "Actualiza nombre, correo y avatar desde un solo lugar.",
-          icon: IconUserCircle,
-          accent: "from-cyan-300/20 to-teal-300/10",
-          status: "Información de cuenta",
-        }
-      : view === "preferences"
-        ? {
-            title: "Preferencias",
-            description: "Configura moneda, idioma y apariencia para toda la app.",
-            icon: IconBell,
-            accent: "from-violet-300/20 to-fuchsia-300/10",
-            status: "Visualización y notificaciones",
-          }
-        : view === "security"
-          ? {
-              title: "Seguridad",
-              description: "Gestiona contraseña y futuras opciones de sesión.",
-              icon: IconShieldLock,
-              accent: "from-rose-300/20 to-orange-300/10",
-              status: "Acceso y protección",
-            }
-          : null;
+  const activeSection = view === "menu" ? null : SECTION_META[view];
 
   if (!mounted) {
     return null;
@@ -338,13 +349,11 @@ export function UserMenu() {
       {open ? (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-sm" onClick={closeDrawer} />
-          <aside className="absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col border-l border-white/10 bg-slate-950/96 p-5 text-cyan-50 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
+          <aside className="absolute right-0 top-0 flex h-full w-[min(92vw,22rem)] flex-col overflow-hidden border-l border-white/10 bg-slate-950/96 p-5 text-cyan-50 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.22em] text-cyan-100/45">Cuenta</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                  {activeSection?.title ?? `${user?.firstName ?? "Usuario"} ${user?.lastName ?? ""}`}
-                </h2>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">{activeSection?.title ?? `${user?.firstName ?? "Usuario"} ${user?.lastName ?? ""}`}</h2>
                 <p className="text-sm text-cyan-100/65">{activeSection?.status ?? user?.email ?? "sin correo"}</p>
               </div>
               <button
@@ -377,168 +386,77 @@ export function UserMenu() {
               </div>
             </div>
 
-            {view === "menu" ? (
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center gap-2 text-sm font-medium text-cyan-50">
-                  <IconSettings size={18} className="text-cyan-200/80" />
-                  <span>Configuración</span>
-                </div>
+            <div className="mt-6 min-h-0 flex-1 overflow-y-auto pr-1">
+              {view === "menu" ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium text-cyan-50">
+                    <IconSettings size={18} className="text-cyan-200/80" />
+                    <span>Configuración</span>
+                  </div>
 
-                <div className="space-y-2">
-                  {[
-                    { view: "profile" as const, icon: IconUserCircle, title: "Perfil", description: "Nombre, correo y foto" },
-                    { view: "preferences" as const, icon: IconBell, title: "Preferencias", description: "Moneda, idioma y tema" },
-                    { view: "security" as const, icon: IconShieldLock, title: "Seguridad", description: "Contraseña y sesión" },
-                  ].map((item) => {
-                    const Icon = item.icon;
+                  <div className="space-y-2">
+                    {[
+                      { view: "profile" as const, icon: IconUserCircle, title: "Perfil", description: "Nombre, correo y foto" },
+                      { view: "preferences" as const, icon: IconBell, title: "Preferencias", description: "Moneda, idioma y tema" },
+                      { view: "security" as const, icon: IconShieldLock, title: "Seguridad", description: "Contraseña y sesión" },
+                    ].map((item) => {
+                      const Icon = item.icon;
 
-                    return (
-                      <button
-                        key={item.title}
-                        type="button"
-                        onClick={() => openSection(item.view)}
-                        className="flex w-full items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-cyan-300/30 hover:bg-white/[0.06]"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/10 text-cyan-200">
-                          <Icon size={18} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-cyan-50">{item.title}</p>
-                          <p className="text-xs text-cyan-100/60">{item.description}</p>
-                        </div>
-                        <IconChevronLeft size={16} className="rotate-180 text-cyan-100/40" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : activeSection?.title === "Perfil" ? (
-              <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${activeSection.accent} p-4`}>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
-                    <activeSection.icon size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-lg font-semibold text-cyan-50">{activeSection.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-cyan-50/80">{activeSection.description}</p>
+                      return (
+                        <button
+                          key={item.title}
+                          type="button"
+                          onClick={() => openSection(item.view)}
+                          className="flex w-full items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-cyan-300/30 hover:bg-white/[0.06]"
+                        >
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/10 text-cyan-200">
+                            <Icon size={18} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-cyan-50">{item.title}</p>
+                            <p className="text-xs text-cyan-100/60">{item.description}</p>
+                          </div>
+                          <IconChevronLeft size={16} className="rotate-180 text-cyan-100/40" />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-
-                <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nombre</label>
-                    <Input value={profileForm.firstName} onChange={(event) => setProfileForm((current) => ({ ...current, firstName: event.target.value }))} placeholder="Tu nombre" />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Apellido</label>
-                    <Input value={profileForm.lastName} onChange={(event) => setProfileForm((current) => ({ ...current, lastName: event.target.value }))} placeholder="Tu apellido" />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Correo</label>
-                    <Input value={user?.email ?? ""} disabled />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Avatar URL</label>
-                    <Input value={profileForm.avatarUrl} onChange={(event) => setProfileForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
-                  </div>
-                  <p className="text-xs text-cyan-100/55">El correo queda solo de lectura por ahora.</p>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack} disabled={isProfileSaving}>
-                    <IconChevronLeft size={18} />
-                    Volver
-                  </Button>
-                  <Button className="flex-1 justify-center" onClick={() => void handleProfileSave()} disabled={isProfileSaving}>
-                    {isProfileSaving ? "Guardando..." : "Guardar"}
-                  </Button>
-                </div>
-              </div>
-            ) : activeSection?.title === "Preferencias" ? (
-              <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${activeSection.accent} p-4`}>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
-                    <activeSection.icon size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-lg font-semibold text-cyan-50">{activeSection.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-cyan-50/80">{activeSection.description}</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Moneda</label>
-                    <Select value={preferences.currency} onChange={(event) => void handlePreferenceChange("currency", event.target.value as typeof preferences.currency)} disabled={isPreferencesSaving}>
-                      <option value="USD">USD</option>
-                      <option value="EUR">EUR</option>
-                      <option value="CLP">CLP</option>
-                      <option value="COP">COP</option>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Tema</label>
-                    <Select value={preferences.theme} onChange={(event) => void handlePreferenceChange("theme", event.target.value as typeof preferences.theme)} disabled={isPreferencesSaving}>
-                      <option value="dark">Oscuro</option>
-                      <option value="light">Claro</option>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Idioma</label>
-                    <Select value={preferences.language} onChange={(event) => void handlePreferenceChange("language", event.target.value as typeof preferences.language)} disabled={isPreferencesSaving}>
-                      <option value="es">Español</option>
-                      <option value="en">English</option>
-                    </Select>
-                  </div>
-                  <p className="text-xs text-cyan-100/55">Los cambios se guardan al instante y actualizan la interfaz.</p>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack} disabled={isPreferencesSaving}>
-                    <IconChevronLeft size={18} />
-                    Volver
-                  </Button>
-                </div>
-              </div>
-            ) : activeSection?.title === "Seguridad" ? (
-              <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${activeSection.accent} p-4`}>
-                <div className="flex items-start gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
-                    <activeSection.icon size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-lg font-semibold text-cyan-50">{activeSection.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-cyan-50/80">{activeSection.description}</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Contraseña actual</label>
-                    <Input type="password" value={securityForm.currentPassword} onChange={(event) => setSecurityForm((current) => ({ ...current, currentPassword: event.target.value }))} placeholder="Contraseña actual" />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nueva contraseña</label>
-                    <Input type="password" value={securityForm.newPassword} onChange={(event) => setSecurityForm((current) => ({ ...current, newPassword: event.target.value }))} placeholder="Nueva contraseña" />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Confirmar contraseña</label>
-                    <Input type="password" value={securityForm.confirmPassword} onChange={(event) => setSecurityForm((current) => ({ ...current, confirmPassword: event.target.value }))} placeholder="Repite la nueva contraseña" />
-                  </div>
-                  <p className="text-xs text-cyan-100/55">Si tu cuenta es Google-only, primero necesitas configurar una contraseña.</p>
-                </div>
-
-                <div className="mt-4 flex gap-2">
-                  <Button variant="secondary" className="flex-1 justify-center" onClick={goBack} disabled={isSecuritySaving}>
-                    <IconChevronLeft size={18} />
-                    Volver
-                  </Button>
-                  <Button className="flex-1 justify-center" onClick={() => void handleSecuritySave()} disabled={isSecuritySaving}>
-                    {isSecuritySaving ? "Guardando..." : "Actualizar"}
-                  </Button>
-                </div>
-              </div>
-            ) : null}
+              ) : view === "profile" ? (
+                <ProfilePanel
+                  userEmail={user?.email}
+                  form={profileForm}
+                  setForm={setProfileForm}
+                  onBack={goBack}
+                  onSave={() => void handleProfileSave()}
+                  isSaving={isProfileSaving}
+                />
+              ) : view === "preferences" ? (
+                <PreferencesPanel
+                  preferences={preferences}
+                  onCurrencyChange={(value) => void handlePreferenceChange("currency", value)}
+                  onThemeChange={(value) => void handlePreferenceChange("theme", value)}
+                  onLanguageChange={(value) => void handlePreferenceChange("language", value)}
+                  onBack={goBack}
+                  isSaving={isPreferencesSaving}
+                  statusText={
+                    preferencesStatus === "saving"
+                      ? "Guardando cambios..."
+                      : preferencesStatus === "saved"
+                        ? "Guardado"
+                        : "Los cambios se guardan al instante y actualizan la interfaz."
+                  }
+                />
+              ) : (
+                <SecurityPanel
+                  form={securityForm}
+                  setForm={setSecurityForm}
+                  onBack={goBack}
+                  onSave={() => void handleSecuritySave()}
+                  isSaving={isSecuritySaving}
+                />
+              )}
+            </div>
 
             <div className="mt-auto pt-6">
               <Button

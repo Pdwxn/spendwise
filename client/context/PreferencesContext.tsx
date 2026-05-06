@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { ApiError, apiRequest } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { requestWithAuth } from "@/lib/authRequest";
 
 export type UserPreferences = {
   currency: "CLP" | "COP" | "USD" | "EUR";
@@ -82,35 +82,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
 
     let cancelled = false;
 
-    async function request(path: string, init: RequestInit = {}, retry = true) {
-      try {
-        return await apiRequest(path, {
-          ...init,
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            ...(init.headers ?? {}),
-          },
-        });
-      } catch (error) {
-        if (retry && error instanceof ApiError && error.status === 401) {
-          const nextAccessToken = await refreshSession();
-
-          if (nextAccessToken) {
-            return apiRequest(path, {
-              ...init,
-              headers: {
-                Authorization: `Bearer ${nextAccessToken}`,
-                ...(init.headers ?? {}),
-              },
-            });
-          }
-        }
-
-        throw error;
-      }
-    }
-
-    request("/api/auth/preferences/")
+    requestWithAuth(accessToken, refreshSession, "/api/auth/preferences/")
       .then((value) => {
         if (!cancelled) {
           setPreferences(normalizePreferences(value));
@@ -132,12 +104,9 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       throw new Error("No hay sesión activa.");
     }
 
-    const response = (await apiRequest("/api/auth/preferences/", {
+    const response = (await requestWithAuth(accessToken, refreshSession, "/api/auth/preferences/", {
       method: "PATCH",
       body: JSON.stringify(input),
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
     })) as UserPreferences;
 
     setPreferences(normalizePreferences(response));

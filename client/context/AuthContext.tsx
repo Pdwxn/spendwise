@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { ApiError, apiRequest } from "@/lib/api";
 
-type AuthUser = {
+export type AuthUser = {
   id: string;
   firstName: string;
   lastName: string;

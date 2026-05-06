@@ -1,0 +1,218 @@
+"use client";
+
+import { type ComponentType, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { IconBell, IconChevronLeft, IconShieldLock, IconUserCircle } from "@tabler/icons-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import type { UserPreferences } from "@/context/PreferencesContext";
+
+export type ProfileFormState = {
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
+};
+
+export type SecurityFormState = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+type DrawerPanelShellProps = {
+  icon: ComponentType<{ size?: number; className?: string }>;
+  title: string;
+  description: string;
+  accent: string;
+  children: ReactNode;
+  footer: ReactNode;
+};
+
+function DrawerPanelShell({ icon: Icon, title, description, accent, children, footer }: DrawerPanelShellProps) {
+  return (
+    <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${accent} p-4`}>
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
+          <Icon size={20} />
+        </div>
+        <div className="min-w-0">
+          <p className="text-lg font-semibold text-cyan-50">{title}</p>
+          <p className="mt-1 text-sm leading-6 text-cyan-50/80">{description}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">{children}</div>
+
+      <div className="mt-4 flex gap-2">{footer}</div>
+    </div>
+  );
+}
+
+type ProfilePanelProps = {
+  userEmail?: string | null;
+  form: ProfileFormState;
+  setForm: Dispatch<SetStateAction<ProfileFormState>>;
+  onBack: () => void;
+  onSave: () => void;
+  isSaving: boolean;
+};
+
+export function ProfilePanel({ userEmail, form, setForm, onBack, onSave, isSaving }: ProfilePanelProps) {
+  return (
+    <DrawerPanelShell
+      icon={IconUserCircle}
+      title="Perfil"
+      description="Actualiza nombre, correo y avatar desde un solo lugar."
+      accent="from-cyan-300/20 to-teal-300/10"
+      footer={
+        <>
+          <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
+            <IconChevronLeft size={18} />
+            Volver
+          </Button>
+          <Button className="flex-1 justify-center" onClick={onSave} disabled={isSaving}>
+            {isSaving ? "Guardando..." : "Guardar"}
+          </Button>
+        </>
+      }
+    >
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nombre</label>
+        <Input value={form.firstName} onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))} placeholder="Tu nombre" />
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Apellido</label>
+        <Input value={form.lastName} onChange={(event) => setForm((current) => ({ ...current, lastName: event.target.value }))} placeholder="Tu apellido" />
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Correo</label>
+        <Input value={userEmail ?? ""} disabled />
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Avatar URL</label>
+        <Input value={form.avatarUrl} onChange={(event) => setForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
+      </div>
+      <p className="text-xs text-cyan-100/55">El correo queda solo de lectura por ahora.</p>
+    </DrawerPanelShell>
+  );
+}
+
+type PreferencesPanelProps = {
+  preferences: UserPreferences;
+  onCurrencyChange: (value: UserPreferences["currency"]) => void;
+  onThemeChange: (value: UserPreferences["theme"]) => void;
+  onLanguageChange: (value: UserPreferences["language"]) => void;
+  onBack: () => void;
+  isSaving: boolean;
+  statusText: string;
+};
+
+export function PreferencesPanel({
+  preferences,
+  onCurrencyChange,
+  onThemeChange,
+  onLanguageChange,
+  onBack,
+  isSaving,
+  statusText,
+}: PreferencesPanelProps) {
+  return (
+    <DrawerPanelShell
+      icon={IconBell}
+      title="Preferencias"
+      description="Configura moneda, idioma y apariencia para toda la app."
+      accent="from-violet-300/20 to-fuchsia-300/10"
+      footer={
+        <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
+          <IconChevronLeft size={18} />
+          Volver
+        </Button>
+      }
+    >
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Moneda</label>
+        <Select value={preferences.currency} onChange={(event) => onCurrencyChange(event.target.value as UserPreferences["currency"])} disabled={isSaving}>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+          <option value="CLP">CLP</option>
+          <option value="COP">COP</option>
+        </Select>
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Tema</label>
+        <Select value={preferences.theme} onChange={(event) => onThemeChange(event.target.value as UserPreferences["theme"])} disabled={isSaving}>
+          <option value="dark">Oscuro</option>
+          <option value="light">Claro</option>
+        </Select>
+        <p className="mt-2 text-xs text-cyan-100/55">El modo claro queda guardado, pero la interfaz todavía está pensada para el tema oscuro.</p>
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Idioma</label>
+        <Select value={preferences.language} onChange={(event) => onLanguageChange(event.target.value as UserPreferences["language"])} disabled={isSaving}>
+          <option value="es">Español</option>
+          <option value="en">English</option>
+        </Select>
+      </div>
+      <p className="text-xs text-cyan-100/55">{statusText}</p>
+    </DrawerPanelShell>
+  );
+}
+
+type SecurityPanelProps = {
+  form: SecurityFormState;
+  setForm: Dispatch<SetStateAction<SecurityFormState>>;
+  onBack: () => void;
+  onSave: () => void;
+  isSaving: boolean;
+};
+
+export function SecurityPanel({ form, setForm, onBack, onSave, isSaving }: SecurityPanelProps) {
+  return (
+    <DrawerPanelShell
+      icon={IconShieldLock}
+      title="Seguridad"
+      description="Gestiona contraseña y futuras opciones de sesión."
+      accent="from-rose-300/20 to-orange-300/10"
+      footer={
+        <>
+          <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
+            <IconChevronLeft size={18} />
+            Volver
+          </Button>
+          <Button className="flex-1 justify-center" onClick={onSave} disabled={isSaving}>
+            {isSaving ? "Guardando..." : "Actualizar"}
+          </Button>
+        </>
+      }
+    >
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Contraseña actual</label>
+        <Input
+          type="password"
+          value={form.currentPassword}
+          onChange={(event) => setForm((current) => ({ ...current, currentPassword: event.target.value }))}
+          placeholder="Contraseña actual"
+        />
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nueva contraseña</label>
+        <Input
+          type="password"
+          value={form.newPassword}
+          onChange={(event) => setForm((current) => ({ ...current, newPassword: event.target.value }))}
+          placeholder="Nueva contraseña"
+        />
+      </div>
+      <div>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Confirmar contraseña</label>
+        <Input
+          type="password"
+          value={form.confirmPassword}
+          onChange={(event) => setForm((current) => ({ ...current, confirmPassword: event.target.value }))}
+          placeholder="Repite la nueva contraseña"
+        />
+      </div>
+      <p className="text-xs text-cyan-100/55">Si tu cuenta es Google-only, primero necesitas configurar una contraseña.</p>
+    </DrawerPanelShell>
+  );
+}
