@@ -6,10 +6,28 @@ type FormatCurrencyOptions = {
   currency?: string;
 };
 
+function formatNumber(value: number, locale: string, maximumFractionDigits: number) {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: maximumFractionDigits,
+    maximumFractionDigits,
+  }).format(value);
+}
+
 export function formatCurrency(
   value: number,
   { locale = DEFAULT_LOCALE, currency = DEFAULT_CURRENCY }: FormatCurrencyOptions = {},
 ) {
+  const isNegative = value < 0;
+  const absoluteValue = Math.abs(value);
+
+  if (currency === "USD") {
+    return `${isNegative ? "-" : ""}$${formatNumber(absoluteValue, "en-US", 2)}`;
+  }
+
+  if (currency === "CLP" || currency === "COP") {
+    return `${isNegative ? "-" : ""}$${formatNumber(absoluteValue, "es-ES", 0)}`;
+  }
+
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,

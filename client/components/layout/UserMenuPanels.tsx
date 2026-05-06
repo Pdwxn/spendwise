@@ -30,18 +30,18 @@ type DrawerPanelShellProps = {
 
 function DrawerPanelShell({ icon: Icon, title, description, accent, children, footer }: DrawerPanelShellProps) {
   return (
-    <div className={`mt-6 rounded-[1.75rem] border border-white/10 bg-gradient-to-br ${accent} p-4`}>
+    <div className={`mt-6 rounded-[1.75rem] border border-[color:var(--border)] bg-gradient-to-br ${accent} p-4 text-[color:var(--foreground)]`}>
       <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-cyan-50">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[color:var(--surface-strong)] text-[color:var(--foreground)]">
           <Icon size={20} />
         </div>
         <div className="min-w-0">
-          <p className="text-lg font-semibold text-cyan-50">{title}</p>
-          <p className="mt-1 text-sm leading-6 text-cyan-50/80">{description}</p>
+          <p className="text-lg font-semibold text-[color:var(--foreground)]">{title}</p>
+          <p className="mt-1 text-sm leading-6 text-[color:var(--foreground)]/80">{description}</p>
         </div>
       </div>
 
-      <div className="mt-4 space-y-3 rounded-3xl border border-white/10 bg-slate-950/35 p-4">{children}</div>
+      <div className="mt-4 space-y-3 rounded-3xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4">{children}</div>
 
       <div className="mt-4 flex gap-2">{footer}</div>
     </div>
@@ -77,22 +77,22 @@ export function ProfilePanel({ userEmail, form, setForm, onBack, onSave, isSavin
       }
     >
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nombre</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Nombre</label>
         <Input value={form.firstName} onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))} placeholder="Tu nombre" />
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Apellido</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Apellido</label>
         <Input value={form.lastName} onChange={(event) => setForm((current) => ({ ...current, lastName: event.target.value }))} placeholder="Tu apellido" />
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Correo</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Correo</label>
         <Input value={userEmail ?? ""} disabled />
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Avatar URL</label>
-        <Input value={form.avatarUrl} onChange={(event) => setForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Avatar URL</label>
+      <Input value={form.avatarUrl} onChange={(event) => setForm((current) => ({ ...current, avatarUrl: event.target.value }))} placeholder="https://..." />
       </div>
-      <p className="text-xs text-cyan-100/55">El correo queda solo de lectura por ahora.</p>
+      <p className="text-xs text-[color:var(--foreground)]/55">El correo queda solo de lectura por ahora.</p>
     </DrawerPanelShell>
   );
 }
@@ -130,7 +130,7 @@ export function PreferencesPanel({
       }
     >
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Moneda</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Moneda</label>
         <Select value={preferences.currency} onChange={(event) => onCurrencyChange(event.target.value as UserPreferences["currency"])} disabled={isSaving}>
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
@@ -139,21 +139,21 @@ export function PreferencesPanel({
         </Select>
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Tema</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Tema</label>
         <Select value={preferences.theme} onChange={(event) => onThemeChange(event.target.value as UserPreferences["theme"])} disabled={isSaving}>
           <option value="dark">Oscuro</option>
           <option value="light">Claro</option>
         </Select>
-        <p className="mt-2 text-xs text-cyan-100/55">El modo claro queda guardado, pero la interfaz todavía está pensada para el tema oscuro.</p>
+        <p className="mt-2 text-xs text-[color:var(--foreground)]/55">El modo claro queda guardado, pero la interfaz todavía está pensada para el tema oscuro.</p>
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Idioma</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Idioma</label>
         <Select value={preferences.language} onChange={(event) => onLanguageChange(event.target.value as UserPreferences["language"])} disabled={isSaving}>
           <option value="es">Español</option>
           <option value="en">English</option>
         </Select>
       </div>
-      <p className="text-xs text-cyan-100/55">{statusText}</p>
+      <p className="text-xs text-[color:var(--foreground)]/55">{statusText}</p>
     </DrawerPanelShell>
   );
 }
@@ -186,7 +186,7 @@ export function SecurityPanel({ form, setForm, onBack, onSave, isSaving }: Secur
       }
     >
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Contraseña actual</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Contraseña actual</label>
         <Input
           type="password"
           value={form.currentPassword}
@@ -195,7 +195,7 @@ export function SecurityPanel({ form, setForm, onBack, onSave, isSaving }: Secur
         />
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Nueva contraseña</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Nueva contraseña</label>
         <Input
           type="password"
           value={form.newPassword}
@@ -204,7 +204,7 @@ export function SecurityPanel({ form, setForm, onBack, onSave, isSaving }: Secur
         />
       </div>
       <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-100/45">Confirmar contraseña</label>
+        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Confirmar contraseña</label>
         <Input
           type="password"
           value={form.confirmPassword}
@@ -212,7 +212,7 @@ export function SecurityPanel({ form, setForm, onBack, onSave, isSaving }: Secur
           placeholder="Repite la nueva contraseña"
         />
       </div>
-      <p className="text-xs text-cyan-100/55">Si tu cuenta es Google-only, primero necesitas configurar una contraseña.</p>
+      <p className="text-xs text-[color:var(--foreground)]/55">Si tu cuenta es Google-only, primero necesitas configurar una contraseña.</p>
     </DrawerPanelShell>
   );
 }

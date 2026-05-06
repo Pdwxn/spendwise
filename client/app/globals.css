@@ -10,6 +10,24 @@
   --accent: #5eead4;
   --accent-strong: #22d3ee;
   --accent-secondary: #a78bfa;
+  --page-glow-cyan: rgba(34, 211, 238, 0.18);
+  --page-glow-violet: rgba(167, 139, 250, 0.16);
+  --page-glow-teal: rgba(94, 234, 212, 0.08);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #f7fbfd;
+  --foreground: #0f172a;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: rgba(255, 255, 255, 0.94);
+  --border: rgba(15, 23, 42, 0.12);
+  --accent: #0f766e;
+  --accent-strong: #0891b2;
+  --accent-secondary: #7c3aed;
+  --page-glow-cyan: rgba(14, 165, 233, 0.14);
+  --page-glow-violet: rgba(124, 58, 237, 0.12);
+  --page-glow-teal: rgba(20, 184, 166, 0.1);
 }
 
 @theme inline {
@@ -29,13 +47,14 @@ html {
 
 body {
   background:
-    radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.16), transparent 30%),
-    linear-gradient(180deg, #041016 0%, #02070b 100%);
+    radial-gradient(circle at top left, var(--page-glow-cyan), transparent 34%),
+    radial-gradient(circle at bottom right, var(--page-glow-violet), transparent 30%),
+    linear-gradient(180deg, var(--background) 0%, color-mix(in srgb, var(--background) 88%, black) 100%);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
   margin: 0;
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 ::selection {
