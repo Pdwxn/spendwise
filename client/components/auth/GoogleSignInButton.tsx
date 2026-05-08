@@ -48,6 +48,8 @@ export function GoogleSignInButton({ onToken }: GoogleSignInButtonProps) {
         return;
       }
 
+      const containerWidth = Math.max(280, Math.floor(containerRef.current.getBoundingClientRect().width || 0));
+
       google.initialize({
         client_id: nextClientId,
         callback: ({ credential }) => {
@@ -63,7 +65,7 @@ export function GoogleSignInButton({ onToken }: GoogleSignInButtonProps) {
         size: "large",
         shape: "pill",
         text: "continue_with",
-        width: "100%",
+        width: containerWidth,
       });
       setIsReady(true);
     }
@@ -99,7 +101,7 @@ export function GoogleSignInButton({ onToken }: GoogleSignInButtonProps) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="w-full max-w-full space-y-2 overflow-hidden">
       <div ref={containerRef} />
       {!isReady ? <p className="text-xs text-[color:var(--foreground)]/45">Cargando Google...</p> : null}
     </div>

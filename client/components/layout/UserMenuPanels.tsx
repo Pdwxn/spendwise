@@ -149,11 +149,10 @@ export function PreferencesPanel({
           <option value="dark">Oscuro</option>
           <option value="light">Claro</option>
         </Select>
-        <p className="mt-2 text-xs text-[color:var(--foreground)]/55">El modo claro ya está disponible y seguirá ajustándose en la siguiente pasada visual.</p>
       </div>
       <div>
         <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Idioma</label>
-        <Select value={preferences.language} onChange={(event) => onLanguageChange(event.target.value as UserPreferences["language"])} disabled={isSaving}>
+        <Select value={preferences.language} onChange={(event) => onLanguageChange(event.target.value as UserPreferences["language"])} disabled>
           <option value="es">Español</option>
           <option value="en">English</option>
         </Select>

@@ -199,7 +199,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           {fieldErrors.password ? (
             <p className="text-xs text-rose-600">{fieldErrors.password}</p>
           ) : mode === "register" ? (
-            <p className="text-xs text-[color:var(--foreground)]/50">Usa 8 caracteres o más. Las contraseñas comunes se rechazan.</p>
+            <p className="text-xs text-[color:var(--foreground)]/50">Utiliza 8 caracteres o mas</p>
           ) : null}
         </label>
 
