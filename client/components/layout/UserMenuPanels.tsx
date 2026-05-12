@@ -102,7 +102,6 @@ export function ProfilePanel({ userEmail, form, setForm, onBack, onSave, isSavin
 
 type PreferencesPanelProps = {
   preferences: UserPreferences;
-  onCurrencyChange: (value: UserPreferences["currency"]) => void;
   onThemeChange: (value: UserPreferences["theme"]) => void;
   onLanguageChange: (value: UserPreferences["language"]) => void;
   onBack: () => void;
@@ -113,7 +112,6 @@ type PreferencesPanelProps = {
 
 export function PreferencesPanel({
   preferences,
-  onCurrencyChange,
   onThemeChange,
   onLanguageChange,
   onBack,
@@ -125,7 +123,7 @@ export function PreferencesPanel({
     <DrawerPanelShell
       icon={IconBell}
       title="Preferencias"
-      description="Configura moneda, idioma y apariencia para toda la app."
+      description="Configura la apariencia y deja listo el idioma para más adelante. La moneda principal queda fija en CLP por ahora."
       accent={theme === "light" ? "from-amber-100/55 to-rose-100/45" : "from-violet-300/20 to-fuchsia-300/10"}
       footer={
         <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
@@ -134,15 +132,6 @@ export function PreferencesPanel({
         </Button>
       }
     >
-      <div>
-        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Moneda</label>
-        <Select value={preferences.currency} onChange={(event) => onCurrencyChange(event.target.value as UserPreferences["currency"])} disabled={isSaving}>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-          <option value="CLP">CLP</option>
-          <option value="COP">COP</option>
-        </Select>
-      </div>
       <div>
         <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--foreground)]/55">Tema</label>
         <Select value={preferences.theme} onChange={(event) => onThemeChange(event.target.value as UserPreferences["theme"])} disabled={isSaving}>

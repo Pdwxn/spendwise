@@ -10,7 +10,7 @@ export function isSystemCategoryId(categoryId: string) {
 }
 
 export const DEFAULT_LOCALE = "es-ES";
-export const DEFAULT_CURRENCY = "USD";
+export const DEFAULT_CURRENCY = "CLP";
 
 export const DEFAULT_CATEGORIES: Category[] = [
   {

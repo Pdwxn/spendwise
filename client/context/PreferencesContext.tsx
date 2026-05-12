@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { requestWithAuth } from "@/lib/authRequest";
 
 export type UserPreferences = {
-  currency: "CLP" | "COP" | "USD" | "EUR";
+  currency: "CLP";
   theme: "dark" | "light";
   language: "es" | "en";
 };
@@ -19,7 +19,7 @@ type PreferencesContextValue = {
 const STORAGE_KEY = "spendwise:user-preferences";
 
 const DEFAULT_PREFERENCES: UserPreferences = {
-  currency: "USD",
+  currency: "CLP",
   theme: "dark",
   language: "es",
 };
@@ -32,9 +32,7 @@ function normalizePreferences(value: unknown): UserPreferences {
   }
 
   const record = value as Partial<Record<keyof UserPreferences, unknown>>;
-  const currency = ["CLP", "COP", "USD", "EUR"].includes(String(record.currency))
-    ? (record.currency as UserPreferences["currency"])
-    : DEFAULT_PREFERENCES.currency;
+  const currency = DEFAULT_PREFERENCES.currency;
   const theme = record.theme === "light" ? "light" : "dark";
   const language = record.language === "en" ? "en" : "es";
 

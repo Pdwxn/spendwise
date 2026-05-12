@@ -45,7 +45,7 @@ const SECTION_META: Record<Exclude<DrawerView, "menu">, SectionMeta> = {
   },
   preferences: {
     title: "Preferencias",
-    description: "Configura moneda, idioma y apariencia para toda la app.",
+    description: "Configura la apariencia y deja el idioma listo para más adelante.",
     icon: IconBell,
     accent: "from-violet-300/20 to-fuchsia-300/10",
     status: "Visualización y notificaciones",
@@ -418,7 +418,7 @@ export function UserMenu() {
                   <div className="space-y-2">
                     {[
                       { view: "profile" as const, icon: IconUserCircle, title: "Perfil", description: "Nombre, correo y foto" },
-                      { view: "preferences" as const, icon: IconBell, title: "Preferencias", description: "Moneda, idioma y tema" },
+                      { view: "preferences" as const, icon: IconBell, title: "Preferencias", description: "Tema e idioma" },
                       { view: "security" as const, icon: IconShieldLock, title: "Seguridad", description: "Contraseña y sesión" },
                     ].map((item) => {
                       const Icon = item.icon;
@@ -456,7 +456,6 @@ export function UserMenu() {
               ) : view === "preferences" ? (
                 <PreferencesPanel
                   preferences={preferences}
-                  onCurrencyChange={(value) => void handlePreferenceChange("currency", value)}
                   onThemeChange={(value) => void handlePreferenceChange("theme", value)}
                   onLanguageChange={(value) => void handlePreferenceChange("language", value)}
                   onBack={goBack}
