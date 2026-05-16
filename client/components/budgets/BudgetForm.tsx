@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -19,6 +19,8 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
     state: { categories, selectedMonth },
     actions,
   } = useFinance();
+  const submitLockRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const visibleCategories = categories.filter((category) => !isSystemCategoryId(category.id));
   const [categoryId, setCategoryId] = useState(visibleCategories[0]?.id ?? "");
   const [month, setMonth] = useState(selectedMonth);
@@ -26,6 +28,9 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLockRef.current || isSubmitting) {
+      return;
+    }
 
     if (!categoryId || !month) {
       return;
@@ -35,6 +40,9 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       return;
     }
+
+    submitLockRef.current = true;
+    setIsSubmitting(true);
 
     try {
       await actions.addBudget({
@@ -50,6 +58,9 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
       onSuccess?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo crear el presupuesto.");
+    } finally {
+      submitLockRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -87,8 +98,8 @@ export function BudgetForm({ onSuccess }: BudgetFormProps) {
           aria-label="Importe del presupuesto"
         />
       </label>
-      <Button type="submit" className="w-full" disabled={visibleCategories.length === 0}>
-        Añadir presupuesto
+      <Button type="submit" className="w-full" disabled={visibleCategories.length === 0 || isSubmitting}>
+        {isSubmitting ? "Añadiendo presupuesto..." : "Añadir presupuesto"}
       </Button>
       {visibleCategories.length === 0 ? (
         <p className="text-xs text-[color:var(--foreground)]/60">Primero crea una categoría para poder asignarle un presupuesto.</p>

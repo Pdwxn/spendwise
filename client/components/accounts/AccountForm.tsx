@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -16,17 +16,25 @@ type AccountFormProps = {
 
 export function AccountForm({ onSuccess }: AccountFormProps) {
   const { actions } = useFinance();
+  const submitLockRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [initialBalance, setInitialBalance] = useState("0");
   const [color, setColor] = useState<HexColor>(defaultColor);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLockRef.current || isSubmitting) {
+      return;
+    }
 
     const trimmedName = name.trim();
     if (!trimmedName) {
       return;
     }
+
+    submitLockRef.current = true;
+    setIsSubmitting(true);
 
     try {
       await actions.addAccount({
@@ -42,6 +50,9 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
       onSuccess?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo crear la cuenta.");
+    } finally {
+      submitLockRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -77,8 +88,8 @@ export function AccountForm({ onSuccess }: AccountFormProps) {
           className="h-12 p-1"
         />
       </label>
-      <Button type="submit" className="w-full">
-        Añadir cuenta
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? "Añadiendo cuenta..." : "Añadir cuenta"}
       </Button>
     </form>
   );

@@ -24,7 +24,7 @@ type ThemeMode = "dark" | "light";
 type DrawerPanelShellProps = {
   icon: ComponentType<{ size?: number; className?: string }>;
   title: string;
-  description: string;
+  description?: string;
   accent: string;
   children: ReactNode;
   footer: ReactNode;
@@ -39,7 +39,7 @@ function DrawerPanelShell({ icon: Icon, title, description, accent, children, fo
         </div>
         <div className="min-w-0">
           <p className="text-lg font-semibold text-[color:var(--foreground)]">{title}</p>
-          <p className="mt-1 text-sm leading-6 text-[color:var(--foreground)]/80">{description}</p>
+          {description ? <p className="mt-1 text-sm leading-6 text-[color:var(--foreground)]/80">{description}</p> : null}
         </div>
       </div>
 
@@ -106,7 +106,6 @@ type PreferencesPanelProps = {
   onLanguageChange: (value: UserPreferences["language"]) => void;
   onBack: () => void;
   isSaving: boolean;
-  statusText: string;
   theme: ThemeMode;
 };
 
@@ -116,14 +115,13 @@ export function PreferencesPanel({
   onLanguageChange,
   onBack,
   isSaving,
-  statusText,
   theme,
 }: PreferencesPanelProps) {
   return (
     <DrawerPanelShell
       icon={IconBell}
       title="Preferencias"
-      description="Configura la apariencia y deja listo el idioma para más adelante. La moneda principal queda fija en CLP por ahora."
+      description={undefined}
       accent={theme === "light" ? "from-amber-100/55 to-rose-100/45" : "from-violet-300/20 to-fuchsia-300/10"}
       footer={
         <Button variant="secondary" className="flex-1 justify-center" onClick={onBack} disabled={isSaving}>
@@ -146,7 +144,6 @@ export function PreferencesPanel({
           <option value="en">English</option>
         </Select>
       </div>
-      <p className="text-xs text-[color:var(--foreground)]/55">{statusText}</p>
     </DrawerPanelShell>
   );
 }

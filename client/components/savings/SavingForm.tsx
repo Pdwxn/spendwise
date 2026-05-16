@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -18,6 +18,8 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
     state: { accounts },
     actions,
   } = useFinance();
+  const submitLockRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [initialAmount, setInitialAmount] = useState("0");
   const [mode, setMode] = useState<SavingMode>("static");
@@ -26,6 +28,9 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLockRef.current || isSubmitting) {
+      return;
+    }
 
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -39,6 +44,9 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
       toast.error("Selecciona una cuenta para registrar el aporte inicial.");
       return;
     }
+
+    submitLockRef.current = true;
+    setIsSubmitting(true);
 
     try {
       await actions.addSaving({
@@ -58,6 +66,9 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
       onSuccess?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo crear el ahorro.");
+    } finally {
+      submitLockRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -115,8 +126,8 @@ export function SavingForm({ onSuccess }: SavingFormProps) {
           />
         </label>
       ) : null}
-      <Button type="submit" className="w-full" disabled={accounts.length === 0 && Number(initialAmount) > 0}>
-        Añadir ahorro
+      <Button type="submit" className="w-full" disabled={(accounts.length === 0 && Number(initialAmount) > 0) || isSubmitting}>
+        {isSubmitting ? "Añadiendo ahorro..." : "Añadir ahorro"}
       </Button>
     </form>
   );

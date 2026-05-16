@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -48,11 +48,45 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
+  const submitTimerRef = useRef<number | null>(null);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const inputErrorClass = "border-rose-400/60 focus:border-rose-300/70 focus:ring-rose-300/25";
+
+  useEffect(() => {
+    return () => {
+      if (submitTimerRef.current !== null) {
+        window.clearTimeout(submitTimerRef.current);
+      }
+    };
+  }, []);
+
+  function beginSubmitting(message = "Conectando...") {
+    if (submitTimerRef.current !== null) {
+      window.clearTimeout(submitTimerRef.current);
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage(message);
+    submitTimerRef.current = window.setTimeout(() => {
+      setSubmitMessage("Estamos preparando el servidor. Esto puede tardar unos segundos si estuvo inactivo.");
+    }, 4000);
+  }
+
+  function endSubmitting() {
+    if (submitTimerRef.current !== null) {
+      window.clearTimeout(submitTimerRef.current);
+      submitTimerRef.current = null;
+    }
+
+    submitLockRef.current = false;
+    setIsSubmitting(false);
+    setSubmitMessage(null);
+  }
 
   function parseFieldErrors(payload: unknown): FieldErrors {
     if (!payload || typeof payload !== "object") {
@@ -83,9 +117,12 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLockRef.current) {
+      return;
+    }
+
     setError(null);
     setFieldErrors({});
-    setIsSubmitting(true);
 
     const nextFieldErrors: FieldErrors = {};
 
@@ -109,9 +146,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     if (Object.keys(nextFieldErrors).length > 0) {
       setFieldErrors(nextFieldErrors);
-      setIsSubmitting(false);
       return;
     }
+
+    submitLockRef.current = true;
+    beginSubmitting();
 
     try {
       if (mode === "login") {
@@ -130,7 +169,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         setError(submitError instanceof Error ? submitError.message : "No se pudo completar el acceso.");
       }
     } finally {
-      setIsSubmitting(false);
+      endSubmitting();
     }
   }
 
@@ -208,6 +247,8 @@ export function AuthForm({ mode }: AuthFormProps) {
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Procesando..." : copy[mode].submit}
         </Button>
+
+        {isSubmitting ? <p className="text-xs text-[color:var(--foreground)]/55" aria-live="polite">{submitMessage}</p> : null}
       </form>
 
       <div className="space-y-3">
@@ -217,22 +258,29 @@ export function AuthForm({ mode }: AuthFormProps) {
           <div className="h-px flex-1 bg-[color:var(--border)]" />
         </div>
 
-        <GoogleSignInButton
-          onToken={async (token) => {
-            setError(null);
-            setFieldErrors({});
-            setIsSubmitting(true);
+        <div className={isSubmitting ? "pointer-events-none opacity-70" : undefined}>
+          <GoogleSignInButton
+            onToken={async (token) => {
+              if (submitLockRef.current) {
+                return;
+              }
 
-            try {
-              await loginWithGoogle(token);
-              router.push("/dashboard");
-            } catch (submitError) {
-              setError(submitError instanceof Error ? submitError.message : "No se pudo iniciar con Google.");
-            } finally {
-              setIsSubmitting(false);
-            }
-          }}
-        />
+              setError(null);
+              setFieldErrors({});
+              submitLockRef.current = true;
+              beginSubmitting("Conectando con Google...");
+
+              try {
+                await loginWithGoogle(token);
+                router.push("/dashboard");
+              } catch (submitError) {
+                setError(submitError instanceof Error ? submitError.message : "No se pudo iniciar con Google.");
+              } finally {
+                endSubmitting();
+              }
+            }}
+          />
+        </div>
       </div>
 
       <p className="text-sm text-[color:var(--foreground)]/65">

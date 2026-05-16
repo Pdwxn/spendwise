@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -30,6 +30,8 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
     actions,
   } = useFinance();
   const { preferences } = usePreferences();
+  const submitLockRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [amount, setAmount] = useState("0");
   const expenseCategories = categories.filter((category) => !isSystemCategoryId(category.id));
   const [categoryId, setCategoryId] = useState(mode === "income" ? getIncomeCategoryId(categories) : expenseCategories[0]?.id ?? "");
@@ -42,6 +44,9 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLockRef.current || isSubmitting) {
+      return;
+    }
 
     if (!accountId || !categoryId) {
       toast.error(mode === "expense" ? "Selecciona una cuenta y una categoría." : "Selecciona una cuenta.");
@@ -59,6 +64,9 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
       toast.error("El importe supera el saldo disponible de esta cuenta.");
       return;
     }
+
+    submitLockRef.current = true;
+    setIsSubmitting(true);
 
     try {
       await actions.addTransaction({
@@ -79,6 +87,9 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
       onSuccess?.();
     } catch (error) {
       toast.error(mode === "expense" ? "Error al crear el gasto." : "Error al crear el ingreso.");
+    } finally {
+      submitLockRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -143,8 +154,8 @@ export function TransactionForm({ mode, onSuccess }: TransactionFormProps) {
           aria-label="Fecha del movimiento"
         />
       </label>
-      <Button type="submit" className="w-full" disabled={formDisabled}>
-        Añadir {mode === "expense" ? "gasto" : "ingreso"}
+      <Button type="submit" className="w-full" disabled={formDisabled || isSubmitting}>
+        {isSubmitting ? `Añadiendo ${mode === "expense" ? "gasto" : "ingreso"}...` : `Añadir ${mode === "expense" ? "gasto" : "ingreso"}`}
       </Button>
       {formDisabled ? (
         <p className="text-xs text-[color:var(--foreground)]/60">

@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   description: "Aplicación de finanzas personales para usuarios hispanohablantes.",
   applicationName: "SpendWise",
   manifest: "/manifest.webmanifest",
+  formatDetection: {
+    telephone: false,
+  },
   appleWebApp: {
     capable: true,
     title: "SpendWise",
@@ -35,6 +38,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
   themeColor: "#041016",
 };
 

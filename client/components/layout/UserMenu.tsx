@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -45,10 +45,10 @@ const SECTION_META: Record<Exclude<DrawerView, "menu">, SectionMeta> = {
   },
   preferences: {
     title: "Preferencias",
-    description: "Configura la apariencia y deja el idioma listo para más adelante.",
+    description: "",
     icon: IconBell,
     accent: "from-violet-300/20 to-fuchsia-300/10",
-    status: "Visualización y notificaciones",
+    status: "",
   },
   security: {
     title: "Seguridad",
@@ -91,8 +91,6 @@ export function UserMenu() {
   const [isProfileSaving, setIsProfileSaving] = useState(false);
   const [isPreferencesSaving, setIsPreferencesSaving] = useState(false);
   const [isSecuritySaving, setIsSecuritySaving] = useState(false);
-  const [preferencesStatus, setPreferencesStatus] = useState<"idle" | "saving" | "saved">("idle");
-  const preferencesStatusTimer = useRef<number | null>(null);
 
   const initials = useMemo(() => getInitials(user?.firstName, user?.lastName, user?.email), [user]);
   const providerLabel = useMemo(() => {
@@ -153,14 +151,6 @@ export function UserMenu() {
       window.clearTimeout(timer);
     };
   }, [open, view]);
-
-  useEffect(() => {
-    return () => {
-      if (preferencesStatusTimer.current !== null) {
-        window.clearTimeout(preferencesStatusTimer.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -259,19 +249,10 @@ export function UserMenu() {
     }
 
     setIsPreferencesSaving(true);
-    setPreferencesStatus("saving");
 
     try {
       await updatePreferences({ [key]: value } as Partial<typeof preferences>);
-      setPreferencesStatus("saved");
-      if (preferencesStatusTimer.current !== null) {
-        window.clearTimeout(preferencesStatusTimer.current);
-      }
-      preferencesStatusTimer.current = window.setTimeout(() => {
-        setPreferencesStatus("idle");
-      }, 1500);
     } catch (error) {
-      setPreferencesStatus("idle");
       toast.error(error instanceof Error ? error.message : "No se pudieron guardar las preferencias.");
     } finally {
       setIsPreferencesSaving(false);
@@ -369,7 +350,11 @@ export function UserMenu() {
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.22em] text-[color:var(--foreground)]/45">Cuenta</p>
                 <h2 className="mt-2 text-2xl font-semibold tracking-tight">{activeSection?.title ?? `${user?.firstName ?? "Usuario"} ${user?.lastName ?? ""}`}</h2>
-                <p className="text-sm text-[color:var(--foreground)]/65">{activeSection?.status ?? user?.email ?? "sin correo"}</p>
+                {activeSection?.status ? (
+                  <p className="text-sm text-[color:var(--foreground)]/65">{activeSection.status}</p>
+                ) : activeSection ? null : (
+                  <p className="text-sm text-[color:var(--foreground)]/65">{user?.email ?? "sin correo"}</p>
+                )}
               </div>
               <button
                 type="button"
@@ -418,7 +403,7 @@ export function UserMenu() {
                   <div className="space-y-2">
                     {[
                       { view: "profile" as const, icon: IconUserCircle, title: "Perfil", description: "Nombre, correo y foto" },
-                      { view: "preferences" as const, icon: IconBell, title: "Preferencias", description: "Tema e idioma" },
+                      { view: "preferences" as const, icon: IconBell, title: "Preferencias", description: "" },
                       { view: "security" as const, icon: IconShieldLock, title: "Seguridad", description: "Contraseña y sesión" },
                     ].map((item) => {
                       const Icon = item.icon;
@@ -461,13 +446,6 @@ export function UserMenu() {
                   onBack={goBack}
                   isSaving={isPreferencesSaving}
                   theme={theme}
-                  statusText={
-                    preferencesStatus === "saving"
-                      ? "Guardando cambios..."
-                      : preferencesStatus === "saved"
-                        ? "Guardado"
-                        : "Los cambios se guardan al instante y actualizan la interfaz."
-                  }
                 />
               ) : (
                 <SecurityPanel

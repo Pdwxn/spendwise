@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -16,12 +16,17 @@ type CategoryFormProps = {
 
 export function CategoryForm({ onSuccess }: CategoryFormProps) {
   const { actions } = useFinance();
+  const submitLockRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("✨");
   const [color, setColor] = useState<HexColor>(defaultColor);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitLockRef.current || isSubmitting) {
+      return;
+    }
 
     const trimmedName = name.trim();
     const trimmedEmoji = emoji.trim();
@@ -29,6 +34,9 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
     if (!trimmedName || !trimmedEmoji) {
       return;
     }
+
+    submitLockRef.current = true;
+    setIsSubmitting(true);
 
     try {
       await actions.addCategory({
@@ -44,6 +52,9 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
       onSuccess?.();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo crear la categoría.");
+    } finally {
+      submitLockRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -77,8 +88,8 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
           className="h-12 p-1"
         />
       </label>
-      <Button type="submit" className="w-full">
-        Añadir categoría
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? "Añadiendo categoría..." : "Añadir categoría"}
       </Button>
     </form>
   );
