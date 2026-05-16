@@ -43,9 +43,13 @@ export function AppShell({ children }: AppShellProps) {
         <div className="absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full blur-3xl" style={{ backgroundColor: "var(--page-glow-teal)" }} />
       </div>
       <div
-        className={`relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8 ${
-          showBottomNavigation ? "pb-28" : "pb-10"
-        }`}
+        className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 sm:px-6 lg:px-8"
+        style={{
+          paddingTop: "calc(1rem + env(safe-area-inset-top))",
+          paddingBottom: showBottomNavigation
+            ? "calc(7rem + env(safe-area-inset-bottom))"
+            : "calc(1rem + env(safe-area-inset-bottom))",
+        }}
       >
         <main className="flex-1">{children}</main>
       </div>
